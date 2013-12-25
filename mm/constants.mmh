@@ -1,0 +1,24 @@
+%
+% MMIX support library for various purposes.
+%
+% Constants used throughout the library.
+%
+% Inclusion of this header file will consume one global register
+% (necessary for offset calcuation.)
+%
+
+#ifndef MM_CONSTANTS_MMH
+#define MM_CONSTANTS_MMH
+
+        PREFIX  :MM:Constants:
+
+        GREG    @       % We need a global register for address
+                        % calculations. Hopefully the only one...
+
+% Some frequently used string literals:
+
+newline BYTE    #A,0
+
+        PREFIX  :
+
+#endif /* MM_CONSTANTS_MMH */

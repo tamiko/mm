@@ -1,0 +1,22 @@
+%
+% MMIX support library for various purposes.
+%
+% Some functions to pretty print text output:
+%
+
+#ifndef MM_PRINT_MMH
+#define MM_PRINT_MMH
+
+#include "constants.mmh"
+
+        PREFIX  :MM:
+
+PrintLn ADDU    $255,$0,0
+        TRAP    0,:Fputs,:StdOut
+        LDA     $255,Constants:newline
+        TRAP    0,:Fputs,:StdOut
+        POP     0,0
+
+        PREFIX  :
+
+#endif /* MM_PRINT_MMH */
