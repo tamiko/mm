@@ -1,0 +1,174 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:__RAND:
+%
+% Internal header file. Implementation of mm/rand.mmh.
+%
+% Inclusion will consume one GREG.
+%
+
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __rand.mmh
+#endif
+
+#ifndef __MM_RAND_MMH
+#define __MM_RAND_MMH
+
+            PREFIX      :MM:__RAND:
+
+Ftell       IS          :Ftell
+Fopen       IS          :Fopen
+Fread       IS          :Fread
+BinaryRead  IS          :BinaryRead
+
+t           IS          $255
+arg0        IS          $0
+arg1        IS          $1
+UrandomFH   IS          #FF % TODO: Include into general framework file.mmh
+filehandler GREG        0 % #0 uninitialized, #-1 initialized...,
+                          % TODO: General framework ;-)
+OCT         IS          #8
+
+%%
+%
+% :MM:__RAND:Init
+%
+% PUSHJ
+%   no arguments
+%   no return value
+%
+            % Arguments for :Fopen
+            OCTA        :MM:__STRS:RandUrandom,BinaryRead
+Init        PBNZ        filehandler,1F % Nothing to do ;-)
+            % Make sure our beloved file handler is not used:
+            TRAP        0,Ftell,UrandomFH
+            BNN         t,2F
+            LDA         t,Init
+            SUBU        t,t,#10
+            TRAP        0,Fopen,UrandomFH
+            BN          t,3F
+            SUBU        filehandler,filehandler,1
+            SET         t,filehandler
+1H          POP         0,0
+2H          LDA         $2,:MM:__STRS:RandInit1
+            LDA         $3,:MM:__STRS:RandInit2
+            SET         $4,UrandomFH
+            LDA         $5,:MM:__STRS:RandInit3
+            PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
+3H          LDA         $2,:MM:__STRS:RandInit1
+            LDA         $3,:MM:__STRS:RandInit4
+            PUSHJ       $1,:MM:__ERROR:IError2 % does not return
+
+%%
+% :MM:__RAND:Octa
+%
+% PUSHJ
+%   no arguments
+%   retm - a random octabyte
+%
+            % Arguments for Fread:
+            OCTA        :MM:__INIT:Buffer,#8
+Octa        GET         $0,:rJ
+            BNZ         filehandler,1F
+            PUSHJ       t,Init
+1H          LDA         t,Octa
+            SUBU        t,t,#10
+            TRAP        0,Fread,UrandomFH
+            BN          t,9F
+            PUT         :rJ,$0
+            LDA         $0,:MM:__INIT:Buffer
+            LDO         $0,$0,0
+            POP         1,0
+9H          LDA         $2,:MM:__STRS:RandOcta1
+            PUSHJ       $1,:MM:__ERROR:Error1
+            PUT         :rJ,$0
+            POP         0,0
+
+%%
+% :MM:__RAND:OctaG
+%
+% PUSHJ $255
+%
+OctaG       GET         $0,:rJ
+            BNZ         filehandler,1F
+            PUSHJ       t,Init
+1H          LDA         t,Octa
+            SUBU        t,t,#10
+            TRAP        0,Fread,UrandomFH
+            BN          t,9F
+            PUT         :rJ,$0
+            LDA         $0,:MM:__INIT:Buffer
+            LDO         t,$0,0
+            POP         0,0
+9H          LDA         $2,:MM:__STRS:RandOctaG1
+            PUSHJ       $1,:MM:__ERROR:Error1
+            PUT         :rJ,$0
+            POP         0,0
+
+%%
+% :MM:__RAND:Range
+% :MM:__RAND:RangeU
+%
+% PUSHJ
+%   arg0 - minimal value
+%   arg1 - maximal value
+%   retm - a random octabyte within [arg0,arg1]
+%
+Range       SWYM
+RangeU      SWYM
+            LDA         $1,:MM:__STRS:ExcNotImpl
+            PUSHJ       $0,:MM:__ERROR:IError1
+
+%%
+% :MM:__RAND:SetJ
+%
+% PUSHJ
+%   arg0 - starting address
+%   arg1 - size (in bytes)
+%   no return value
+%
+SetJ        GET         $3,:rJ
+            BNZ         filehandler,1F
+            PUSHJ       t,Init
+1H          ADDU        t,arg0,arg1
+            CMPU        t,t,arg0
+            BN          t,9F
+            BZ          arg1,1F % Nothing to do.
+            LDA         t,:MM:__INIT:Buffer
+            STO         arg0,t
+            STO         arg1,t,OCT
+            TRAP        0,Fread,UrandomFH
+            BN          t,9F
+1H          PUT         :rJ,$3
+            POP         0,1
+9H          PUT         :rJ,$3
+            POP         0,0
+
+            PREFIX      :
+
+#endif /* __MM_RAND_MMH */

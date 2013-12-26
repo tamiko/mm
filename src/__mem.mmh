@@ -1,0 +1,371 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:__MEM:
+%
+% Internal header file. Implementation of mm/mem.mmh.
+%
+
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __MEM.mmh
+#endif
+
+#ifndef __MM_MEM_MMH
+#define __MM_MEM_MMH
+
+            PREFIX      :MM:__MEM:
+
+t           IS          $255
+arg0        IS          $0
+arg1        IS          $1
+arg2        IS          $2
+ret0        IS          $0
+ret1        IS          $1
+ret2        IS          $2
+OCT         IS          #8
+
+%%
+% :MM:__MEM:CopyJ
+%
+% PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - pointer to destination memory
+%   arg2 - size (in bytes)
+%   no return value
+%
+            % Check preconditions:
+CopyJ       ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,9F
+            ADDU        t,arg1,arg2
+            CMPU        t,t,arg1
+            BN          t,9F
+            CMPU        t,arg0,arg1
+            BZ          t,8F % Nothing to do.
+            BZ          arg2,8F % Nothing to do.
+            % Check for alignment:
+CopyJIntern AND         t,arg0,#7
+            BNZ         t,1F
+            AND         t,arg1,#7
+            BNZ         t,1F
+            % If arg0 and arg1 are octa aligned, take a shortcut:
+            % First, store the last Octas for later use (we have no
+            % idea in which direction we will iterate)
+            SET         $4,$2    % store arg2
+            LDO         $5,$0,$2 % store M_8[arg0+arg2]
+            LDO         $6,$1,$2 % store M_8[arg0+arg2]
+            % Round arg2 down to next integral multiple of octa and
+            % jump into CopyOctaAl:
+            ANDN        $2,$2,#7
+            JMP         CopyOctaAl
+            % Take care of the last, partial octa:
+7H          AND         t,$4,#7
+            BZ          t,8F % arg2 is aligned.
+            % Generate a bitmask:
+            NEG         t,8,t
+            SLU         t,t,3
+            SET         $7,1
+            SLU         t,$7,t
+            SUBU        t,t,1
+            % And apply it:
+            AND         $6,$6,t
+            ANDN        $5,$5,t
+            OR          t,$5,$6
+            STO         t,$1,$4
+            JMP         8F
+            % So, arg0 and or arg1 are not octa aligned. Now, it gets
+            % a bit tricky...
+1H          SWYM
+            LDA         $1,:MM:__STRS:ExcNotImpl
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+8H          POP         0,1
+9H          POP         0,0
+            % All arguments are octa aligned
+CopyOctaAl  BZ          $2,7B % nothing to do
+            CMPU        t,$0,$1
+            BN          t,1F % Is arg0 < arg1 ?
+            SET         $3,0
+2H          LDO         t,$0,$3
+            STO         t,$1,$3
+            ADDU        $3,$3,8
+            SUBU        $2,$2,8
+            PBNZ        $2,2B
+            JMP         7B % back to copy
+1H          SUBU        $2,$2,8
+            LDO         t,$0,$2
+            STO         t,$1,$2
+            PBNZ        $2,1B
+            JMP         7B % back to copy
+
+%%
+% :MM:__MEM:Copy
+%
+% PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - pointer to destination memory
+%   arg2 - size (in bytes)
+%   no return value
+%
+            % Check preconditions:
+Copy        GET         $3,:rJ
+            ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,1F
+            ADDU        t,arg1,arg2
+            CMPU        t,t,arg1
+            BN          t,2F
+            CMPU        t,arg0,arg1
+            BZ          t,3F % Nothing to do.
+            BZ          arg2,3F % Nothing to do.
+            SET         $5,arg0
+            SET         $6,arg1
+            SET         $7,arg2
+            PUSHJ       $4,CopyJIntern % Jump right into CopyJ
+            JMP         9F
+3H          PUT         :rJ,$3
+            POP         0,0
+1H          SET         $4,arg0
+            GET         $0,:rJ
+            LDA         $3,:MM:__STRS:MemCopy1
+            LDA         $5,:MM:__STRS:MemCopy3
+            SET         $6,arg2
+            LDA         $7,:MM:__STRS:MemCopy4
+            PUSHJ       $2,:MM:__ERROR:Error5R24
+            PUT         :rJ,$0
+            POP         0,0
+2H          GET         $0,:rJ
+            LDA         $3,:MM:__STRS:MemCopy2
+            SET         $4,arg1
+            LDA         $5,:MM:__STRS:MemCopy3
+            SET         $6,arg2
+            LDA         $7,:MM:__STRS:MemCopy4
+            PUSHJ       $2,:MM:__ERROR:Error5R24
+            PUT         :rJ,$0
+            POP         0,0
+9H          LDA         $1,:MM:__STRS:MemCopy5
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+
+%%
+% :MM:__MEM:ZeroJ
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+% :MM:__MEM:SetJ
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - byte template
+%   arg2 - size (in bytes)
+%   no return value
+%
+ZeroJ       SET         $2,arg1
+            SET         $1,0
+SetJ        ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,1F
+            BZ          arg2,2F % Nothing to do.
+            % Prepare stencil:
+SetJIntern  AND         $1,arg1,#FF
+            SLU         t,$1,#08
+            OR          $1,$1,t
+            SLU         t,$1,#10
+            OR          $1,$1,t
+            SLU         t,$1,#20
+stencil     IS          $1
+            OR          stencil,$1,t
+            % Check for alignment:
+            AND         t,arg0,#7
+            BZ          t,3F
+            % arg0 is not octa aligned:
+            ADDU        $2,arg2,t % increase copy region
+            % And generate a bitmask for the first octa block:
+            NEG         t,8,t
+            SLU         t,t,3
+            SET         $3,1
+            SLU         t,$3,t
+            SUBU        $3,t,1
+            % We have to take care of a possibly small arg2 as well:
+            CMPU        t,$2,#8
+            BNN         t,4F
+            % Update bitmask:
+            NEG         t,8,$2
+            SLU         t,t,3
+            SET         $4,1
+            SLU         t,$4,t
+            NEG         t,t
+            AND         $3,t,$3
+            % And apply it:
+4H          LDO         $4,arg0,0
+            ANDN        $4,$4,$3
+            AND         $5,$1,$3
+            OR          t,$4,$5
+            STO         t,arg0,0
+            % Update arg0:
+            ANDN        $0,arg0,#7
+            ADDU        $0,$0,#8
+            % Are we done?
+            CMPU        t,$2,#8
+            BN          t,2F
+            SUBU        $2,$2,#8
+            CMPU        t,$2,#8
+            % arg0 is aligned. Now, round arg2 down to next integral
+            % multiple of octa:
+3H          AND         $3,$2,#7
+            ANDN        $2,$2,#7
+            BZ          $2,6F % No full loop left, immediately take
+                              % care of last bit
+5H          STO         stencil,$0,0 % Inner loop
+            ADDU        $0,$0,#8
+            SUBU        $2,$2,#8
+            PBNZ        $2,5B
+            % Are we done?
+            BZ          $3,2F
+            % Take care of the last bits of non octa aligned arg2:
+6H          NEG         t,8,$3
+            SLU         t,t,3
+            SET         $3,1
+            SLU         t,$3,t
+            SUBU        t,t,1
+            LDO         $4,arg0,0
+            AND         $4,$4,t
+            ANDN        $5,$1,t
+            OR          t,$4,$5
+            STO         t,arg0,0
+2H          POP         0,1
+1H          POP         0,0
+
+%%
+% :MM:__MEM:Set
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - byte template
+%   arg2 - size (in bytes)
+%   no return value
+%
+Set         GET         $3,:rJ
+            ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,1F
+            BZ          arg2,3F % Nothing to do.
+            SET         $5,arg0
+            SET         $6,arg1
+            SET         $7,arg2
+            PUSHJ       $4,SetJIntern % Jump right into SetJ
+            JMP         9F
+3H          PUT         :rJ,$3
+            POP         0,0
+1H          SET         $4,arg0
+            GET         $0,:rJ
+            LDA         $3,:MM:__STRS:MemSet1
+            LDA         $5,:MM:__STRS:MemSet2
+            SET         $6,arg2
+            LDA         $7,:MM:__STRS:MemSet3
+            PUSHJ       $2,:MM:__ERROR:Error5R24
+            PUT         :rJ,$0
+            POP         0,0
+9H          LDA         $1,:MM:__STRS:MemSet4
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+
+%%
+% :MM:__MEM:Zero
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+Zero        GET         $2,:rJ
+            ADDU        t,arg0,arg1
+            CMPU        t,t,arg0
+            BN          t,1F
+            BZ          arg1,3F % Nothing to do.
+            SET         $4,arg0
+            SET         $5,0
+            SET         $6,arg1
+            PUSHJ       $3,SetJIntern % Jump right into SetJ
+            JMP         9F
+3H          PUT         :rJ,$2
+            POP         0,0
+1H          SET         $4,arg0
+            GET         $0,:rJ
+            LDA         $3,:MM:__STRS:MemZero1
+            LDA         $5,:MM:__STRS:MemZero2
+            SET         $6,arg2
+            LDA         $7,:MM:__STRS:MemZero3
+            PUSHJ       $2,:MM:__ERROR:Error5R24
+            PUT         :rJ,$0
+            POP         0,0
+9H          LDA         $1,:MM:__STRS:MemZero4
+            PUSHJ       $0,:MM:__ERROR:IError1
+
+
+%%
+% :MM:__MEM:RandJ
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+% :MM:__MEM:Rand
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+RandJ       IS          :MM:__RAND:SetJ
+Rand        GET         $2,:rJ
+            ADDU        t,arg0,arg1
+            CMPU        t,t,arg0
+            BN          t,1F
+            BZ          arg1,3F % Nothing to do.
+            SET         $4,arg0
+            SET         $5,arg1
+            PUSHJ       $3,RandJ
+            JMP         9F
+3H          PUT         :rJ,$2
+            POP         0,0
+1H          SET         $4,arg0
+            GET         $0,:rJ
+            LDA         $3,:MM:__STRS:MemRand1
+            LDA         $5,:MM:__STRS:MemRand2
+            SET         $6,arg2
+            LDA         $7,:MM:__STRS:MemRand3
+            PUSHJ       $2,:MM:__ERROR:Error5R24
+            PUT         :rJ,$0
+            POP         0,0
+9H          LDA         $1,:MM:__STRS:MemRand4
+            PUSHJ       $0,:MM:__ERROR:IError1
+
+            PREFIX      :
+
+#endif /* __MM_MEM_MMH */

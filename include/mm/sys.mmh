@@ -1,0 +1,151 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:Sys:
+%
+% Subroutines for program termination and related event handlers.
+%
+% - Stable ABI, partially implemented -
+%
+% TODO: Time and wait.
+%
+% This header file defines:
+%   :MM:Sys:Exit
+%   :MM:Sys:Abort
+%   :MM:Sys:AtExit (AtExitG)
+%   :MM:Sys:AtAbort (AtAbortG)
+%   :MM:Sys:AtError (AtErrorG)
+%
+
+#ifndef MM_SYS_MMH
+#define MM_SYS_MMH
+
+#ifdef __MMIXAL
+#define __MM_INTERNAL
+#include "../../src/__mmixal_init.mmh"
+#include "../../src/__sys.mmh"
+#undef __MM_INTERNAL
+#endif
+
+            PREFIX      :MM:
+
+%%
+% :MM:Sys:Exit
+%   Terminate program with exit code 0.
+%
+%   If one or more addresses were registered via a call to
+%   :MM:Sys:AtExit, control jumps to these addresses via GO linkage
+%   prior to program termination. The return address is stored in
+%   register $0.
+%
+% GO, PUSHJ (,$255)
+%   no arguments
+%   does not return
+%
+Sys:Exit    IS         :MM:__SYS:Exit
+
+%%
+% :MM:Sys:Abort
+%   Terminate program with a nonzero exit code.
+%
+%   If one or more addresses were registered via a call to
+%   :MM:Sys:AtExit, control jumps to these addresses via GO linkage
+%   prior to program termination. The return address is stored in
+%   register $0.
+%
+% GO, PUSHJ (,$255)
+%   no arguments
+%   does not return
+%
+Sys:Abort   IS         :MM:__SYS:Abort
+
+
+%%
+% :MM:Sys:AtExit
+% :MM:Sys:AtAbort
+% :MM:Sys:AtError
+%
+% A subroutine can be registered via a call to one of the above
+% routines that will be executed at the appropriate event:
+%   AtExit  - After invocation of :MM:Sys:Exit
+%   AtAbort - After invocation of :MM:Sys:Abort
+%   AtError - As an event handler that is invoked if a non fatal (non
+%             internal) error condition arises in one of the :MM:
+%             subroutines.
+%
+% The subroutine is called via GO linkage. The return address is
+% stored in register $0. Registered subroutines should not make any
+% assumptions on register and memory state (except for $0 holding a
+% valid return address).
+%
+% Upon returning, :MM:Sys:Exit and :MM:Sys:Abort will terminate
+% the program.
+%
+% Handler can be reregistered arbitrarily; by specifying #0 the
+% current event handler will be removed, in detail:
+%
+% :MM:Sys:AtExit
+% :MM:Sys:AtAbort
+%
+%   #0000000000000000 - no handler is invoked, program will be
+%                       terminated
+%   any other address - jump to the specified address via GO linkage
+%                       and register $0; after returning, terminate
+%                       the program.
+%
+% :MM:Sys:AtError
+%
+%   #0000000000000000 - no handler is invoked, program will be
+%                       terminated
+%   #FFFFFFFFFFFFFFFF - print an error message and resume execution
+%   any other address - jump to the specified address via GO linkage
+%                       and register $0; after returning, resume
+%                       execution.
+%
+% PUSHJ
+%   arg0 - address of a subroutine that is registered to be executed
+%          at one of the given events
+%   no return value
+%
+% :MM:Sys:AtExitG
+% :MM:Sys:AtAbortG
+% :MM:Sys:AtErrorG
+%   variant of above functions that passes arg0 through general
+%   register $255. The value of $255 is preserved.
+%
+% PUSHJ $255
+%
+Sys:AtExit  IS          :MM:__SYS:AtExit
+Sys:AtAbort IS          :MM:__SYS:AtAbort
+Sys:AtError IS          :MM:__SYS:AtError
+Sys:AtExitG IS          :MM:__SYS:AtExitG
+Sys:AtAbortG IS         :MM:__SYS:AtAbortG
+Sys:AtErrorG IS         :MM:__SYS:AtErrorG
+
+            PREFIX      :
+
+#endif /* MM_SYS_MMH */

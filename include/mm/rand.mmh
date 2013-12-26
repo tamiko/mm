@@ -1,0 +1,91 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:Rand:
+%
+% - unstable, partially implemented -
+%
+% TODO: More description
+%
+% Subroutines for cryptographically strong pseudo random numbers.
+% default, this library attempts to open '/dev/urandom' for a source
+% of random numbers.
+%
+% This header file defines:
+%   :MM:Rand:Octa (OctaG)
+%   :MM:Rand:Range
+%   :MM:Rand:RangU
+%
+
+#ifndef MM_RAND_MMH
+#define MM_RAND_MMH
+
+#ifdef __MMIXAL
+#define __MM_INTERNAL
+#include "../../src/__mmixal_init.mmh"
+#include "../../src/__rand.mmh"
+#undef __MM_INTERNAL
+#endif
+
+            PREFIX      :MM:
+
+%%
+% :MM:Rand:Octa
+%   Get a raw, random octabyte from a uniform distribution within
+%   [u_min,u_max] (inclusive, unsigned arithmetic).
+%
+%   PUSHJ
+%   no arguments
+%   retm - a random octabyte
+%
+% :MM:Rand:OctaG
+%   Same as above but stores a random octa in the general register
+%   $255 instead of default PUSHJ linkage
+%
+%   PUSHJ $255
+%
+Rand:Octa   IS          :MM:__RAND:Octa
+Rand:OctaG  IS          :MM:__RAND:OctaG
+
+%%
+% :MM:Rand:Range
+% :MM:Rand:RangeU
+%   Get a random, integral octabyte from a uniform distribution within
+%   [arg0,arg1] (inclusive) obeying either signed (Range) or unsigend
+%   (RangeU) integer arithmetic.
+%
+%   PUSHJ
+%   arg0 - minimal value
+%   arg1 - maximal value
+%   retm - a random octabyte within [arg0,arg1]
+%
+Rand:Range  IS          :MM:__RAND:Range
+Rand:RangeU IS          :MM:__RAND:RangeU
+
+            PREFIX      :
+
+#endif /* MM_RAND_MMH */

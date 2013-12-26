@@ -1,0 +1,33 @@
+#!/bin/bash -eu
+
+include_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../include"
+src_file=$1
+shift
+base_name=$(basename -s .mms $src_file)
+preproc_file=${base_name}${RANDOM}${RANDOM}.pre
+obj_file=${base_name}${RANDOM}${RANDOM}.mmo
+
+#grep -vP "^#!" "$src_file" | \
+#  cpp -D__MMIXAL -D__MMIX_SIM "-I$include_dir" -o "/tmp/$preproc_file"
+
+cpp -D__MMIXAL -D__MMIX_SIM "-I$include_dir" \
+  "$src_file" -o "/tmp/$preproc_file"
+
+mmixal -b 160 -x -o "/tmp/${obj_file}" "/tmp/$preproc_file" \
+  || (rm -f "/tmp/${obj_file}" "/tmp/$preproc_file" && exit 1)
+rm "/tmp/$preproc_file"
+
+until [[ "$@" == "" ]]; do
+  if [[ "$1" == "-mmix" ]]; then
+    shift
+    interpret+=( $1 )
+  else
+    args+=( $1 )
+  fi
+  shift
+done
+
+mmix "${interpret[@]:+${interpret[@]}}" "/tmp/${obj_file}" \
+  "${args[@]:+${args[@]}}" || (rm -f "/tmp/${obj_file}" && exit 1)
+rm "/tmp/$obj_file"
+

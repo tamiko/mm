@@ -1,0 +1,169 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:Mem:
+%
+% This header file provides subroutines for general memory
+% manipulation
+%
+% - Stable ABI, partially implemented -
+%
+% All subroutines come in two variants. The first variant, without a
+% trailing 'J', will terminate the program with an error message, the
+% second variant (with a trailing 'J'), will jump to :rJ+#4 on succes
+% and to :rJ+#0 on failure, and can be used to implement customized
+% error handling. An example:
+%           % Try to allocate a block of memory:
+%           SET         $1,[...]
+%           PUSHJ       $0,:MM:AllocaJ
+%           JMP         1F
+%           [...] % Allocation was successful, continue normally.
+%
+%    1H     [...] % Allocation failed, error handling.
+%
+% This header file definesdefines:
+%
+% :MM:Mem:Copy (CopyJ)
+% :MM:Mem:Set (SetJ)
+% :MM:Mem:Zero (ZeroJ)
+% :MM:Mem:Rand (RandJ)
+%
+% TODO:
+%
+% :MM:Mem:ChrJ
+% :MM:Mem:Chr
+% :MM:Mem.CmpJ
+% :MM:Mem.Cmp
+%
+
+#ifndef MM_MEM_MMH
+#define MM_MEM_MMH
+
+#ifdef __MMIXAL
+#define __MM_INTERNAL
+#include "../../src/__mmixal_init.mmh"
+#include "../../src/__rand.mmh"
+#include "../../src/__mem.mmh"
+#undef __MM_INTERNAL
+#endif
+
+            PREFIX      :MM:
+
+%%
+% :MM:Mem:Copy
+%   Copy arg2 bytes from the location pointed to by arg0 to the memory
+%   block pointed to by arg1.
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - pointer to destination memory
+%   arg2 - size (in bytes)
+%   no return value
+%
+%   Precondition:
+%   - arg0 + arg2 <= #FFFFFFFFFFFFFFFF
+%   - arg1 + arg2 <= #FFFFFFFFFFFFFFFF
+%
+% :MM:Mem:CopyJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
+%   instead of throwing an error message. Same calling sequence as
+%   above.
+%
+Mem:Copy    IS          :MM:__MEM:Copy
+Mem:CopyJ   IS          :MM:__MEM:CopyJ
+
+%%
+% :MM:Mem:Set
+%   Set arg2 bytes from the location pointed to by arg0 to the (least
+%   significant) byte stored in arg1. This subroutine terminates the
+%   program with an error message if the specified memory block wraps
+%   around #FFFFFFFFFFFFFFFF.
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - byte template
+%   arg2 - size (in bytes)
+%   no return value
+%
+%   Precondition:
+%   - arg0 + arg2 <= #FFFFFFFFFFFFFFFF
+%
+% :MM:Mem:SetJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
+%   instead of throwing an error message. Same calling sequence as
+%   above.
+%
+Mem:Set     IS          :MM:__MEM:Set
+Mem:SetJ    IS          :MM:__MEM:SetJ
+
+%%
+% :MM:Mem:Zero
+%   Set arg2 bytes from the location pointed to by arg0 to zero.
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+%   Precondition:
+%   - arg0 + arg2 <= #FFFFFFFFFFFFFFFF
+%
+% :MM:Mem:ZeroJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
+%   instead of throwing an error message. Same calling sequence as
+%   above.
+%
+Mem:Zero    IS          :MM:__MEM:Zero
+Mem:ZeroJ   IS          :MM:__MEM:ZeroJ
+
+%%
+% :MM:Mem:Rand
+%   Overwrite arg2 bytes from the location pointed to by arg0 with
+%   random data.
+%
+%   This subroutine uses the prng implementation described in
+%   rand.mmh.
+%
+%   PUSHJ:
+%   arg0 - pointer to source memory
+%   arg1 - size (in bytes)
+%   no return value
+%
+%   Precondition:
+%   - arg0 + arg2 < #FFFFFFFFFFFFFFFF
+%
+% :MM:Mem:RandJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
+%   instead of throwing an error message. Same calling sequence as
+%   above.
+%
+Mem:Rand    IS          :MM:__MEM:Rand
+Mem:RandJ   IS          :MM:__MEM:RandJ
+
+            PREFIX      :
+
+#endif /* MM_MEM_MMH */

@@ -1,0 +1,108 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:Print:
+%
+% Various printing subroutines. Mainly useful for diagnostics.
+%
+% - Stable ABI, partially implemented -
+%
+% TODO: Some more useful pretty print stuff.
+%
+% This header file defines:
+%   :MM:Print:Reg (RegG)
+%   :MM:Print:RegLn (RegLnG)
+%   :MM:Print:MemLn
+%   :MM:Print:Ln
+%
+
+#ifndef MM_PRINT_MMH
+#define MM_PRINT_MMH
+
+#ifdef __MMIXAL
+#define __MM_INTERNAL
+#include "../../src/__mmixal_init.mmh"
+#include "../../src/__print.mmh"
+#undef __MM_INTERNAL
+#endif
+
+            PREFIX      :MM:
+
+%
+% Pretty print data and memory:
+%
+
+%%
+% :MM:Print:Reg
+% :MM:Print:RegLn
+%   Pretty print the OCT arg0 on stdout (Reg), or pretty print and
+%   append a newline (RegLn).
+%
+%   PUSHJ (,$255)
+%   arg0 - Oct to pretty print
+%   no return value
+%
+% :MM:Print:RegG
+% :MM:Print:RegLnG
+%   Pretty print the content of GREG $255 on std::out. The value in
+%   $255 is preserved.
+%
+%   PUSHJ (,$255)
+%   no arguments
+%   no return value
+%
+Print:Reg   IS          :MM:__PRINT:Reg
+Print:RegLn IS          :MM:__PRINT:RegLn
+Print:RegG  IS          :MM:__PRINT:RegG
+Print:RegLnG IS         :MM:__PRINT:RegLnG
+
+%%
+% :MM:Print:MemLn
+%   Pretty print the content of the memory region defined by pointer
+%   arg0 of size arg1. Outputs each OCTA on an individual line.
+%
+%   PUSHJ
+%   arg0 - pointer to memory region
+%   arg1 - size of memory region to pretty print
+%   no return value
+%
+Print:MemLn IS         :MM:__PRINT:MemLn
+
+%%
+% :MM:Print:Ln
+%   Print an newline character to stdout. The value of $255 is
+%   preserved.
+%
+%   PUSHJ (,$255)
+%   no arguments
+%   no return value
+%
+Print:Ln    IS          :MM:__PRINT:Ln
+
+            PREFIX      :
+
+#endif /* MM_PRINT_MMH */

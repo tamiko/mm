@@ -1,0 +1,87 @@
+#!/bin/bash -eu
+
+include_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../include"
+lib_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../lib"
+
+cpp=cpp
+cpp_args=( "-D__GNU_AS" "-D__MMIX_SIM" "-I$include_dir" )
+as=mmix-as
+as_args=( "-linker-allocated-gregs" )
+ld=mmix-ld
+ld_args=( "-L$lib_dir" )
+out_file=
+
+rand=${RANDOM}${RANDOM}
+tmpdir=/tmp/
+verbose=false
+compile_only=false
+
+until [[ "$@" == "" ]]; do
+  if [[ "$1" == -I* ]]; then
+    cpp_args+=( "$1" )
+  elif [[ "$1" == -L* ]]; then
+    ld_args+=( "$1" )
+  elif [[ "$1" == -l* ]]; then
+    ld_args+=( "$1" )
+  elif [[ "$1" == "-o" ]]; then
+    shift
+    out_file="$1"
+  elif [[ "$1" == "-v" ]]; then
+    verbose=true
+  elif [[ "$1" == "-c" ]]; then
+    compile_only=true
+  else
+    src_files+=( "$1" )
+  fi
+  shift
+done
+
+if [[ "$out_file" == "" ]]; then
+  out_file="a.mmo"
+fi
+
+clean_tmp()
+{
+  for i in "${src_files[@]}"; do
+    pre="$tmpdir$(basename -s .mms $i)$rand.s"
+    obj="$tmpdir$(basename -s .mms $i)$rand.o"
+    rm -f "$pre"
+    $compile_only || rm -f "$obj"
+  done
+}
+
+for i in "${src_files[@]}"; do
+  pre="$tmpdir$(basename -s .mms $i)$rand.s"
+  obj="$tmpdir$(basename -s .mms $i)$rand.o"
+  $compile_only && obj=$(basename -s .mms $i).o
+
+  obj_files+=( "$obj" )
+
+  $verbose && echo "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"
+  if "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"; then
+    $verbose && echo "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"
+    if ! "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"; then
+      clean_tmp
+      exit 1
+    fi
+  else
+    clean_tmp
+    exit 1
+  fi
+done
+
+
+if ! $compile_only; then
+  $verbose && echo "$ld" -o "$out_file" \
+    "${obj_files[@]:+${obj_files[@]}}" "${ld_args[@]:+${ld_args[@]}}"
+
+  if "$ld" -o "$out_file" "${obj_files[@]:+${obj_files[@]}}" \
+    "${ld_args[@]:+${ld_args[@]}}" ; then
+    clean_tmp
+  else
+    clean_tmp
+    exit 1
+  fi
+fi
+
+clean_tmp;

@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+until [[ "$@" == "" ]]; do
+  if [[ "$1" == "-mmix" ]]; then
+    shift
+    interpret+=( "$1" )
+  else
+    args+=( "$1" )
+  fi
+  shift
+done
+exec /usr/bin/mmix "${interpret[@]:+${interpret[@]}}" "${args[@]:+${args[@]}}"

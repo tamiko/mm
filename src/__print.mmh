@@ -1,0 +1,164 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:__Print:
+%
+% Internal header file. Implementation of mm/print.mmh.
+%
+
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __print.mmh
+#endif
+
+#ifndef __MM_PRINT_MMH
+#define __MM_PRINT_MMH
+
+            PREFIX      :MM:__PRINT:
+
+Fputs       IS          :Fputs
+StdOut      IS          :StdOut
+
+%%
+% :MM:__PRINT:RegLnG
+% :MM:__PRINT:RegG
+%
+% PUSHJ
+%   no arguments
+%   no return value
+%
+% :MM:__PRINT:Reg
+% :MM:__PRINT:RegLn
+%
+% PUSHJ
+%   arg0 - the OCT to pretty print
+%   no return value
+%
+% :MM:__PRINT:RegP
+% :MM:__PRINT:RegLnP
+%
+% PUSHJ
+%   arg0 - the OCT to pretty print
+%   arg1 - do not print bytes with position < arg1
+%   arg2 - do not print bytes with position > arg2
+%   no return value
+%
+t           IS          $255
+buffer      IS          $1
+ptr         IS          $2
+RegLnG      SET         $0,t
+RegLn       SET         $1,0
+            SET         $2,8
+RegLnP      ADD         $5,$1,$1
+            ADD         $6,$2,$2
+            LDA         buffer,:MM:__INIT:Buffer
+            SET         $3,10 % newline
+            STB         $3,buffer,17
+            SET         $3,0
+            STB         $3,buffer,18
+            JMP         1F
+RegG        SET         $0,t
+Reg         SET         $1,0
+            SET         $2,8
+RegP        ADD         $5,$1,$1
+            ADD         $6,$2,$2
+            LDA         buffer,:MM:__INIT:Buffer
+            SET         $3,0
+            STB         $3,buffer,17
+1H          SET         $4,$0 % save original value
+            SET         ptr,16
+2H          AND         $3,$0,#F
+            CMP         t,$3,10
+            BN          t,1F
+            ADDU        $3,$3,7
+1H          ADD         $3,$3,48
+            CMPU        t,ptr,$5
+            CSNP        $3,t,'_'
+            CMPU        t,ptr,$6
+            CSP         $3,t,'_'
+            STB         $3,buffer,ptr
+            SUBU        ptr,ptr,1
+            SRU         $0,$0,4
+            PBNZ        ptr,2B
+            SET         $3,'#'
+            STB         $3,buffer,0
+            SET         t,buffer
+            TRAP        0,Fputs,StdOut
+            SET         t,$4 % restore original value
+            POP         0,0
+
+%%
+% :MM:__PRINT:MemLn
+%
+% PUSHJ
+%   arg0 - pointer to memory region
+%   arg1 - size of memory region to pretty print
+%   no return value
+%
+MemLn       GET         $2,:rJ
+            SET         $3,0
+            % I care for alignment (tm)
+            AND         t,$0,#7
+            BNP         $1,3F
+            ADD         $1,$1,t
+1H          BNP         $1,3F
+            SUB         $1,$1,8
+            LDO         $5,$0,$3
+            BZ          $3,7F % first octa
+            BNP         $1,8F % last octa
+            PUSHJ       $4,RegLn
+            ADD         $3,$3,8
+            PBP         $1,1B
+3H          PUT         :rJ,$2
+            POP         0,0
+            % Pretty print the last and first octa:
+7H          AND         $6,$0,#7
+            BNP         $1,8F
+            SET         $7,8
+            JMP         9F
+8H          ADD         $7,$1,8
+            CSNZ        $6,$3,0
+9H          PUSHJ       $4,RegLnP
+            ADD         $3,$3,8
+            PBP         $1,1B
+            JMP 3B
+
+%%
+% :MM:__PRINT:Ln
+%
+% PUSHJ, PUSHJ $255
+%   no arguments
+%   no return value
+%
+Ln          SET         $0,t
+            LDA         t,:MM:__STRS:PrintLn
+            TRAP        0,Fputs,StdOut
+            SET         t,$0
+            POP         0,0
+
+            PREFIX      :
+
+#endif /* __MM_PRINT_MMH */
