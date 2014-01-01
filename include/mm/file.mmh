@@ -1,0 +1,183 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+%
+% :MM:File:
+%
+% TODO: Necessary cooperation, file handler and stuff...
+%
+% This header file provides subroutines for file handling
+%
+
+#ifndef MM_FILE_MMH
+#define MM_FILE_MMH
+
+#ifdef __MMIXAL
+#define __MM_INTERNAL
+#include "../../src/__mmixal_init.mmh"
+#include "../../src/__file.mmh"
+#undef __MM_INTERNAL
+#endif
+
+            PREFIX      :MM:
+
+%%
+% :MM:File:Open
+%   arg0 - pointer to string containing filename
+%   arg1 - mode
+%   retm - file handle on success / -1 on error
+%
+% :MM:File:OpenJ
+%
+
+%%
+% :MM:File:Reopen
+%   arg0 - pointer to string containing filename
+%   arg1 - mode
+%   arg2 - file handle to replace
+%   retm - file handle on success / -1 on failure
+%
+% :MM:File:ReopenJ
+%
+
+%%
+% :MM:File:Close
+%   arg0 - file handle
+%   no return value
+%
+% :MM:File:CloseJ
+% :MM:File:CloseG
+%
+
+%%
+% :MM:File:Seek
+%   arg0 - pointer to string containing filename
+%   arg1 - offset
+%   retm - actual offset (todo)
+%
+% :MM:File:SeekJ
+% :MM:File:SeekG
+%
+
+%%
+% :MM:File:Tell
+%   arg0 - file handler
+%   retm - current position
+%
+% :MM:File:TellJ
+% :MM:File:TellG
+%
+
+%%
+% :MM:File:Read
+%   arg0 - pointer to buffer
+%   arg1 - number of bytes to read
+%   arg2 - file handle
+%   retm - number of bytes actually read
+%
+% :MM:File:ReadJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+
+%%
+% :MM:File:Write
+%   arg0 - pointer to buffer
+%   arg1 - number of bytes to write
+%   arg2 - file handle
+%   retm - number of bytes actually written
+%
+% :MM:File:WriteJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+
+%%
+% :MM:File:Gets
+%   read until arg1 char or newline is encountered and stored, store
+%   null terminated
+%
+%   arg0 - pointer to string
+%   arg1 - number of characters to read
+%   arg2 - file handle
+%   retm - number of characters actually read
+%
+% :MM:File:GetsJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+
+%%
+% :MM:File:Puts
+%   write until arg1 char are written or null is encountered, does not
+%   store are terminating null.
+%
+%   arg0 - pointer to string
+%   arg1 - number of characters to read
+%   arg2 - file handle
+%   retm - number of characters actually read
+%
+% :MM:File:PutsJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+
+
+%%
+% :MM:File:Exists
+%   arg0 - pointer to string containing filename
+%   retm - ..
+%
+% :MM:File:ExistsJ
+% :MM:File:ExistsG
+%
+
+%%
+% :MM:File:Size TODO
+%   arg0 - pointer to string containing filename
+%   retm - ..
+%
+% :MM:File:SizeJ
+% :MM:File:SizeG
+%
+
+%%
+% :MM:File:ReadIn TODO
+%   arg0 - pointer to string containing filename
+%   retm - memory containing file content
+%
+% :MM:File:ReadInJ
+% :MM:File:ReadInG
+%
+
+%%
+% :MM:File:WriteOut TODO
+%   arg0 - memory containing file content
+%   no return value
+%
+% :MM:File:WriteOutJ
+% :MM:File:WriteOutG
+%
+
+            PREFIX      :
+
+#endif /* MM_FILE_MMH */
