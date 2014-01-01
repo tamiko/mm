@@ -11,25 +11,26 @@ ld=mmix-ld
 ld_args=( "-L$lib_dir" )
 out_file=
 
-tmpdir="$(mktemp -d /tmp/mmic.XXXXXXXXXX)"
+tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
 
 verbose=false
 compile_only=false
+keep_tmp=false
 
 until [[ "$@" == "" ]]; do
   if [[ "$1" == -I* ]]; then
     cpp_args+=( "$1" )
-  elif [[ "$1" == -L* ]]; then
-    ld_args+=( "$1" )
-  elif [[ "$1" == -l* ]]; then
+  elif [[ "$1" == -L* || "$1" == -l* ]]; then
     ld_args+=( "$1" )
   elif [[ "$1" == "-o" ]]; then
     shift
     out_file="$1"
-  elif [[ "$1" == "-v" ]]; then
+  elif [[ "$1" == "-v" || "$1" == "-verbose" ]]; then
     verbose=true
   elif [[ "$1" == "-c" ]]; then
     compile_only=true
+  elif [[ "$1" == "-keep-tmp" || "$1" == "-save-tmps" ]]; then
+    keep_tmp=true
   else
     src_files+=( "$1" )
   fi
@@ -39,6 +40,8 @@ done
 if [[ "$out_file" == "" ]]; then
   out_file="a.mmo"
 fi
+
+$keep_tmp && echo "Temporary directory \"$tmpdir\" preserved."
 
 for i in "${src_files[@]}"; do
   pre="$tmpdir/$(basename -s .mms $i)$RANDOM.s"
@@ -51,11 +54,11 @@ for i in "${src_files[@]}"; do
   if "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"; then
     $verbose && echo "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"
     if ! "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"; then
-      rm -rf "$tmpdir"
+      $keep_tmp || rm -rf "$tmpdir"
       exit 1
     fi
   else
-    rm -rf "$tmpdir"
+    $keep_tmp || rm -rf "$tmpdir"
     exit 1
   fi
 done
@@ -67,11 +70,11 @@ if ! $compile_only; then
 
   if "$ld" -o "$out_file" "${obj_files[@]:+${obj_files[@]}}" \
     "${ld_args[@]:+${ld_args[@]}}" ; then
-    rm -rf "$tmpdir"
+    $keep_tmp || rm -rf "$tmpdir"
   else
-    rm -rf "$tmpdir"
+    $keep_tmp || rm -rf "$tmpdir"
     exit 1
   fi
 fi
 
-rm -rf "$tmpdir"
+$keep_tmp || rm -rf "$tmpdir"
