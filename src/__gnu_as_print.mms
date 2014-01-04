@@ -41,5 +41,11 @@
             .global :MM:__PRINT:RegLn
             .global :MM:__PRINT:RegP
             .global :MM:__PRINT:RegLnP
+            .global :MM:__PRINT:Byte
+            .global :MM:__PRINT:ByteG
+            .global :MM:__PRINT:Unsigned
+            .global :MM:__PRINT:UnsignedG
+            .global :MM:__PRINT:Signed
+            .global :MM:__PRINT:SignedG
             .global :MM:__PRINT:MemLn
             .global :MM:__PRINT:Ln

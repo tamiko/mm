@@ -56,7 +56,7 @@ AtErrorAddr OCTA        #0000000000000000
             LOC         (@+#F)&-#10
             PREFIX      :MM:__INIT:
 Buffer      IS          @
-            LOC         @+1024*#8
+            LOC         @+128*8
             PREFIX      :
 
 #endif /* __MM_MMIXAL_DATA_SEGMENT_MMH */

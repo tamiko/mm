@@ -44,7 +44,7 @@ AtErrorAddr OCTA        #0000000000000000
             .balign 8
             PREFIX      :MM:__INIT:
 Buffer      IS          @
-            .fill 1024*8
+            .fill 128*8
             PREFIX      :
             .global :MM:__STRS:Terminated
             .global :MM:__STRS:Continued
