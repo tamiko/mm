@@ -28,6 +28,7 @@
 % :MM:File:
 %
 % TODO: Necessary cooperation, file handler and stuff...
+%       fh - an OCTA storing a byte interpreted as fh
 %
 % This header file provides subroutines for file handling
 %
@@ -45,13 +46,103 @@
             PREFIX      :MM:
 
 %%
+% :MM:File:Lock
+%   Lock the file handle arg0 manually.
+%
+% PUSHJ
+%   arg0 - lowest byte defines the file handle to lock
+%   no return value
+%
+% Precondition:
+%   arg0 must be a valid file handle, neither in use by the system, by
+%   the library, nor locked by the user.
+%
+% :MM:File:LockG
+%   Variant of above function that passes arg0 in the general register
+%   $255. The value of $255 is preserved.
+%
+% :MM:File:LockJ
+%   Variant of File:Lock that returns to :rJ+#4 on success, and
+%   to :rJ+#0 on failure. Same calling sequence.
+%
+:MM:File:Lock  IS       :MM:__FILE:Lock
+:MM:File:LockG IS       :MM:__FILE:LockG
+:MM:File:LockJ IS       :MM:__FILE:LockJ
+
+%%
+% :MM:File:Unlock
+%   Unlock a previously locked file handle arg0.
+%
+% PUSHJ
+%   arg0 - lowest byte defines the file handle to unlock
+%   no return value
+%
+% Precondition:
+%   arg0 must be a file handle previously locked with :MM:File:Lock.
+%
+% :MM:File:UnlockG
+%   Variant of above function that passes arg0 in the general register
+%   $255.
+%
+% :MM:File:UnlockJ
+%   Variant of File:Unlock that returns to :rJ+#4 on success, and
+%   to :rJ+#0 on failure. Same calling sequence.
+%
+:MM:File:Unlock  IS     :MM:__FILE:Unlock
+:MM:File:UnlockG IS     :MM:__FILE:UnlockG
+:MM:File:UnlockJ IS     :MM:__FILE:UnlockJ
+
+%%
 % :MM:File:Open
+%   Open the file described by a string at memory position arg0 with
+%   file mode arg1. arg1 is hereby one of
+%     :TextRead
+%     :TextWrite
+%     :BinaryRead
+%     :BinaryWrite
+%     :BinaryReadWrite.
+%   On success an (unsigned) octa with a filehandle in the range 0-255
+%   is returned. On failure, -1 is returned.
+%
+% PUSHJ:
 %   arg0 - pointer to string containing filename
 %   arg1 - mode
 %   retm - file handle on success / -1 on error
 %
-% :MM:File:OpenJ
+% Precondition:
+%   0 <= arg1, arg1 <= 4
 %
+% :MM:File:OpenJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%   In case of an error retm ist #0.
+%
+File:Open   IS          :MM:__FILE:Open
+File:OpenJ  IS          :MM:__FILE:OpenJ
+
+%%
+% :MM:File:Close
+%   Close the open file described by the file handle given by the
+%   lowest byte in arg0. If the file handle could not be closed an
+%   error is thrown.
+%
+% Precondition:
+%   The lowest byte in arg0 must be a succesfully opened file handle
+%   returned by a call to File:Open(J) or File:Reopen(J).
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   no return value
+%
+% :MM:File:CloseG
+%   Variant of above function that passes arg0 in the general register
+%   $255.
+%
+% :MM:File:CloseJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+File:Close  IS          :MM:__FILE:Close
+File:CloseG IS          :MM:__FILE:CloseG
+File:CloseJ IS          :MM:__FILE:CloseJ
 
 %%
 % :MM:File:Reopen
@@ -61,15 +152,6 @@
 %   retm - file handle on success / -1 on failure
 %
 % :MM:File:ReopenJ
-%
-
-%%
-% :MM:File:Close
-%   arg0 - file handle
-%   no return value
-%
-% :MM:File:CloseJ
-% :MM:File:CloseG
 %
 
 %%

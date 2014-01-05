@@ -83,7 +83,7 @@ OnStartup   PUT         :rW,$255
             RESUME % Use resume for a pristine entry into Main
 __Pos2      IS          @
             %LOC         #F0
-            %MP         OnStartup
+            %JMP         OnStartup
             LOC         __Pos2
 
             PREFIX      :

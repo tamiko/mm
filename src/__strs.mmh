@@ -125,7 +125,7 @@ MemRand4    BYTE        "Mem:Rand failed. Something went horribly "
 % Literals used in __RAND:
 RandUrandom BYTE        "/dev/urandom",0
 RandInit1   BYTE        "__Rand:Init failed. Unable to open '/dev/urandom'",0
-RandInit2   BYTE        ". File handler [",0
+RandInit2   BYTE        ". File handle [",0
 RandInit3   BYTE        "] is in use.",10,0
 RandInit4   BYTE        ".",10,0
 RandOcta1   BYTE        "Rand:Octa failed. Could not read random data.",10,0
@@ -138,6 +138,21 @@ RandRange4  BYTE        "Heap:Range failed. Could not read from "
 
 % Literals used in __PRINT:
 PrintLn     BYTE        10,0
+
+% Literals used in __FILE:
+FileLock1   BYTE        "File:Lock failed. Could not lock handle [arg0=",0
+FileLock2   BYTE        "]. Already locked.",10,0
+FileUnlock1 BYTE        "File:Unlock failed. Could not unlock handle [arg0=",0
+FileUnlock2 BYTE        "]. File handle is not locked.",10,0
+FileOpen1   BYTE        "File:Open failed. Invalid file mode [arg1=",0
+FileOpen2   BYTE        "] specified.",10,0
+FileOpen3   BYTE        "File.Open failed. No free file handler "
+            BYTE        "available.",10,0
+FileClose1  BYTE        "File:Close failed. File handle [arg0=",0
+FileClose2  BYTE        "] locked by user or system.",10,0
+FileClose3  BYTE        "] not opened.",10,0
+FileClose4  BYTE        "File:Close failed. Could not close file handle [arg0=",0
+FileClose5  BYTE        "]. Internal state corrupted.",10,0
 
             PREFIX      :
 

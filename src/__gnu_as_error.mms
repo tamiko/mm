@@ -43,4 +43,5 @@
             .global :MM:__ERROR:Error1
             .global :MM:__ERROR:Error2
             .global :MM:__ERROR:Error3R2
+            .global :MM:__ERROR:Error3RB2
             .global :MM:__ERROR:Error5R24

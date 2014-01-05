@@ -25,42 +25,24 @@
 %%
 
 %
-% Internal header file.
+% Assemble __file.mmh
 %
-% Assemble data segment structures.
-%
-            SWYM
 
-#ifndef __MM_INTERNAL
-#error Inclusion of internal header file __mmixal_data_segment.mmh
+#ifndef __GNU_AS
+#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-#ifndef __MMIXAL
-#error Inclusion of internal header file __mmixal_data_segment.mmh for foreign assembler
-#endif
-
-#ifndef __MM_MMIXAL_DATA_SEGMENT_MMH
-#define __MM_MMIXAL_DATA_SEGMENT_MMH
-
-#ifndef MM_DATA_SEGMENT_ADDR
-#define MM_DATA_SEGMENT_ADDR :Data_Segment+#1100000000000000
-#endif
-            LOC         MM_DATA_SEGMENT_ADDR
-#undef MM_DATA_SEGMENT_ADDR
-#include "__strs.mmh"
-            LOC         (@+#7)&-#8
-            PREFIX      :MM:__SYS:
-AtExitAddr  OCTA        #0000000000000000
-AtAbortAddr OCTA        #0000000000000000
-AtErrorAddr OCTA        #0000000000000000
-            LOC         (@+#7)&-#8
-            PREFIX      :MM:__FILE:
-Pool        BYTE        #EE,#EE,#EE
-            LOC         @+253*1
-            LOC         (@+#7)&-#8
-            PREFIX      :MM:__INIT:
-Buffer      IS          @
-            LOC         @+128*8
-            PREFIX      :
-
-#endif /* __MM_MMIXAL_DATA_SEGMENT_MMH */
+            .section .mm_text,"ax",@progbits
+#define __MM_INTERNAL
+#include "__file.mmh"
+            .global :MM:__FILE:LockJ
+            .global :MM:__FILE:LockG
+            .global :MM:__FILE:Lock
+            .global :MM:__FILE:UnlockJ
+            .global :MM:__FILE:UnlockG
+            .global :MM:__FILE:Unlock
+            .global :MM:__FILE:OpenJ
+            .global :MM:__FILE:Open
+            .global :MM:__FILE:CloseJ
+            .global :MM:__FILE:CloseG
+            .global :MM:__FILE:Close

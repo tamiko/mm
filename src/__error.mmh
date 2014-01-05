@@ -202,6 +202,28 @@ Error3R2    LDA         t,:MM:__STRS:Error
             JMP         ErrorHndl
 
 %%
+% :MM:__ERROR:Error3RB2
+%   Print an error message and terminate the program.
+%
+% PUSHJ, JMP:
+%   arg0 - address of an error string
+%   arg1 - Octa to print between arg0 and arg2
+%   arg2 - address of an error string
+%   - routine does not return -
+%
+Error3RB2   LDA         t,:MM:__STRS:Error
+            TRAP        0,Fputs,StdErr
+            SET         t,arg0
+            TRAP        0,Fputs,StdErr
+            SET         t,arg1
+            GET         $0,:rJ
+            PUSHJ       t,:MM:__PRINT:ByteG
+            PUT         :rJ,$0
+            SET         t,arg2
+            TRAP        0,Fputs,StdErr
+            JMP         ErrorHndl
+
+%%
 % :MM:__ERROR:Error5R24
 %   Print an error message and terminate the program.
 %
