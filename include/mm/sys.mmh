@@ -97,10 +97,13 @@ Sys:Abort   IS         :MM:__SYS:Abort
 %             internal) error condition arises in one of the :MM:
 %             subroutines.
 %
-% The subroutine is called via GO linkage. The return address is
-% stored in register $0. Registered subroutines should not make any
-% assumptions on register and memory state (except for $0 holding a
-% valid return address).
+% The subroutine is called via GO linkage. A return address to the
+% corresponding internal library routine is stored in register $0. In
+% case of the AtError handler an additional return address is stored
+% in $255 pointing to the caller of the library routine.
+% Registered subroutines should not make any assumptions on register
+% and memory state (except for $0 - and $255 in case of AtError -
+% holding a valid return address).
 %
 % Upon returning, :MM:Sys:Exit and :MM:Sys:Abort will terminate
 % the program.

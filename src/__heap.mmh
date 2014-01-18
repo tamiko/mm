@@ -104,19 +104,23 @@ Alloc       SET         $3,arg0
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-1H          SET         $3,arg0
-            SET         $0,$1 % save :rJ
-            LDA         $2,:MM:__STRS:HeapAlloc1
-            LDA         $4,:MM:__STRS:HeapAlloc2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
+1H          GET         :MM:__ERROR:__rJ,:rJ
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapAlloc1
+            LDA         $3,:MM:__STRS:HeapAlloc2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
+AllocG      SET         $3,t
+            GET         $1,:rJ
+            PUSHJ       $2,AllocJ
+            JMP         1F
+            PUT         :rJ,$1
+            SET         t,$2
             POP         0,0
-AllocG      GET         $0,:rJ
-            SET         $2,t
-            PUSHJ       $1,Alloc
-            PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+1H          GET         :MM:__ERROR:__rJ,:rJ
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapAlloc1
+            LDA         $3,:MM:__STRS:HeapAlloc2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 %%
 % :MM:__HEAP:DeallocJ
@@ -154,25 +158,18 @@ DeallocJ    GET         $1,:rJ
             POP         0,1
 1H          PUT         :rJ,$1
             POP         0,0
+DeallocG    SET         $0,t
 Dealloc     SET         $3,arg0
             GET         $1,:rJ
-            PUSHJ       $2,DeallocJ % Call into DeallocJ
+            PUSHJ       $2,DeallocJ
             JMP         1F
             PUT         :rJ,$1
             POP         0,0
-1H          SET         $3,arg0
-            SET         $0,$1 % save :rJ
-            LDA         $2,:MM:__STRS:HeapFree1
-            LDA         $4,:MM:__STRS:HeapFree2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
-DeallocG    GET         $0,:rJ
-            SET         $2,t
-            PUSHJ       $1,Dealloc
-            PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$1
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapFree1
+            LDA         $3,:MM:__STRS:HeapFree2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 %%
 % :MM:__HEAP:ReallocJ
@@ -203,7 +200,7 @@ ReallocJ    GET         $2,:rJ
 1H          PUT         :rJ,$2
             POP         0,0
 2H          LDA         $1,:MM:__STRS:HeapReallo5
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
@@ -231,22 +228,18 @@ Realloc     GET         $2,:rJ
             SET         ret0,$3
             PUT         :rJ,$2
             POP         1,0
-1H          SET         $3,arg0
-            SET         $0,$2 % save :rJ
-            LDA         $2,:MM:__STRS:HeapReallo1
-            LDA         $4,:MM:__STRS:HeapReallo2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
-2H          SET         $3,arg1
-            SET         $0,$2 % save :rJ
-            LDA         $2,:MM:__STRS:HeapReallo3
-            LDA         $4,:MM:__STRS:HeapReallo4
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapReallo1
+            LDA         $3,:MM:__STRS:HeapReallo2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
+2H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg1
+            LDA         $1,:MM:__STRS:HeapReallo3
+            LDA         $3,:MM:__STRS:HeapReallo4
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 3H          LDA         $1,:MM:__STRS:HeapReallo5
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
@@ -318,19 +311,23 @@ Size        SET         $3,arg0
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-1H          SET         $3,arg0
-            SET         $0,$1 % save :rJ
-            LDA         $2,:MM:__STRS:HeapSize1
-            LDA         $4,:MM:__STRS:HeapSize2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
+1H          SET         :MM:__ERROR:__rJ,$1
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapSize1
+            LDA         $3,:MM:__STRS:HeapSize2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
+SizeG       SET         $3,t
+            GET         $1,:rJ
+            PUSHJ       $2,SizeJ
+            JMP         1F
+            PUT         :rJ,$1
+            SET         t,$2
             POP         0,0
-SizeG       GET         $0,:rJ
-            SET         $2,t
-            PUSHJ       $1,Size
-            PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$1
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapSize1
+            LDA         $3,:MM:__STRS:HeapSize2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 %%
 % :MM:__HEAP:Valid
@@ -387,7 +384,7 @@ CopyJ       GET         $2,:rJ
 1H          PUT         :rJ,$2
             POP         0,0
 3H          LDA         $1,:MM:__STRS:HeapMove4
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
 % :MM:__HEAP:Copy
@@ -413,22 +410,18 @@ Copy        GET         $2,:rJ
             JMP         3F
             PUT         :rJ,$2
             POP         0,0
-1H          SET         $3,arg0
-            SET         $0,$2 % save :rJ
-            LDA         $2,:MM:__STRS:HeapMove1
-            LDA         $4,:MM:__STRS:HeapMove3
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
-2H          SET         $3,arg1
-            SET         $0,$2 % save :rJ
-            LDA         $2,:MM:__STRS:HeapMove2
-            LDA         $4,:MM:__STRS:HeapMove3
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ:$2
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapMove1
+            LDA         $3,:MM:__STRS:HeapMove3
+            PUSHJ       $0,:MM:__ERROR:Error3R2
+2H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg1
+            LDA         $1,:MM:__STRS:HeapMove2
+            LDA         $3,:MM:__STRS:HeapMove3
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 3H          LDA         $1,:MM:__STRS:HeapMove4
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
 % :MM:__HEAP:ZeroJ
@@ -458,14 +451,14 @@ SetJ        GET         $2,:rJ
 1H          PUT         :rJ,$2
             POP         0,0
 2H          LDA         $1,:MM:__STRS:HeapSetZero
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
 % :MM:__HEAP:Set
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
-%   arg1 - pointer to memory block
+%   arg1 - byte template
 %   no return value
 %
 Set         GET         $2,:rJ
@@ -475,13 +468,11 @@ Set         GET         $2,:rJ
             JMP         1F
             PUT         :rJ,$2
             POP         0,0
-1H          SET         $3,arg0
-            SET         $0,$2 % save :rJ
-            LDA         $2,:MM:__STRS:HeapSet1
-            LDA         $4,:MM:__STRS:HeapSet2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapSet1
+            LDA         $3,:MM:__STRS:HeapSet2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 %%
 % :MM:__HEAP:Zero
@@ -494,26 +485,19 @@ Set         GET         $2,:rJ
 %
 % PUSHJ $255.
 %
+ZeroG       SET         $0,t
 Zero        GET         $1,:rJ
             SET         $3,arg0
             PUSHJ       $2,ZeroJ
             JMP         1F
             PUT         :rJ,$1
+            SET         t,arg0
             POP         0,0
-1H          SET         $3,arg0
-            SET         $0,$1 % save :rJ
-            LDA         $2,:MM:__STRS:HeapZero1
-            LDA         $4,:MM:__STRS:HeapZero2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
-ZeroG       GET         $0,:rJ
-            SET         $1,t
-            SET         $3,t
-            PUSHJ       $2,Zero
-            PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$1
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapZero1
+            LDA         $3,:MM:__STRS:HeapZero2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 %%
 % :MM:__HEAP:RandJ
@@ -534,7 +518,7 @@ RandJ       GET         $1,:rJ
 1H          PUT         :rJ,$1
             POP         0,0
 2H          LDA         $1,:MM:__STRS:HeapRand3
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+            PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
 % :MM:__HEAP:Rand
@@ -547,25 +531,18 @@ RandJ       GET         $1,:rJ
 %
 % PUSHJ $255
 %
+RandG       SET         $0,t
 Rand        GET         $1,:rJ
             SET         $3,arg0
             PUSHJ       $2,RandJ
             JMP         1F
             PUT         :rJ,$1
+            SET         t,arg0
             POP         0,0
-1H          SET         $3,arg0
-            SET         $0,$1 % save :rJ
-            LDA         $2,:MM:__STRS:HeapRand1
-            LDA         $4,:MM:__STRS:HeapRand2
-            PUSHJ       $1,:MM:__ERROR:Error3R2
-            PUT         :rJ,$0
-            POP         0,0
-RandG       GET         $0,:rJ
-            SET         $1,t
-            SET         $3,t
-            PUSHJ       $2,Rand
-            PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+1H          SET         :MM:__ERROR:__rJ,$1
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:HeapRand1
+            LDA         $3,:MM:__STRS:HeapRand2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 
 #endif /* __MM_HEAP_MMH */

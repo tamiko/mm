@@ -125,7 +125,7 @@ OctaG       GET         $0,:rJ
             LDA         $0,:MM:__INIT:Buffer
             LDO         t,$0,0
             POP         0,0
-9H          LDA         $2,:MM:__STRS:RandOctaG1
+9H          LDA         $2,:MM:__STRS:RandOcta1
             PUSHJ       $1,:MM:__ERROR:Error1
             PUT         :rJ,$0
             POP         0,0

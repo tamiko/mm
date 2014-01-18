@@ -61,7 +61,6 @@ __Pos1      IS          @
 %
             LOC         (@+#FF)&-#100
 #include "__sys.mmh"
-#include "__print.mmh"
 #include "__error.mmh"
 #ifdef __MMIX_SIM
 #include "__mmix_sim_raw_heap.mmh"

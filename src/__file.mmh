@@ -87,13 +87,11 @@ Lock        SET         $3,arg0
             PUT         :rJ,$1
             SET         t,arg0
             POP         0
-9H          LDA         $3,:MM:__STRS:FileLock1
-            SET         $4,arg0
-            LDA         $5,:MM:__STRS:FileLock2
-            PUSHJ       $2,:MM:__ERROR:Error3RB2
-            PUT         :rJ,$1
-            SET         t,arg0
-            POP         0
+9H          SET         :MM:__ERROR:__rJ,$1
+            LDA         $1,:MM:__STRS:FileLock1
+            SET         $2,arg0
+            LDA         $3,:MM:__STRS:FileLock2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
 % :MM:File:UnlockJ
@@ -125,13 +123,11 @@ Unlock      SET         $3,arg0
             PUT         :rJ,$1
             SET         t,arg0
             POP         0
-9H          LDA         $3,:MM:__STRS:FileUnlock1
-            SET         $4,arg0
-            LDA         $5,:MM:__STRS:FileUnlock2
-            PUSHJ       $2,:MM:__ERROR:Error3RB2
-            PUT         :rJ,$1
-            SET         t,arg0
-            POP         0
+9H          SET         :MM:__ERROR:__rJ,$1
+            LDA         $1,:MM:__STRS:FileUnlock1
+            SET         $2,arg0
+            LDA         $3,:MM:__STRS:FileUnlock2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
 % :MM:File:OpenJ
@@ -456,18 +452,14 @@ Open        CMPU        t,arg1,4
             NEG         $0,$0
             PUT         :rJ,$2
             POP         1,0
-8H          GET         $0,:rJ
-            LDA         $2,:MM:__STRS:FileOpen3
-            PUSHJ       $1,:MM:__ERROR:Error1
-            PUT         :rJ,$0
-            POP         0,0
-9H          GET         $0,:rJ
-            SET         $3,arg1
-            LDA         $2,:MM:__STRS:FileOpen1
-            LDA         $4,:MM:__STRS:FileOpen2
-            PUSHJ       $1,:MM:__ERROR:Error3RB2
-            PUT         :rJ,$0
-            POP         0,0
+8H          GET         :MM:__ERROR:__rJ,:rJ
+            LDA         $1,:MM:__STRS:FileOpen3
+            PUSHJ       $0,:MM:__ERROR:Error1
+9H          GET         :MM:__ERROR:__rJ,:rJ
+            SET         $2,arg1
+            LDA         $1,:MM:__STRS:FileOpen1
+            LDA         $3,:MM:__STRS:FileOpen2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
 % :MM:File:CloseJ
@@ -776,23 +768,21 @@ Close       AND         $3,arg0,#FF
 7H          AND         $3,arg0,#FF
             SET         $4,0
             STBU        $4,pool,$3
+            SET         :MM:__ERROR:__rJ,$1
             LDA         $3,:MM:__STRS:FileClose4
             SET         $4,arg0
             LDA         $5,:MM:__STRS:FileClose5
             PUSHJ       $2,:MM:__ERROR:Error3RB2
-            JMP         0F
-8H          LDA         $3,:MM:__STRS:FileClose1
-            SET         $4,arg0
-            LDA         $5,:MM:__STRS:FileClose2
-            PUSHJ       $2,:MM:__ERROR:Error3RB2
-            JMP         0F
-9H          LDA         $3,:MM:__STRS:FileClose1
-            SET         $4,arg0
-            LDA         $5,:MM:__STRS:FileClose3
-            PUSHJ       $2,:MM:__ERROR:Error3RB2
-0H          PUT         :rJ,$1
-            SET         t,arg0
-            POP         0
+8H          SET         :MM:__ERROR:__rJ,$1
+            LDA         $1,:MM:__STRS:FileClose1
+            SET         $2,arg0
+            LDA         $3,:MM:__STRS:FileClose2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
+9H          GET         :MM:__ERROR:__rJ,:rJ
+            LDA         $1,:MM:__STRS:FileClose1
+            SET         $2,arg0
+            LDA         $3,:MM:__STRS:FileClose3
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 
             PREFIX      :
 

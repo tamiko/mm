@@ -53,7 +53,8 @@ Buffer      IS          @
             .global :MM:__STRS:Terminated
             .global :MM:__STRS:Continued
             .global :MM:__STRS:InternErro
-            .global :MM:__STRS:Error
+            .global :MM:__STRS:Error1
+            .global :MM:__STRS:Error2
             .global :MM:__STRS:ErrorHndlR1
             .global :MM:__STRS:ErrorHndlR2
             .global :MM:__STRS:ExcNotImpl
@@ -111,6 +112,18 @@ Buffer      IS          @
             .global :MM:__STRS:RandRange2
             .global :MM:__STRS:RandRange3
             .global :MM:__STRS:RandRange4
+            .global :MM:__STRS:FileLock1
+            .global :MM:__STRS:FileLock2
+            .global :MM:__STRS:FileUnlock1
+            .global :MM:__STRS:FileUnlock2
+            .global :MM:__STRS:FileOpen1
+            .global :MM:__STRS:FileOpen2
+            .global :MM:__STRS:FileOpen3
+            .global :MM:__STRS:FileClose1
+            .global :MM:__STRS:FileClose2
+            .global :MM:__STRS:FileClose3
+            .global :MM:__STRS:FileClose4
+            .global :MM:__STRS:FileClose5
             .global :MM:__STRS:PrintLn
             .global :MM:__SYS:AtExitAddr
             .global :MM:__SYS:AtAbortAddr

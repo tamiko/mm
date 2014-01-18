@@ -42,12 +42,14 @@
 
 % Error messages:
 
-Terminated  BYTE        "[MM library] Program terminated.",10,0
-Continued   BYTE        "[MM library] Continue execution.",10,0
-InternErro  BYTE        "[MM library] Internal error: ",0
-Error       BYTE        "[MM library] Error: ",0
+Terminated  BYTE        "[MM library]   Program terminated.",10,0
+Continued   BYTE        "[MM library]   Continue execution.",10,0
+InternErro  BYTE        "[MM library] Internal error: ",10
+            BYTE        "[MM library]   ",10,0
+Error1      BYTE        "[MM library] Called from [rJ=",0
+Error2      BYTE        "]:",10,"[MM library]   ",0
 
-ErrorHndlR1 BYTE        "[MM library] Error handler [",0
+ErrorHndlR1 BYTE        "[MM library]   Error handler [",0
 ErrorHndlR2 BYTE        "] returned.",10,0
 
 ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
@@ -129,7 +131,6 @@ RandInit2   BYTE        ". File handle [",0
 RandInit3   BYTE        "] is in use.",10,0
 RandInit4   BYTE        ".",10,0
 RandOcta1   BYTE        "Rand:Octa failed. Could not read random data.",10,0
-RandOctaG1  BYTE        "Rand:OctaG failed. Could not read random data.",10,0
 RandRange1  BYTE        "Rand:Range failed. Invalid range specified, [arg0=",0
 RandRange2  BYTE        "] and [arg1=",0
 RandRange3  BYTE        "] do not define a valid interval.",10,0
