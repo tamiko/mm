@@ -335,16 +335,16 @@ Error5R24   LDA         t,:MM:__STRS:Error1
 ErrorHndl   LDA         $0,:MM:__SYS:AtErrorAddr
             LDO         $0,$0
             BZ          $0,1F
-            SET         t,__rJ
-            GO          $0,$0
-            % Notify the fact that an error handler returned:
-            LDA         t,:MM:__STRS:ErrorHndlR1
+            LDA         t,:MM:__STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
             LDA         t,:MM:__SYS:AtErrorAddr
             LDO         t,t
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:ErrorHndlR2
+            LDA         t,:MM:__STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
+            SET         t,__rJ
+            GO          $0,$0
+            % Notify the fact that an error handler returned:
 2H          LDA         t,:MM:__STRS:Continued
             TRAP        0,Fputs,StdErr
             PUT         :rJ,__rJ

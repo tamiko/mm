@@ -55,8 +55,8 @@ Buffer      IS          @
             .global :MM:__STRS:InternErro
             .global :MM:__STRS:Error1
             .global :MM:__STRS:Error2
-            .global :MM:__STRS:ErrorHndlR1
-            .global :MM:__STRS:ErrorHndlR2
+            .global :MM:__STRS:ErrorHndlC1
+            .global :MM:__STRS:ErrorHndlC2
             .global :MM:__STRS:ExcNotImpl
             .global :MM:__STRS:Generic
             .global :MM:__STRS:HeapGrow1

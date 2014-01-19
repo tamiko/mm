@@ -410,7 +410,7 @@ Copy        GET         $2,:rJ
             JMP         3F
             PUT         :rJ,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ:$2
+1H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg0
             LDA         $1,:MM:__STRS:HeapMove1
             LDA         $3,:MM:__STRS:HeapMove3

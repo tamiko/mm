@@ -43,14 +43,15 @@
 % Error messages:
 
 Terminated  BYTE        "[MM library]   Program terminated.",10,0
-Continued   BYTE        "[MM library]   Continue execution.",10,0
+Continued   BYTE        "[MM library]   Error handler returned. "
+            BYTE        "Continue execution.",10,0
 InternErro  BYTE        "[MM library] Internal error: ",10
             BYTE        "[MM library]   ",10,0
 Error1      BYTE        "[MM library] Called from [rJ=",0
 Error2      BYTE        "]:",10,"[MM library]   ",0
 
-ErrorHndlR1 BYTE        "[MM library]   Error handler [",0
-ErrorHndlR2 BYTE        "] returned.",10,0
+ErrorHndlC1 BYTE        "[MM library]   Calling error handler [",0
+ErrorHndlC2 BYTE        "].",10,0
 
 ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             BYTE        "(ExcNotImpl).",10,0

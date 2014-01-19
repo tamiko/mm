@@ -148,14 +148,14 @@ Copy        GET         $3,:rJ
             JMP         9F
 3H          PUT         :rJ,$3
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,:rJ
+1H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__STRS:MemCopy1
             LDA         $3,:MM:__STRS:MemCopy3
             LDA         $5,:MM:__STRS:MemCopy4
             PUSHJ       $0,:MM:__ERROR:Error5R24
-2H          SET         :MM:__ERROR:__rJ,:rJ
+2H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $4,arg2
             SET         $2,arg1
             LDA         $1,:MM:__STRS:MemCopy2
@@ -278,7 +278,7 @@ Set         GET         $3,:rJ
             JMP         9F
 3H          PUT         :rJ,$3
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,:rJ
+1H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__STRS:MemSet1
@@ -308,7 +308,7 @@ Zero        GET         $2,:rJ
             JMP         9F
 3H          PUT         :rJ,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,:rJ
+1H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__STRS:MemZero1
@@ -346,7 +346,7 @@ Rand        GET         $2,:rJ
             JMP         9F
 3H          PUT         :rJ,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,:rJ
+1H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__STRS:MemRand1

@@ -35,6 +35,7 @@
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
 #include "__error.mmh"
+            .global :MM:__ERROR:__rJ
             .global :MM:__ERROR:IError0
             .global :MM:__ERROR:IError1
             .global :MM:__ERROR:IError2
