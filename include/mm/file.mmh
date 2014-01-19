@@ -155,6 +155,37 @@ File:CloseJ IS          :MM:__FILE:CloseJ
 %
 
 %%
+% :MM:File:IsOpen
+% :MM:File:IsReadable
+% :MM:File:IsWritable
+%   Return whether the least significant byte in arg0 represents a
+%   valid and open|readable|writable file handle.
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   retm - 0 true | -1 false
+%
+% :MM:File:IsOpenG
+% :MM:File:IsReadableG
+% :MM:File:IsWritableG
+%   Variants that pass arg0 and retm in the general register $255
+%
+% :MM:File:IsOpenJ
+% :MM:File:IsReadableJ
+% :MM:File:IsWritablej
+%   These variants return to :rJ+#4 if true and to :rJ+#0 if false.
+%
+File:IsOpen IS          :MM:__FILE:IsOpen
+File:IsOpenG IS         :MM:__FILE:IsOpenG
+File:IsOpenJ IS         :MM:__FILE:IsOpenJ
+File:IsReadable IS      :MM:__FILE:IsReadable
+File:IsReadableG IS     :MM:__FILE:IsReadableG
+File:IsReadableJ IS     :MM:__FILE:IsReadableJ
+File:IsWritable IS      :MM:__FILE:IsWritable
+File:IsWritableG IS     :MM:__FILE:IsWritableG
+File:IsWritableJ IS     :MM:__FILE:IsWritableJ
+
+%%
 % :MM:File:Seek
 %   arg0 - pointer to string containing filename
 %   arg1 - offset

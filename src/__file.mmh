@@ -32,7 +32,8 @@
 % We have 256 Bytes at address :MM:__FILE:Pool to store some internal
 % data for file descriptors. Therefore,
 %   #00        - not in use
-%   #01 - #04  - in use (by us) and opened with the respective mode
+%   #08 - #C   - in use (by us) and opened with the respective mode
+%                +#8.
 %   #EE        - marked as 'controlled by the system' (e.g. fh 0 - 2)
 %   #FF        - markes ad 'manually controlled by the user'
 %
@@ -406,7 +407,9 @@ fh          IS          $3
             BP          t,9F
             JMP         2B
             % So we found an unused fh:
-1H          STB         arg1,pool,fh
+1H          ORL         arg1,#8
+            STB         arg1,pool,fh
+            ANDNL       arg1,#8
             LDA         $4,:MM:__INIT:Buffer
             STO         arg0,$4,0
             STO         arg1,$4,8
@@ -431,7 +434,7 @@ fh          IS          $3
 %
 Open        CMPU        t,arg1,4
             BP          t,9F
-            % Are any file handlers available?
+            % Are any file handles available?
             LDA         pool,:MM:__FILE:Pool
             SET         fh,0
 2H          LDBU        $4,pool,fh
@@ -783,6 +786,116 @@ Close       AND         $3,arg0,#FF
             SET         $2,arg0
             LDA         $3,:MM:__STRS:FileClose3
             PUSHJ       $0,:MM:__ERROR:Error3RB2
+
+%%
+% :MM:File:IsOpenJ
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   no return value
+%
+% :MM:File:IsOpenG
+% :MM:File:IsOpen
+%
+pool        IS          $2
+IsOpenJ     AND         arg0,arg0,#FF
+            LDA         pool,:MM:__FILE:Pool
+            LDBU        $1,pool,arg0
+            BZ          $1,9F
+            CMPU        t,$1,#FF
+            BZ          t,9F
+            CMPU        t,$1,#EE
+            BZ          t,9F
+            POP         0,1
+9H          POP         0,0
+IsOpenG     SET         $0,t
+IsOpen      GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,IsOpenJ
+            JMP         1F
+            SET         $0,0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
+1H          SET         $0,1
+            NEG         $0,$0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
+
+%%
+% :MM:File:IsReadableJ
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   no return value
+%
+% :MM:File:IsReadableG
+% :MM:File:IsReadable
+%
+pool        IS          $2
+IsReadableJ AND         arg0,arg0,#FF
+            LDA         pool,:MM:__FILE:Pool
+            LDBU        $1,pool,arg0
+            CMPU        t,$1,#8 % :TextRead
+            BZ          t,1F
+            CMPU        t,$1,#A % :BinaryRead
+            BZ          t,1F
+            CMPU        t,$1,#C % :BinaryReadWrite
+            BZ          t,1F
+            POP         0,0
+1H          POP         0,1
+IsReadableG SET         $0,t
+IsReadable  GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,IsReadableJ
+            JMP         1F
+            SET         $0,0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
+1H          SET         $0,1
+            NEG         $0,$0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
+
+%%
+% :MM:File:IsWritableJ
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   no return value
+%
+% :MM:File:IsWritableG
+% :MM:File:IsWritable
+%
+pool        IS          $2
+IsWritableJ AND         arg0,arg0,#FF
+            LDA         pool,:MM:__FILE:Pool
+            LDBU        $1,pool,arg0
+            CMPU        t,$1,#9 % :TextRead
+            BZ          t,1F
+            CMPU        t,$1,#B % :BinaryRead
+            BZ          t,1F
+            CMPU        t,$1,#C % :BinaryReadWrite
+            BZ          t,1F
+            POP         0,0
+1H          POP         0,1
+IsWritableG SET         $0,t
+IsWritable  GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,IsWritableJ
+            JMP         1F
+            SET         $0,0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
+1H          SET         $0,1
+            NEG         $0,$0
+            PUT         :rJ,$1
+            SET         t,$0
+            POP         1,0
 
             PREFIX      :
 

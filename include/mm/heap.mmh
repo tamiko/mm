@@ -37,8 +37,8 @@
 %   user: The convention (as defined by the mmix-sim documentation) is
 %   that M_8[:Pool_Segment] points to the first unallocated region
 %   within the pool adress space. User programs utilizing address
-%   space from the pool segment manually must obey this rule by
-%   'allocating' memory by modifying M_8[:Pool_Segment] appropriately.
+%   space from the pool segment must obey this rule by 'allocating'
+%   memory by modifying M_8[:Pool_Segment] appropriately.
 %
 % - Stable ABI, fully implemented -
 %
