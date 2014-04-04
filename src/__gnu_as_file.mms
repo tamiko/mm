@@ -46,3 +46,12 @@
             .global :MM:__FILE:CloseJ
             .global :MM:__FILE:CloseG
             .global :MM:__FILE:Close
+            .global :MM:__FILE:IsOpenJ
+            .global :MM:__FILE:IsOpenG
+            .global :MM:__FILE:IsOpen
+            .global :MM:__FILE:IsReadableJ
+            .global :MM:__FILE:IsReadableG
+            .global :MM:__FILE:IsReadable
+            .global :MM:__FILE:IsWritableJ
+            .global :MM:__FILE:IsWritableG
+            .global :MM:__FILE:IsWritable

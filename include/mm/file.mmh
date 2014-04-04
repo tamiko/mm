@@ -214,6 +214,8 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 % :MM:File:ReadJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
 %
+File:ReadJ  IS          :MM:__FILE:ReadJ
+%File:Read   IS          :MM:__FILE:Read
 
 %%
 % :MM:File:Write

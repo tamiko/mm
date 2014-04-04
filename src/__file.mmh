@@ -50,6 +50,7 @@
 t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
+arg2        IS          $2
 
 Fopen       IS          :Fopen
 Fclose      IS          :Fclose
@@ -895,6 +896,290 @@ IsWritable  GET         $1,:rJ
             NEG         $0,$0
             PUT         :rJ,$1
             SET         t,$0
+            POP         1,0
+
+%%
+% :MM:File:ReadJ
+%
+% PUSHJ:
+%   arg0 - lowest byte defines the file handle
+%   no return value
+%
+ReadTable   TRAP 0,Fread,0; JMP 7F
+            TRAP 0,Fread,1; JMP 7F
+            TRAP 0,Fread,2; JMP 7F
+            TRAP 0,Fread,3; JMP 7F
+            TRAP 0,Fread,4; JMP 7F
+            TRAP 0,Fread,5; JMP 7F
+            TRAP 0,Fread,6; JMP 7F
+            TRAP 0,Fread,7; JMP 7F
+            TRAP 0,Fread,8; JMP 7F
+            TRAP 0,Fread,9; JMP 7F
+            TRAP 0,Fread,10; JMP 7F
+            TRAP 0,Fread,11; JMP 7F
+            TRAP 0,Fread,12; JMP 7F
+            TRAP 0,Fread,13; JMP 7F
+            TRAP 0,Fread,14; JMP 7F
+            TRAP 0,Fread,15; JMP 7F
+            TRAP 0,Fread,16; JMP 7F
+            TRAP 0,Fread,17; JMP 7F
+            TRAP 0,Fread,18; JMP 7F
+            TRAP 0,Fread,19; JMP 7F
+            TRAP 0,Fread,20; JMP 7F
+            TRAP 0,Fread,21; JMP 7F
+            TRAP 0,Fread,22; JMP 7F
+            TRAP 0,Fread,23; JMP 7F
+            TRAP 0,Fread,24; JMP 7F
+            TRAP 0,Fread,25; JMP 7F
+            TRAP 0,Fread,26; JMP 7F
+            TRAP 0,Fread,27; JMP 7F
+            TRAP 0,Fread,28; JMP 7F
+            TRAP 0,Fread,29; JMP 7F
+            TRAP 0,Fread,30; JMP 7F
+            TRAP 0,Fread,31; JMP 7F
+            TRAP 0,Fread,32; JMP 7F
+            TRAP 0,Fread,33; JMP 7F
+            TRAP 0,Fread,34; JMP 7F
+            TRAP 0,Fread,35; JMP 7F
+            TRAP 0,Fread,36; JMP 7F
+            TRAP 0,Fread,37; JMP 7F
+            TRAP 0,Fread,38; JMP 7F
+            TRAP 0,Fread,39; JMP 7F
+            TRAP 0,Fread,40; JMP 7F
+            TRAP 0,Fread,41; JMP 7F
+            TRAP 0,Fread,42; JMP 7F
+            TRAP 0,Fread,43; JMP 7F
+            TRAP 0,Fread,44; JMP 7F
+            TRAP 0,Fread,45; JMP 7F
+            TRAP 0,Fread,46; JMP 7F
+            TRAP 0,Fread,47; JMP 7F
+            TRAP 0,Fread,48; JMP 7F
+            TRAP 0,Fread,49; JMP 7F
+            TRAP 0,Fread,50; JMP 7F
+            TRAP 0,Fread,51; JMP 7F
+            TRAP 0,Fread,52; JMP 7F
+            TRAP 0,Fread,53; JMP 7F
+            TRAP 0,Fread,54; JMP 7F
+            TRAP 0,Fread,55; JMP 7F
+            TRAP 0,Fread,56; JMP 7F
+            TRAP 0,Fread,57; JMP 7F
+            TRAP 0,Fread,58; JMP 7F
+            TRAP 0,Fread,59; JMP 7F
+            TRAP 0,Fread,60; JMP 7F
+            TRAP 0,Fread,61; JMP 7F
+            TRAP 0,Fread,62; JMP 7F
+            TRAP 0,Fread,63; JMP 7F
+            TRAP 0,Fread,64; JMP 7F
+            TRAP 0,Fread,65; JMP 7F
+            TRAP 0,Fread,66; JMP 7F
+            TRAP 0,Fread,67; JMP 7F
+            TRAP 0,Fread,68; JMP 7F
+            TRAP 0,Fread,69; JMP 7F
+            TRAP 0,Fread,70; JMP 7F
+            TRAP 0,Fread,71; JMP 7F
+            TRAP 0,Fread,72; JMP 7F
+            TRAP 0,Fread,73; JMP 7F
+            TRAP 0,Fread,74; JMP 7F
+            TRAP 0,Fread,75; JMP 7F
+            TRAP 0,Fread,76; JMP 7F
+            TRAP 0,Fread,77; JMP 7F
+            TRAP 0,Fread,78; JMP 7F
+            TRAP 0,Fread,79; JMP 7F
+            TRAP 0,Fread,80; JMP 7F
+            TRAP 0,Fread,81; JMP 7F
+            TRAP 0,Fread,82; JMP 7F
+            TRAP 0,Fread,83; JMP 7F
+            TRAP 0,Fread,84; JMP 7F
+            TRAP 0,Fread,85; JMP 7F
+            TRAP 0,Fread,86; JMP 7F
+            TRAP 0,Fread,87; JMP 7F
+            TRAP 0,Fread,88; JMP 7F
+            TRAP 0,Fread,89; JMP 7F
+            TRAP 0,Fread,90; JMP 7F
+            TRAP 0,Fread,91; JMP 7F
+            TRAP 0,Fread,92; JMP 7F
+            TRAP 0,Fread,93; JMP 7F
+            TRAP 0,Fread,94; JMP 7F
+            TRAP 0,Fread,95; JMP 7F
+            TRAP 0,Fread,96; JMP 7F
+            TRAP 0,Fread,97; JMP 7F
+            TRAP 0,Fread,98; JMP 7F
+            TRAP 0,Fread,99; JMP 7F
+            TRAP 0,Fread,100; JMP 7F
+            TRAP 0,Fread,101; JMP 7F
+            TRAP 0,Fread,102; JMP 7F
+            TRAP 0,Fread,103; JMP 7F
+            TRAP 0,Fread,104; JMP 7F
+            TRAP 0,Fread,105; JMP 7F
+            TRAP 0,Fread,106; JMP 7F
+            TRAP 0,Fread,107; JMP 7F
+            TRAP 0,Fread,108; JMP 7F
+            TRAP 0,Fread,109; JMP 7F
+            TRAP 0,Fread,110; JMP 7F
+            TRAP 0,Fread,111; JMP 7F
+            TRAP 0,Fread,112; JMP 7F
+            TRAP 0,Fread,113; JMP 7F
+            TRAP 0,Fread,114; JMP 7F
+            TRAP 0,Fread,115; JMP 7F
+            TRAP 0,Fread,116; JMP 7F
+            TRAP 0,Fread,117; JMP 7F
+            TRAP 0,Fread,118; JMP 7F
+            TRAP 0,Fread,119; JMP 7F
+            TRAP 0,Fread,120; JMP 7F
+            TRAP 0,Fread,121; JMP 7F
+            TRAP 0,Fread,122; JMP 7F
+            TRAP 0,Fread,123; JMP 7F
+            TRAP 0,Fread,124; JMP 7F
+            TRAP 0,Fread,125; JMP 7F
+            TRAP 0,Fread,126; JMP 7F
+            TRAP 0,Fread,127; JMP 7F
+            TRAP 0,Fread,128; JMP 7F
+            TRAP 0,Fread,129; JMP 7F
+            TRAP 0,Fread,130; JMP 7F
+            TRAP 0,Fread,131; JMP 7F
+            TRAP 0,Fread,132; JMP 7F
+            TRAP 0,Fread,133; JMP 7F
+            TRAP 0,Fread,134; JMP 7F
+            TRAP 0,Fread,135; JMP 7F
+            TRAP 0,Fread,136; JMP 7F
+            TRAP 0,Fread,137; JMP 7F
+            TRAP 0,Fread,138; JMP 7F
+            TRAP 0,Fread,139; JMP 7F
+            TRAP 0,Fread,140; JMP 7F
+            TRAP 0,Fread,141; JMP 7F
+            TRAP 0,Fread,142; JMP 7F
+            TRAP 0,Fread,143; JMP 7F
+            TRAP 0,Fread,144; JMP 7F
+            TRAP 0,Fread,145; JMP 7F
+            TRAP 0,Fread,146; JMP 7F
+            TRAP 0,Fread,147; JMP 7F
+            TRAP 0,Fread,148; JMP 7F
+            TRAP 0,Fread,149; JMP 7F
+            TRAP 0,Fread,150; JMP 7F
+            TRAP 0,Fread,151; JMP 7F
+            TRAP 0,Fread,152; JMP 7F
+            TRAP 0,Fread,153; JMP 7F
+            TRAP 0,Fread,154; JMP 7F
+            TRAP 0,Fread,155; JMP 7F
+            TRAP 0,Fread,156; JMP 7F
+            TRAP 0,Fread,157; JMP 7F
+            TRAP 0,Fread,158; JMP 7F
+            TRAP 0,Fread,159; JMP 7F
+            TRAP 0,Fread,160; JMP 7F
+            TRAP 0,Fread,161; JMP 7F
+            TRAP 0,Fread,162; JMP 7F
+            TRAP 0,Fread,163; JMP 7F
+            TRAP 0,Fread,164; JMP 7F
+            TRAP 0,Fread,165; JMP 7F
+            TRAP 0,Fread,166; JMP 7F
+            TRAP 0,Fread,167; JMP 7F
+            TRAP 0,Fread,168; JMP 7F
+            TRAP 0,Fread,169; JMP 7F
+            TRAP 0,Fread,170; JMP 7F
+            TRAP 0,Fread,171; JMP 7F
+            TRAP 0,Fread,172; JMP 7F
+            TRAP 0,Fread,173; JMP 7F
+            TRAP 0,Fread,174; JMP 7F
+            TRAP 0,Fread,175; JMP 7F
+            TRAP 0,Fread,176; JMP 7F
+            TRAP 0,Fread,177; JMP 7F
+            TRAP 0,Fread,178; JMP 7F
+            TRAP 0,Fread,179; JMP 7F
+            TRAP 0,Fread,180; JMP 7F
+            TRAP 0,Fread,181; JMP 7F
+            TRAP 0,Fread,182; JMP 7F
+            TRAP 0,Fread,183; JMP 7F
+            TRAP 0,Fread,184; JMP 7F
+            TRAP 0,Fread,185; JMP 7F
+            TRAP 0,Fread,186; JMP 7F
+            TRAP 0,Fread,187; JMP 7F
+            TRAP 0,Fread,188; JMP 7F
+            TRAP 0,Fread,189; JMP 7F
+            TRAP 0,Fread,190; JMP 7F
+            TRAP 0,Fread,191; JMP 7F
+            TRAP 0,Fread,192; JMP 7F
+            TRAP 0,Fread,193; JMP 7F
+            TRAP 0,Fread,194; JMP 7F
+            TRAP 0,Fread,195; JMP 7F
+            TRAP 0,Fread,196; JMP 7F
+            TRAP 0,Fread,197; JMP 7F
+            TRAP 0,Fread,198; JMP 7F
+            TRAP 0,Fread,199; JMP 7F
+            TRAP 0,Fread,200; JMP 7F
+            TRAP 0,Fread,201; JMP 7F
+            TRAP 0,Fread,202; JMP 7F
+            TRAP 0,Fread,203; JMP 7F
+            TRAP 0,Fread,204; JMP 7F
+            TRAP 0,Fread,205; JMP 7F
+            TRAP 0,Fread,206; JMP 7F
+            TRAP 0,Fread,207; JMP 7F
+            TRAP 0,Fread,208; JMP 7F
+            TRAP 0,Fread,209; JMP 7F
+            TRAP 0,Fread,210; JMP 7F
+            TRAP 0,Fread,211; JMP 7F
+            TRAP 0,Fread,212; JMP 7F
+            TRAP 0,Fread,213; JMP 7F
+            TRAP 0,Fread,214; JMP 7F
+            TRAP 0,Fread,215; JMP 7F
+            TRAP 0,Fread,216; JMP 7F
+            TRAP 0,Fread,217; JMP 7F
+            TRAP 0,Fread,218; JMP 7F
+            TRAP 0,Fread,219; JMP 7F
+            TRAP 0,Fread,220; JMP 7F
+            TRAP 0,Fread,221; JMP 7F
+            TRAP 0,Fread,222; JMP 7F
+            TRAP 0,Fread,223; JMP 7F
+            TRAP 0,Fread,224; JMP 7F
+            TRAP 0,Fread,225; JMP 7F
+            TRAP 0,Fread,226; JMP 7F
+            TRAP 0,Fread,227; JMP 7F
+            TRAP 0,Fread,228; JMP 7F
+            TRAP 0,Fread,229; JMP 7F
+            TRAP 0,Fread,230; JMP 7F
+            TRAP 0,Fread,231; JMP 7F
+            TRAP 0,Fread,232; JMP 7F
+            TRAP 0,Fread,233; JMP 7F
+            TRAP 0,Fread,234; JMP 7F
+            TRAP 0,Fread,235; JMP 7F
+            TRAP 0,Fread,236; JMP 7F
+            TRAP 0,Fread,237; JMP 7F
+            TRAP 0,Fread,238; JMP 7F
+            TRAP 0,Fread,239; JMP 7F
+            TRAP 0,Fread,240; JMP 7F
+            TRAP 0,Fread,241; JMP 7F
+            TRAP 0,Fread,242; JMP 7F
+            TRAP 0,Fread,243; JMP 7F
+            TRAP 0,Fread,244; JMP 7F
+            TRAP 0,Fread,245; JMP 7F
+            TRAP 0,Fread,246; JMP 7F
+            TRAP 0,Fread,247; JMP 7F
+            TRAP 0,Fread,248; JMP 7F
+            TRAP 0,Fread,249; JMP 7F
+            TRAP 0,Fread,250; JMP 7F
+            TRAP 0,Fread,251; JMP 7F
+            TRAP 0,Fread,252; JMP 7F
+            TRAP 0,Fread,253; JMP 7F
+            TRAP 0,Fread,254; JMP 7F
+            TRAP 0,Fread,255; JMP 7F
+
+ReadJ       BN          arg1,9F % invalid size
+            AND         arg2,arg2,#FF
+            GET         $3,:rJ
+            SET         $5,arg2
+            PUSHJ       $4,ReadableJ
+            JMP         9F % not readable
+
+
+            SLU         arg2,arg2,3 % *8
+            LDA         $4,ReadTable
+            GO          $4,$4,arg2
+7H          SRU         arg2,arg2,3 % /8
+            SET         ret0,t
+            PUT         :rJ,$3
+            POP         1,1
+9H          NEG         $0,$1
+            SUB         $0,$0,1 % cannot underflow
+            PUT         :rJ,$3
             POP         1,0
 
             PREFIX      :
