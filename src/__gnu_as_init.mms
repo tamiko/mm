@@ -25,21 +25,16 @@
 %%
 
 %
-% Set up a raw heap implementation
+% Assemble data segment structures.
 %
 
 #ifndef __GNU_AS
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-            .section .mm_text,"ax",@progbits
 #ifdef __MMIX_SIM
-#define __MM_INTERNAL
-#include "__mmix_sim_raw_heap.mmh"
-            .global :MM:__RAW_HEAP:Dealloc
-            .global :MM:__RAW_HEAP:Alloc
-            .global :MM:__RAW_HEAP:heap_ptr
-#else
-#error No implementation of :MM:__RAW_SIM available for your platform.
+% Assemble a non-relocatable guard section that prevents LOC #0 - #100 from
+% being overwritten.
+            .section .mm_guard,"ax",@progbits
+            LOC         #100
 #endif
-
