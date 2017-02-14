@@ -66,9 +66,9 @@ HeapDeallo1 BYTE        "__RAW_HEAP::Dealloc called with invalid "
 
 % Literals used in __HEAP:
 
-HeapAlloc1  BYTE        "Heap:Alloc failed. Could not request a Heapory "
+HeapAlloc1  BYTE        "Heap:Alloc failed. Could not request a memory "
             BYTE        "block of size [arg0=",0
-HeapAlloc2  BYTE        "]. Out of Heapory.",10,0
+HeapAlloc2  BYTE        "]. Out of memory.",10,0
 HeapFree1   BYTE        "Heap:Free failed. Invalid pointer [arg0=",0
 HeapFree2   BYTE        "]. Double free or corruption.",10,0
 HeapSize1   BYTE        "Heap:Size failed. Invalid pointer [arg0=",0
