@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2017 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -25,46 +25,20 @@
 %%
 
 %
-% :MM:String:
-%
-% This header file provides Subroutines for character string
-% manipulation:
-%
-% - to be implemented -
-%
-% TODO:
-%
-% strcat();
-% strncat();
-% strchr();
-% strcmp();
-% strncmp();
-% strcoll();
-% strcpy();
-% strncpy();
-% strcspn();
-% strerror();
-% strlen();
-% strpbrk();
-% strrchr();
-% strspn();
-% strstr();
-% strtok();
-% strxfrm();
+% TODO
 %
 
-#ifndef MM_STR
-#define MM_STR
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "../../src/__mmixal_init.mmh"
-%#include "../../src/impl/__str.mmh"
-#undef __MM_INTERNAL
+#ifndef __GNU_AS
+#error Tried to include <mm/gnu_as_init> with foreign assembler.
 #endif
 
-            PREFIX      :MM:
+#ifndef __MMIX_SIM
+#error Tried to include <mm/gnu_as_init> for non mmix-sim platform.
+#endif
 
-            PREFIX      :
+#ifdef MM_GNU_AS_INIT
+#error <mm/gnu_as_init> must be included at most once.
+#endif
+#define MM_GNU_AS_INIT
 
-#endif /* MM_STR */
+#include "../../src/__gnu_as_init.mmh"

@@ -43,8 +43,8 @@
 %   :MM:Print:Ln
 %
 
-#ifndef MM_PRINT_MMH
-#define MM_PRINT_MMH
+#ifndef MM_PRINT
+#define MM_PRINT
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
@@ -151,4 +151,4 @@ Print:Ln    IS          :MM:__PRINT:Ln
 
             PREFIX      :
 
-#endif /* MM_PRINT_MMH */
+#endif /* MM_PRINT */

@@ -41,8 +41,8 @@
 %   :MM:Sys:AtError (AtErrorG)
 %
 
-#ifndef MM_SYS_MMH
-#define MM_SYS_MMH
+#ifndef MM_SYS
+#define MM_SYS
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
@@ -151,4 +151,4 @@ Sys:AtErrorG IS         :MM:__SYS:AtErrorG
 
             PREFIX      :
 
-#endif /* MM_SYS_MMH */
+#endif /* MM_SYS */

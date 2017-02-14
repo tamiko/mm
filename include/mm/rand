@@ -41,8 +41,8 @@
 %   :MM:Rand:RangU
 %
 
-#ifndef MM_RAND_MMH
-#define MM_RAND_MMH
+#ifndef MM_RAND
+#define MM_RAND
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
@@ -88,4 +88,4 @@ Rand:RangeU IS          :MM:__RAND:RangeU
 
             PREFIX      :
 
-#endif /* MM_RAND_MMH */
+#endif /* MM_RAND */

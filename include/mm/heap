@@ -75,8 +75,8 @@
 %   :MM:Heap:Zero (ZeroJ, ZeroG)
 %
 
-#ifndef MM_HEAP_MMH
-#define MM_HEAP_MMH
+#ifndef MM_HEAP
+#define MM_HEAP
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
@@ -327,4 +327,4 @@ Heap:RandG  IS          :MM:__HEAP:RandG
 
             PREFIX      :
 
-#endif /* MM_HEAP_MMH */
+#endif /* MM_HEAP */

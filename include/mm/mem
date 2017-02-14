@@ -60,8 +60,8 @@
 % :MM:Mem.Cmp
 %
 
-#ifndef MM_MEM_MMH
-#define MM_MEM_MMH
+#ifndef MM_MEM
+#define MM_MEM
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
@@ -166,4 +166,4 @@ Mem:RandJ   IS          :MM:__MEM:RandJ
 
             PREFIX      :
 
-#endif /* MM_MEM_MMH */
+#endif /* MM_MEM */

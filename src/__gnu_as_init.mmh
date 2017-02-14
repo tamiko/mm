@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2017 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -29,12 +29,18 @@
 %
 
 #ifndef __GNU_AS
-#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
+#error Tried to assemble __gnu_as_init.mmh with foreign assembler.
 #endif
 
-#ifdef __MMIX_SIM
-% Assemble a non-relocatable guard section that prevents LOC #0 - #100 from
-% being overwritten.
-            .section .mm_guard,"ax",@progbits
-            LOC         #100
+#ifndef __MMIX_SIM
+#error Tried to assemble __gnu_as_init.mmh for non mmix-sim platform.
 #endif
+
+#ifdef __MM_GNU_AS_INIT_MMH
+#error __gnu_as_init.mmh included more than once.
+#endif
+#define __MM_GNU_AS_INIT_MMH
+
+            .section .program,"ax",@progbits
+
+            LOC         #100
