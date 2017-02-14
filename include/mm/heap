@@ -80,10 +80,10 @@
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "../../src/__mmixal_init.mmh"
-#include "../../src/__rand.mmh"
-#include "../../src/__mem.mmh"
-#include "../../src/__heap.mmh"
+#include "__internal/__mmixal_init.mmh"
+#include "__internal/__rand.mmh"
+#include "__internal/__mem.mmh"
+#include "__internal/__heap.mmh"
 #undef __MM_INTERNAL
 #endif
 

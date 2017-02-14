@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__mem.mmh"
+#include <mm/__internal/__mem.mmh>
             .global :MM:__MEM:Copy
             .global :MM:__MEM:CopyJ
             .global :MM:__MEM:Zero

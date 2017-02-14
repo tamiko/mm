@@ -41,4 +41,4 @@
 #endif
 #define MM_GNU_AS_INIT
 
-#include "../../src/__gnu_as_init.mmh"
+#include "__internal/__gnu_as_init.mmh"

@@ -24,23 +24,23 @@
 % SOFTWARE.
 %%
 
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __file.mmh
+#endif
+
+#ifndef __GNU_AS
+#error Inclusion of internal header file __mmixal_data_segment.mmh for foreign assembler
+#endif
+
+#ifndef __MM_GNU_AS_INIT_MMH
+#define __MM_GNU_AS_INIT_MMH
+
 %
 % Assemble data segment structures.
 %
 
-#ifndef __GNU_AS
-#error Tried to assemble __gnu_as_init.mmh with foreign assembler.
-#endif
-
-#ifndef __MMIX_SIM
-#error Tried to assemble __gnu_as_init.mmh for non mmix-sim platform.
-#endif
-
-#ifdef __MM_GNU_AS_INIT_MMH
-#error __gnu_as_init.mmh included more than once.
-#endif
-#define __MM_GNU_AS_INIT_MMH
-
             .section .program,"ax",@progbits
 
             LOC         #100
+
+#endif __MM_GNU_AS_INIT_MMH

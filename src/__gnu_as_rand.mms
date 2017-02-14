@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__rand.mmh"
+#include <mm/__internal/__rand.mmh>
             .global :MM:__RAND:Octa
             .global :MM:__RAND:OctaG
             .global :MM:__RAND:Range

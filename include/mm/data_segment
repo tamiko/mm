@@ -58,7 +58,7 @@
 
 #define __MM_INTERNAL
 #define MM_DATA_SEGMENT_ADDR @
-#include "../../src/__mmixal_data_segment.mmh"
+#include "__internal/__mmixal_data_segment.mmh"
 #undef __MM_INTERNAL
 
 #endif /* MM_DATA_SEGMENT */

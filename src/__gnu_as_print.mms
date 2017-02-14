@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__print.mmh"
+#include <mm/__internal/__print.mmh>
             .global :MM:__PRINT:RegLnG
             .global :MM:__PRINT:RegG
             .global :MM:__PRINT:Reg

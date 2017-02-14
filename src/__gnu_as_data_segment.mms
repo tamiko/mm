@@ -35,7 +35,7 @@
             .section .mm_data,"a"
             .balign 8
 #define __MM_INTERNAL
-#include "__strs.mmh"
+#include <mm/__internal/__strs.mmh>
             .balign 8
             PREFIX      :MM:__SYS:
 AtExitAddr  OCTA        #0000000000000000

@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__sys.mmh"
+#include <mm/__internal/__sys.mmh>
             .global :MM:__SYS:Exit
             .global :MM:__SYS:Abort
             .global :MM:__SYS:AtExit

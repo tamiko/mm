@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__heap.mmh"
+#include <mm/__internal/__heap.mmh>
             .global :MM:__HEAP:Alloc
             .global :MM:__HEAP:AllocJ
             .global :MM:__HEAP:AllocG

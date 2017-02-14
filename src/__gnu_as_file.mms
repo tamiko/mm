@@ -34,7 +34,7 @@
 
             .section .mm_text,"ax",@progbits
 #define __MM_INTERNAL
-#include "__file.mmh"
+#include <mm/__internal/__file.mmh>
             .global :MM:__FILE:LockJ
             .global :MM:__FILE:LockG
             .global :MM:__FILE:Lock

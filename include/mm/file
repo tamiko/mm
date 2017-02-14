@@ -38,8 +38,8 @@
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "../../src/__mmixal_init.mmh"
-#include "../../src/__file.mmh"
+#include "__internal/__mmixal_init.mmh"
+#include "__internal/__file.mmh"
 #undef __MM_INTERNAL
 #endif
 
