@@ -104,11 +104,6 @@ Alloc       SET         $3,arg0
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-1H          GET         :MM:__ERROR:__rJ,:rJ
-            SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapAlloc1
-            LDA         $3,:MM:__STRS:HeapAlloc2
-            PUSHJ       $0,:MM:__ERROR:Error3R2
 AllocG      SET         $3,t
             GET         $1,:rJ
             PUSHJ       $2,AllocJ
