@@ -35,10 +35,14 @@
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__print.mmh>
-            .global :MM:__PRINT:RegLnG
-            .global :MM:__PRINT:RegG
+            .global :MM:__PRINT:Str
+            .global :MM:__PRINT:StrG
+            .global :MM:__PRINT:StrLn
+            .global :MM:__PRINT:StrLnG
             .global :MM:__PRINT:Reg
+            .global :MM:__PRINT:RegG
             .global :MM:__PRINT:RegLn
+            .global :MM:__PRINT:RegLnG
             .global :MM:__PRINT:RegP
             .global :MM:__PRINT:RegLnP
             .global :MM:__PRINT:Byte

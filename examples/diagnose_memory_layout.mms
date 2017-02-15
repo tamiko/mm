@@ -32,11 +32,11 @@ arg1		IS		$1
 			% arg1 - address to print
 AddressOf 	GET     $2,:rJ
 			SET		t,arg0
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 			SET     t,arg1
 			PUSHJ	t,MM:Print:RegG
 			LDA		t,str_endl
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 			PUT		:rJ,$2
 			POP		0,0
 
@@ -44,21 +44,21 @@ AddressOf 	GET     $2,:rJ
 			% arg1 - address to print
 AddressOf2	GET     $2,:rJ
 			SET		t,arg0
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 			SET     t,arg1
 			PUSHJ	t,MM:Print:RegG
 			LDA		t,str_between
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 			LDOU    t,arg1
 			PUSHJ	t,MM:Print:RegG
 			LDA		t,str_endl
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 			PUT		:rJ,$2
 			POP		0,0
 
 Main		SET		$2,t
 			LDA		t,str_header
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 
 			LDA		$5,#0
 			LDA		$4,str_text
@@ -80,7 +80,7 @@ Main		SET		$2,t
 			PUSHJ   t,MM:Print:Ln
 
 			LDA		t,str_header2
-			TRAP	0,Fputs,StdOut
+			PUSHJ   t,MM:Print:StrG
 
 			LDA		$5,:MM:__INIT:OnStartup
 			LDA		$4,str_onstart

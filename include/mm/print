@@ -34,6 +34,8 @@
 % TODO: Some more useful pretty print stuff.
 %
 % This header file defines:
+%   :MM:Print:Str (StrG)
+%   :MM:Print:StrLn (StrLnG)
 %   :MM:Print:Reg (RegG)
 %   :MM:Print:RegLn (RegLnG)
 %   :MM:Print:Byte (ByteG)
@@ -55,6 +57,30 @@
 
             PREFIX      :MM:
 
+%%
+% :MM:Print:Str
+% :MM:Print:StrLn
+%   Print The null terminated string at memory location arg0 on stdout
+%   (Str), or print and append a newline (StrLn).
+%
+%   PUSHJ
+%   arg0 - pointer to null terminated string
+%   no return value
+%
+% :MM:Print:StrG
+% :MM:Print:StrLnG
+%   Print The null terminated string at memory location $255 on stdout
+%   (StrG), or print and append a newline (StrLnG).
+%   The content of $255 is preserved.
+%
+%   PUSHJ (,$255)
+%   no return value
+%
+Print:Str   IS          :MM:__PRINT:Str
+Print:StrLn IS          :MM:__PRINT:StrLn
+Print:StrG  IS          :MM:__PRINT:StrG
+Print:StrLnG IS         :MM:__PRINT:StrLnG
+
 %
 % Pretty print data and memory:
 %
@@ -75,7 +101,6 @@
 %   $255 is preserved.
 %
 %   PUSHJ (,$255)
-%   no arguments
 %   no return value
 %
 Print:Reg   IS          :MM:__PRINT:Reg
@@ -96,7 +121,6 @@ Print:RegLnG IS         :MM:__PRINT:RegLnG
 %   The content of $255 is preserved.
 %
 %   PUSHJ (,$255)
-%   no arguments
 %   no return value
 %
 Print:Byte  IS          :MM:__PRINT:Byte
@@ -118,7 +142,6 @@ Print:ByteG IS          :MM:__PRINT:ByteG
 %   stdout. The content of GREG $255 is preserved.
 %
 %   PUSHJ (,$255)
-%   no arguments
 %   no return value
 %
 Print:Signed IS         :MM:__PRINT:Signed
@@ -144,7 +167,6 @@ Print:MemLn IS         :MM:__PRINT:MemLn
 %   preserved.
 %
 %   PUSHJ (,$255)
-%   no arguments
 %   no return value
 %
 Print:Ln    IS          :MM:__PRINT:Ln

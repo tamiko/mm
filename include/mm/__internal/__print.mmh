@@ -45,11 +45,37 @@ Fputs       IS          :Fputs
 StdOut      IS          :StdOut
 
 %%
+% :MM:__PRINT:Str
+% :MM:__PRINT:StrLn
+%
+% PUSHJ
+%   arg0 - pointer to string
+%   no return value
+%
+% :MM:__PRINT:StrG
+% :MM:__PRINT:StrLnG
+%
+% PUSHJ
+%   no arguments
+%   no return value
+%
+Str         SET         t,$0
+StrG        SET         $0,t
+            TRAP        0,Fputs,StdOut
+            SET         t,$0
+            POP         0,0
+StrLn       SET         t,$0
+StrLnG      SET         $0,t
+            TRAP        0,Fputs,StdOut
+            PUSHJ       t,Ln
+            SET         t,$0
+            POP         0,0
+
+%%
 % :MM:__PRINT:RegLnG
 % :MM:__PRINT:RegG
 %
 % PUSHJ
-%   no arguments
 %   no return value
 %
 % :MM:__PRINT:Reg
