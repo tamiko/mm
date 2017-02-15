@@ -102,7 +102,7 @@ Grow        SLU         $0,arg0,1
 
 %%
 % :MM:__RAW_HEAP:Dealloc
-%   Deallocate a previously allocated bunch of memory. arg1 is hereby
+%   Deallocate a previously allocated bunch of memory. arg1 is
 %   aligned to 2*OCT and set to at least 2*OCT.
 %
 % PUSHJ:
@@ -197,7 +197,7 @@ sizeN       IS          $4
 
 %%
 % :MM:__RAW_HEAP:Alloc
-%   Allocate a continous block of memory. arg1 is hereby aligned to
+%   Allocate a continous block of memory. arg1 is aligned to
 %   2*OCT and set to at least 2*OCT.
 %
 % PUSHJ:

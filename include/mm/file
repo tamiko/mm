@@ -95,7 +95,7 @@
 %%
 % :MM:File:Open
 %   Open the file described by a string at memory position arg0 with
-%   file mode arg1. arg1 is hereby one of
+%   file mode arg1. arg1 is one of
 %     :TextRead
 %     :TextWrite
 %     :BinaryRead
