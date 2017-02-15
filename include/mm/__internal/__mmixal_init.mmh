@@ -50,37 +50,36 @@
 
 
 %
-% Initialize data segment:
+% Assemble basic library initalization code
 %
 
-            PREFIX      :MM:__INIT:
-__Pos1      IS          @
-            PREFIX      :
-#include "__mmixal_data_segment.mmh"
-            LOC         :MM:__INIT:__Pos1
-
-%
-% Include basic functionality and static literals:
-%
             LOC         (@+#FF)&-#100
-#include "__sys.mmh"
-#include "__error.mmh"
-#include "__mmix_sim_raw_heap.mmh"
-
-%
-% Hijack program startup to do some sanity checks.
-%
-
 #include <mm/__internal/__init.mmh>
 
-            %
-            % register :MM:__INIT:OnStartup as entry point
-            %
+%
+% Hijack program startup by registering :MM:__INIT:OnStartup as entry point
+%
+
             PREFIX      :MM:__INIT:
-__Pos2      IS          @
+__Pos       IS          @
             PREFIX      :
             LOC         #F0
             JMP         :MM:__INIT:OnStartup
-            LOC         :MM:__INIT:__Pos2
+            LOC         :MM:__INIT:__Pos
+
+%
+% Initialize data segment:
+%
+
+#include "__mmixal_data_segment.mmh"
+            LOC         :MM:__INIT:__Pos
+
+%
+% Initialize low level HEAP implementation:
+%
+
+#include "__sys.mmh"
+#include "__error.mmh"
+#include "__mmix_sim_raw_heap.mmh"
 
 #endif /* __MM_MMIXAL_INIT_MMH */
