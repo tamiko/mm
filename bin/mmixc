@@ -15,8 +15,27 @@ out_file=
 tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
 
 verbose=false
+preprocess_only=false
 compile_only=false
 keep_tmp=false
+
+print_help() {
+  echo "Usage: mmixc [-Idir...] [-Ldir...] [-llib...] [-o filename] [-E] [-c] [-keep-tmp|-save-tmps] [-v|-verbose] [-h|-help] [source files]"
+  echo ""
+  echo "A minimal wrapper around cpp, mmix-as, mmix-ld"
+  echo ""
+  echo "Options:"
+  echo "  -I<directory>  : add directory to the list of include directories passed to cpp"
+  echo "  -L<directory>  : add directory to the list of library directories passed to mmix-ld"
+  echo "  -l<archive>    : an archive to link against (passed to mmix-ld)"
+  echo "  -o <filename>  : filename of linked proglram (passed to mmix-ld)"
+  echo "  -E             : only run preprocessor (cpp) on given source files (creates *.i files)"
+  echo "  -c             : preprocessor (cpp) and assembler (mmix-as) on given source files (creates *.o files)"
+  echo "  -keep-tmp      : keep temporary directories (implies -verbose)"
+  echo "  -save-tmps     : same as -keep-tmp"
+  echo "  -v (-verbose)  : show preprocessor, assembler, linker invocation"
+  echo "  -h (-help)     : print this help message"
+}
 
 until [[ "$@" == "" ]]; do
   if [[ "$1" == -I* ]]; then
@@ -26,12 +45,18 @@ until [[ "$@" == "" ]]; do
   elif [[ "$1" == "-o" ]]; then
     shift
     out_file="$1"
+  elif [[ "$1" == "-h" || "$1" == "-help" ]]; then
+    print_help
+    exit 1
   elif [[ "$1" == "-v" || "$1" == "-verbose" ]]; then
     verbose=true
+  elif [[ "$1" == "-E" ]]; then
+    preprocess_only=true
   elif [[ "$1" == "-c" ]]; then
     compile_only=true
   elif [[ "$1" == "-keep-tmp" || "$1" == "-save-tmps" ]]; then
     keep_tmp=true
+    verbose=true
   else
     src_files+=( "$1" )
   fi
@@ -45,7 +70,8 @@ fi
 $keep_tmp && echo "Temporary directory \"$tmpdir\" preserved."
 
 for i in "${src_files[@]}"; do
-  pre="$tmpdir/$(basename -s .mms $i)$RANDOM.s"
+  pre="$tmpdir/$(basename -s .mms $i)$RANDOM.i"
+  $preprocess_only && pre=$(basename -s .mms $i).i
   obj="$tmpdir/$(basename -s .mms $i)$RANDOM.o"
   $compile_only && obj=$(basename -s .mms $i).o
 
@@ -53,11 +79,14 @@ for i in "${src_files[@]}"; do
 
   $verbose && echo "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"
   if "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"; then
-    $verbose && echo "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"
-    if ! "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"; then
-      $keep_tmp || rm -rf "$tmpdir"
-      exit 1
+    if ! $preprocess_only; then
+      $verbose && echo "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"
+      if ! "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"; then
+        $keep_tmp || rm -rf "$tmpdir"
+        exit 1
+      fi
     fi
+
   else
     $keep_tmp || rm -rf "$tmpdir"
     exit 1
@@ -65,7 +94,7 @@ for i in "${src_files[@]}"; do
 done
 
 
-if ! $compile_only; then
+if ! $compile_only && ! $preprocess_only; then
   $verbose && echo "$ld" -o "$out_file" \
     "${obj_files[@]:+${obj_files[@]}}" "${ld_args[@]:+${ld_args[@]}}"
 
