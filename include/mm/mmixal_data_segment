@@ -25,7 +25,7 @@
 %%
 
 %
-% :MM:DataSegment: (for mmixal assembler only)
+% :MM:MmixalDataSegment: (for mmixal assembler only)
 %
 % Explicitly assemble internal data structures at @.
 %

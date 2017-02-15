@@ -25,7 +25,12 @@
 %%
 
 %
-% FIXME: Description
+% :MM:GnuAsInit (for gnu-as assembler only)
+%
+% Include library startup code for GNU as assembler.
+%
+% Including this header file will declare a new .text section in which the
+% library startup code is explicitly assembled.
 %
 
 #ifndef __GNU_AS
