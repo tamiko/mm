@@ -8,7 +8,7 @@ base_name="$(basename -s .mms "$src_file")"
 preproc_file="$(mktemp "/tmp/$base_name.XXXXXXXX.c")"
 obj_file="$(mktemp "/tmp/$base_name.XXXXXXXX.o")"
 
-cpp -D__MMIXAL -D__MMIX_SIM "-I$include_dir" \
+cpp -D__MMIXAL -D__MMIXWARE "-I$include_dir" \
   "$src_file" -o "$preproc_file"
 
 mmixal -b 160 -x -o "${obj_file}" "$preproc_file" \

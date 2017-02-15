@@ -33,7 +33,7 @@
 #endif
 
             .section .mm_text,"ax",@progbits
-#ifdef __MMIX_SIM
+#ifdef __MMIXWARE
 #define __MM_INTERNAL
 #include <mm/__internal/__mmix_sim_raw_heap.mmh>
             .global :MM:__RAW_HEAP:Dealloc

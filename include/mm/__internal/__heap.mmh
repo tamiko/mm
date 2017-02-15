@@ -254,7 +254,7 @@ Realloc     GET         $2,:rJ
 ValidJ      SET         $5,0
             JMP         1F
 SizeJ       SET         $5,1
-#ifdef __MMIX_SIM
+#ifdef __MMIXWARE
             % A pointer to memory must be inside the pool segment:
 1H          LDA         t,Pool_Segment
             ADDU        t,t,2*OCT

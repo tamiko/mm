@@ -32,8 +32,8 @@
 #error Tried to include <mm/gnu_as_init> with foreign assembler.
 #endif
 
-#ifndef __MMIX_SIM
-#error Tried to include <mm/gnu_as_init> for non mmix-sim platform.
+#ifndef __MMIXWARE
+#error Tried to include <mm/gnu_as_init> for non mmixware platform.
 #endif
 
 #ifdef MM_GNU_AS_INIT

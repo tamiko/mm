@@ -32,8 +32,8 @@
 #error Inclusion of internal header file __mmixal_data_segment.mmh for foreign assembler
 #endif
 
-#ifndef __MMIX_SIM
-#error Incluseion of internal header file __gnu_as_init.mmh for non mmix-sim platform
+#ifndef __MMIXWARE
+#error Incluseion of internal header file __gnu_as_init.mmh for non mmixware platform
 #endif
 
 #ifndef __MM_GNU_AS_INIT_MMH

@@ -1,7 +1,7 @@
 prefix=__gnu_as_
 
 cpp=cpp
-cpp_args=-D__GNU_AS -D__MMIX_SIM
+cpp_args=-D__GNU_AS -D__MMIXWARE
 as=mmix-as
 as_args=-linker-allocated-gregs
 ld=mmix-ld
