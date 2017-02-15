@@ -3,7 +3,7 @@
 #include<mm/sys>
 
 #ifdef __GNU_AS
-            .section .data,"a",@progbits
+            .section .data,"wa",@progbits
 #endif
 str_header	BYTE	"Diagnose startup",10,10,0
 str_header2	BYTE	"Library specific adresses:",10,10,0
