@@ -8,6 +8,8 @@ base_name="$(basename -s .mms "$src_file")"
 preproc_file="$(mktemp "/tmp/$base_name.XXXXXXXX.c")"
 obj_file="$(mktemp "/tmp/$base_name.XXXXXXXX.o")"
 
+rm=true
+
 cpp -D__MMIXAL -D__MMIXWARE "-I$include_dir" \
   "$src_file" -o "$preproc_file"
 
@@ -18,9 +20,9 @@ rm "$preproc_file"
 until [[ "$@" == "" ]]; do
   if [[ "$1" == "-mmix" ]]; then
     shift
-    interpret+=( $1 )
+    interpret+=( "$1" )
   else
-    args+=( $1 )
+    args+=( "$1" )
   fi
   shift
 done
