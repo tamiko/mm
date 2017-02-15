@@ -13,22 +13,16 @@ ranlib=mmix-ranlib
 all: libmm.a $(objects)
 
 sources:=$(wildcard ../src/$(prefix)*.mms)
-preproc:=$(patsubst ../src/$(prefix)%.mms,%.s,$(sources))
+preproc:=$(patsubst ../src/$(prefix)%.mms,%.i,$(sources))
 objects:=$(patsubst ../src/$(prefix)%.mms,%.o,$(sources))
 
-%.s: ../src/$(prefix)%.mms ../src/__%.mmh
+%.i: ../src/$(prefix)%.mms ../include/__internal/__%.mmh ../include/__internal/__strs.mmh ../include/__internal/__mmixware_*.mmh
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
-%.s: ../src/$(prefix)%.mms ../src/__mmix_sim_%.mmh
+%.i: ../src/$(prefix)%.mms
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
-%.s: ../src/$(prefix)%.mms ../src/__strs.mmh
-	$(cpp) $(cpp_args) -I../include $< -o $@
-
-%.s: ../src/$(prefix)%.mms
-	$(cpp) $(cpp_args) -I../include $< -o $@
-
-%.o: %.s
+%.o: %.i
 	$(as) $(as_args) $< -o $@
 
 libmm.a: $(objects)
