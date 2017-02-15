@@ -49,11 +49,11 @@
 %        LOC     ...
 %
 
-#ifndef MM_DATA_SEGMENT
-#define MM_DATA_SEGMENT
+#ifndef MM_MMIXAL_DATA_SEGMENT
+#define MM_MMIXAL_DATA_SEGMENT
 
 #ifndef __MMIXAL
-#error Inclusion of header file mm/data_segment.mmh for foreign assembler.
+#error Inclusion of <mm/mmixal_data_segment> for foreign assembler.
 #endif
 
 #define __MM_INTERNAL
@@ -61,4 +61,4 @@
 #include "__internal/__mmixal_data_segment.mmh"
 #undef __MM_INTERNAL
 
-#endif /* MM_DATA_SEGMENT */
+#endif /* MM_MMIXAL_DATA_SEGMENT */

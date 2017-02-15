@@ -24,23 +24,27 @@
 % SOFTWARE.
 %%
 
-%
-% FIXME: Description
-%
-
-#ifndef __GNU_AS
-#error Tried to include <mm/gnu_as_init> with foreign assembler.
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __gnu_as_init.mmh
 #endif
 
-#ifndef __MMIX_SIM
-#error Tried to include <mm/gnu_as_init> for non mmix-sim platform.
-#endif
+            PREFIX      :MM:__INIT:
+OnStartup   SET         $2,$255     % store Main in $4
 
-#ifdef MM_GNU_AS_INIT
-#error <mm/gnu_as_init> must be included exactly once.
-#endif
-#define MM_GNU_AS_INIT
+            % $0 - argc
+            % $1 - argv
+            % $2 - Main
 
-#define __MM_INTERNAL
-#include "__internal/__gnu_as_init.mmh"
-#undef __MM_INTERNAL
+            %
+            % Now call into startup code
+            %
+
+            PUT         :rW,$2      % $255 <- Main after RESUME
+            PUT         :rB,$2      % RESUME at Main
+            SETML       $2,#F700
+            PUT         :rX,$2
+            PUT         :rJ,0
+            SET         $2,0
+            RESUME                  % Use resume for a pristine entry into Main
+
+            PREFIX      :

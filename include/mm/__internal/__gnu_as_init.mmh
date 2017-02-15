@@ -25,22 +25,31 @@
 %%
 
 #ifndef __MM_INTERNAL
-#error Inclusion of internal header file __file.mmh
+#error Inclusion of internal header file __gnu_as_init.mmh
 #endif
 
 #ifndef __GNU_AS
 #error Inclusion of internal header file __mmixal_data_segment.mmh for foreign assembler
 #endif
 
+#ifndef __MMIX_SIM
+#error Incluseion of internal header file __gnu_as_init.mmh for non mmix-sim platform
+#endif
+
 #ifndef __MM_GNU_AS_INIT_MMH
 #define __MM_GNU_AS_INIT_MMH
 
-%
-% Assemble data segment structures.
-%
-
             .section .program,"ax",@progbits
 
-            LOC         #100
+            %
+            % Hijack program startup by assembling an unconditional jump to
+            % address #100 and assemble the internal startup code there.
+            %
 
-#endif __MM_GNU_AS_INIT_MMH
+            LOC         #F0
+            GO          $2,#100
+            LOC         #100
+#include <mm/__internal/__init.mmh>
+
+
+#endif /* __MM_GNU_AS_INIT_MMH */

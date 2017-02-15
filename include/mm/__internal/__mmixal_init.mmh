@@ -41,6 +41,10 @@
 #error Inclusion of internal header file __mmixal_init.mmh for foreign assembler
 #endif
 
+#ifndef __MMIX_SIM
+#error Incluseion of internal header file __mmixal_init.mmh for non mmix-sim platform
+#endif
+
 #ifndef __MM_MMIXAL_INIT_MMH
 #define __MM_MMIXAL_INIT_MMH
 
@@ -50,11 +54,10 @@
 %
 
             PREFIX      :MM:__INIT:
-
 __Pos1      IS          @
+            PREFIX      :
 #include "__mmixal_data_segment.mmh"
-            PREFIX      :MM:__INIT:
-            LOC         __Pos1
+            LOC         :MM:__INIT:__Pos1
 
 %
 % Include basic functionality and static literals:
@@ -62,29 +65,22 @@ __Pos1      IS          @
             LOC         (@+#FF)&-#100
 #include "__sys.mmh"
 #include "__error.mmh"
-#ifdef __MMIX_SIM
 #include "__mmix_sim_raw_heap.mmh"
-#else
-#error No implementation of :MM:__RAW_SIM available for your platform.
-#endif
 
 %
 % Hijack program startup to do some sanity checks.
 %
 
-            PREFIX      :MM:__INIT:
-t           IS          $255
-OnStartup   PUT         :rW,$255
-            PUT         :rB,$255
-            SETML       $255,#F700
-            PUT         :rX,$255
-            PUT         :rJ,$3
-            RESUME % Use resume for a pristine entry into Main
-__Pos2      IS          @
-            LOC         #F0
-            JMP         OnStartup
-            LOC         __Pos2
+#include <mm/__internal/__init.mmh>
 
+            %
+            % register :MM:__INIT:OnStartup as entry point
+            %
+            PREFIX      :MM:__INIT:
+__Pos2      IS          @
             PREFIX      :
+            LOC         #F0
+            JMP         :MM:__INIT:OnStartup
+            LOC         :MM:__INIT:__Pos2
 
 #endif /* __MM_MMIXAL_INIT_MMH */
