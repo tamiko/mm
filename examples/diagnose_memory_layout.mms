@@ -1,6 +1,6 @@
 			SWYM
-#include<mm/print>
-#include<mm/sys>
+#include <mm/print>
+#include <mm/sys>
 
 #ifdef __GNU_AS
             .section .data,"wa",@progbits
@@ -28,7 +28,7 @@ str_str2	BYTE	"'",10,0
 str_endl	BYTE	" ]",10,0
 
 #ifdef __GNU_AS
-#include<mm/gnu_as_init>
+#include <mm/gnu_as_init>
 #endif
 t			IS		$255
 arg0		IS		$0
