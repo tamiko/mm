@@ -39,7 +39,7 @@
 #ifndef __MM_GNU_AS_INIT_MMH
 #define __MM_GNU_AS_INIT_MMH
 
-            .section .program,"ax",@progbits
+            .section .text,"ax",@progbits
 
             %
             % Hijack program startup by assembling an unconditional jump to
