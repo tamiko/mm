@@ -25,6 +25,38 @@ How to compile and run mmix programs:
 
   TODO: binfmt
 
+%
+% mmixal and GNU as on mmixware:
+%   The heap will be organized as memory blocks inside the pool
+%   segment of the executable. This needs some cooperation from the
+%   user: The convention (as defined by the mmixware documentation) is
+%   that M_8[:Pool_Segment] points to the first unallocated region
+%   within the pool adress space. User programs utilizing address
+%   space from the pool segment must obey this rule by 'allocating'
+%   memory by modifying M_8[:Pool_Segment] appropriately.
+%
+% All subroutines come in two variants. The first variant, without a
+% trailing 'J', will terminate the program with an error message, the
+% second variant (with a trailing 'J'), will jump to :rJ+#4 on succes
+% and to :rJ+#0 on failure, and can be used to implement customized
+% error handling. An example:
+%           % Try to allocate a block of memory:
+%           SET         $1,[...]
+%           PUSHJ       $0,:MM:Heap:AllocJ
+%           JMP         1F
+%           [...] % Allocation was successful, continue normally.
+%
+%    1H     [...] % Allocation failed, error handling.
+%
+% Subroutines that have at most one argument and one return parameter
+% come also in a variant with a trailing 'G' which indicates that
+% values are passed through the temporary general register $255. An
+% example:
+%           % Try to allocate a block of memory:
+%           SET         $255,[...]
+%           PUSHJ       $255,:MM:Heap:AllocG
+%                       % Address of allocated memory in $255
+
 
 Copying:
 ========

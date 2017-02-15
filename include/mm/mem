@@ -30,34 +30,17 @@
 % This header file provides subroutines for general memory
 % manipulation
 %
-% - Stable ABI, partially implemented -
+% - Stable ABI, fully implemented -
 %
-% All subroutines come in two variants. The first variant, without a
-% trailing 'J', will terminate the program with an error message, the
-% second variant (with a trailing 'J'), will jump to :rJ+#4 on succes
-% and to :rJ+#0 on failure, and can be used to implement customized
-% error handling. An example:
-%           % Try to allocate a block of memory:
-%           SET         $1,[...]
-%           PUSHJ       $0,:MM:AllocaJ
-%           JMP         1F
-%           [...] % Allocation was successful, continue normally.
-%
-%    1H     [...] % Allocation failed, error handling.
-%
-% This header file definesdefines:
+% This header file defines:
 %
 % :MM:Mem:Copy (CopyJ)
 % :MM:Mem:Set (SetJ)
 % :MM:Mem:Zero (ZeroJ)
 % :MM:Mem:Rand (RandJ)
+% :MM:Mem.Cmp (CmpJ)
 %
 % TODO:
-%
-% :MM:Mem:ChrJ
-% :MM:Mem:Chr
-% :MM:Mem.CmpJ
-% :MM:Mem.Cmp
 %
 
 #ifndef MM_MEM
@@ -122,7 +105,7 @@ Mem:SetJ    IS          :MM:__MEM:SetJ
 
 %%
 % :MM:Mem:Zero
-%   Set arg2 bytes from the location pointed to by arg0 to zero.
+%   Set arg1 bytes from the location pointed to by arg0 to zero.
 %
 %   PUSHJ:
 %   arg0 - pointer to source memory
@@ -130,7 +113,7 @@ Mem:SetJ    IS          :MM:__MEM:SetJ
 %   no return value
 %
 %   Precondition:
-%   - arg0 + arg2 <= #FFFFFFFFFFFFFFFF
+%   - arg0 + arg1 <= #FFFFFFFFFFFFFFFF
 %
 % :MM:Mem:ZeroJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
@@ -142,7 +125,7 @@ Mem:ZeroJ   IS          :MM:__MEM:ZeroJ
 
 %%
 % :MM:Mem:Rand
-%   Overwrite arg2 bytes from the location pointed to by arg0 with
+%   Overwrite arg1 bytes from the location pointed to by arg0 with
 %   random data.
 %
 %   This subroutine uses the prng implementation described in
@@ -154,7 +137,7 @@ Mem:ZeroJ   IS          :MM:__MEM:ZeroJ
 %   no return value
 %
 %   Precondition:
-%   - arg0 + arg2 < #FFFFFFFFFFFFFFFF
+%   - arg0 + arg1 < #FFFFFFFFFFFFFFFF
 %
 % :MM:Mem:RandJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
@@ -163,6 +146,28 @@ Mem:ZeroJ   IS          :MM:__MEM:ZeroJ
 %
 Mem:Rand    IS          :MM:__MEM:Rand
 Mem:RandJ   IS          :MM:__MEM:RandJ
+
+%%
+% :MM:Mem:Cmp
+%   Compare arg2 bytes starting from pointer arg0 and arg1, respectively,
+%   for equality.
+%
+%   PUSHJ:
+%   arg0 - pointer to memory region
+%   arg1 - pointer to memory region
+%   arg2 - size (in bytes)
+%   retm - 0 indicating two equal memory regions, -1 otherwise
+%
+%   Precondition:
+%   - arg0 + arg2 < #FFFFFFFFFFFFFFFF
+%   - arg1 + arg2 < #FFFFFFFFFFFFFFFF
+%
+% :MM:Mem:CmpJ
+%   This variant returns to :rJ+#4 if both memory regions are equal and to
+%   :rJ+#0 otherwise. No return value.
+%
+Mem:Cmp     IS          :MM:__MEM:Cmp
+Mem:CmpJ    IS          :MM:__MEM:CmpJ
 
             PREFIX      :
 
