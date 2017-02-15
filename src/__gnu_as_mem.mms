@@ -43,3 +43,5 @@
             .global :MM:__MEM:SetJ
             .global :MM:__MEM:Rand
             .global :MM:__MEM:RandJ
+            .global :MM:__MEM:Cmp
+            .global :MM:__MEM:CmpJ

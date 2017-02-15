@@ -124,6 +124,12 @@ MemRand2    BYTE        "] and [arg2=",0
 MemRand3    BYTE        "], wraps.",10,0
 MemRand4    BYTE        "Mem:Rand failed. Something went horribly "
             BYTE        "wrong",10,0
+MemCmp1     BYTE        "Mem:Cmp failed. Invalid data range specified. "
+            BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+MemCmp2     BYTE        "Mem:Cmp failed. Invalid data range specified. "
+            BYTE        "Memory region [arg1,arg1+arg2), with [arg1=",0
+MemCmp3     BYTE        "] and [arg2=",0
+MemCmp4     BYTE        "], wraps.",10,0
 
 % Literals used in __RAND:
 RandUrandom BYTE        "/dev/urandom",0

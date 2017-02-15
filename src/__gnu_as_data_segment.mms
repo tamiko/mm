@@ -101,6 +101,10 @@ Buffer      IS          @
             .global :MM:__STRS:MemRand2
             .global :MM:__STRS:MemRand3
             .global :MM:__STRS:MemRand4
+            .global :MM:__STRS:MemCmp1
+            .global :MM:__STRS:MemCmp2
+            .global :MM:__STRS:MemCmp3
+            .global :MM:__STRS:MemCmp4
             .global :MM:__STRS:RandUrandom
             .global :MM:__STRS:RandInit1
             .global :MM:__STRS:RandInit2

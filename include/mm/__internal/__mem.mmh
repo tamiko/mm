@@ -356,6 +356,121 @@ Rand        GET         $2,:rJ
 9H          LDA         $1,:MM:__STRS:MemRand4
             PUSHJ       $0,:MM:__ERROR:IError1
 
+
+%%
+% :MM:__MEM:CmpJ
+%
+%   arg0 - pointer to memory region
+%   arg1 - pointer to memory region
+%   arg2 - size (in bytes)
+%   no return value
+%
+
+            % Check preconditions:
+CmpJ        ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,9F
+            ADDU        t,arg1,arg2
+            CMPU        t,t,arg1
+            BN          t,9F
+            CMPU        t,arg0,arg1
+            BZ          t,8F % Nothing to do.
+            BZ          arg2,8F % Nothing to do.
+            % Check for alignment:
+CmpInternJ  AND         t,arg0,#7
+            BNZ         t,1F
+            AND         t,arg1,#7
+            BNZ         t,1F
+            % If arg0 and arg1 are octa aligned, take a shortcut:
+            SET         $4,$2    % store arg2
+            LDO         $5,$0,$2 % store M_8[arg0+arg2]
+            LDO         $6,$1,$2 % store M_8[arg0+arg2]
+            % Round arg2 down to next integral multiple of octa and
+            % jump into CopyOctaAl:
+            ANDN        $2,$2,#7
+            JMP         CmpOctaAl
+            % Take care of the last, partial octa:
+7H          AND         t,$4,#7
+            BZ          t,8F % arg2 is aligned.
+            % Generate a bitmask:
+            NEG         t,8,t
+            SLU         t,t,3
+            SET         $7,1
+            SLU         t,$7,t
+            SUBU        t,t,1
+            % And apply it:
+            AND         $6,$6,t
+            ANDN        $5,$5,t
+            OR          t,$5,$6
+            LDO         $7,$1,$4
+            CMPU        t,$7,t
+            BNZ         t,9F % last bytes are not the same
+            JMP         8F
+            % So, arg0 and or arg1 are not octa aligned. Now, it gets
+            % a bit tricky...
+1H          SWYM
+            LDA         $1,:MM:__STRS:ExcNotImpl
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+8H          POP         0,1
+9H          POP         0,0
+            % All arguments are octa aligned
+CmpOctaAl   BZ          $2,7B % nothing to do
+            SET         $3,0
+2H          LDO         t,$0,$3
+            LDO         $7,$1,$3
+            CMPU        t,$7,t
+            BNZ         t,9B % octas are not the same
+            ADDU        $3,$3,#8
+            SUBU        $2,$2,#8
+            PBNZ        $2,2B
+            JMP         7B % back to cmp
+
+% :MM:__MEM:Cmp
+%
+%   PUSHJ:
+%   arg0 - pointer to memory region
+%   arg1 - pointer to memory region
+%   arg2 - size (in bytes)
+%   retm - 0 indicating two equal memory regions, -1 otherwise
+%
+            % Check preconditions:
+Cmp         GET         $3,:rJ
+            ADDU        t,arg0,arg2
+            CMPU        t,t,arg0
+            BN          t,1F
+            ADDU        t,arg1,arg2
+            CMPU        t,t,arg1
+            BN          t,2F
+            CMPU        t,arg0,arg1
+            BZ          t,3F % Nothing to do.
+            BZ          arg2,3F % Nothing to do.
+            SET         $5,arg0
+            SET         $6,arg1
+            SET         $7,arg2
+            PUSHJ       $4,CmpInternJ
+            JMP         4F
+3H          PUT         :rJ,$3
+            SET         ret0,0
+            POP         1,0
+4H          PUT         :rJ,$3
+            SET         ret0,0
+            SUB         ret0,ret0,1
+            POP         1,0
+1H          GET         :MM:__ERROR:__rJ,:rJ
+            SET         $4,arg2
+            SET         $2,arg0
+            LDA         $1,:MM:__STRS:MemCmp1
+            LDA         $3,:MM:__STRS:MemCmp3
+            LDA         $5,:MM:__STRS:MemCmp4
+            PUSHJ       $0,:MM:__ERROR:Error5R24
+2H          GET         :MM:__ERROR:__rJ,:rJ
+            SET         $4,arg2
+            SET         $2,arg1
+            LDA         $1,:MM:__STRS:MemCmp2
+            LDA         $3,:MM:__STRS:MemCmp3
+            LDA         $5,:MM:__STRS:MemCmp4
+            PUSHJ       $0,:MM:__ERROR:Error5R24
+
             PREFIX      :
 
 #endif /* __MM_MEM_MMH */
