@@ -29,7 +29,7 @@
 %
 % Various printing subroutines. Mainly useful for diagnostics.
 %
-% - Stable ABI, partially implemented -
+% - Stable ABI, fully implemented -
 %
 % TODO: Some more useful pretty print stuff.
 %

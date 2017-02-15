@@ -29,7 +29,7 @@
 %
 % Subroutines for program termination and related event handlers.
 %
-% - Stable ABI, partially implemented -
+% - Stable ABI,  fully implemented -
 %
 % TODO: Time and wait.
 %
