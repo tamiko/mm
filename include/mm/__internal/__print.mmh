@@ -67,7 +67,9 @@ StrG        SET         $0,t
 StrLn       SET         t,$0
 StrLnG      SET         $0,t
             TRAP        0,Fputs,StdOut
+            GET         $1,:rJ
             PUSHJ       t,Ln
+            PUT         :rJ,$1
             SET         t,$0
             POP         0,0
 
