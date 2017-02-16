@@ -54,7 +54,9 @@ Buffer      IS          @
             .fill 128*8
             PREFIX      :
             .global :MM:__STRS:Terminated
-            .global :MM:__STRS:Continued
+            .global :MM:__STRS:Continued1
+            .global :MM:__STRS:Continued2
+            .global :MM:__STRS:Continued3
             .global :MM:__STRS:InternErro
             .global :MM:__STRS:Error1
             .global :MM:__STRS:Error2
@@ -62,8 +64,8 @@ Buffer      IS          @
             .global :MM:__STRS:ErrorHndlC2
             .global :MM:__STRS:ExcNotImpl
             .global :MM:__STRS:Generic
-            .global :MM:__STRS:HeapGrow1
-            .global :MM:__STRS:HeapDeallo1
+            .global :MM:__STRS:PoolGrow1
+            .global :MM:__STRS:PoolDeallo1
             .global :MM:__STRS:HeapAlloc1
             .global :MM:__STRS:HeapAlloc2
             .global :MM:__STRS:HeapFree1

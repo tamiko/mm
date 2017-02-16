@@ -51,6 +51,7 @@
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
+#include "__internal/__file.mmh"
 #include "__internal/__rand.mmh"
 #include "__internal/__mem.mmh"
 #include "__internal/__heap.mmh"

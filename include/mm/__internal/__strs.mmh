@@ -42,8 +42,12 @@
 % Error messages:
 
 Terminated  BYTE        "[MM library]   Program terminated.",10,0
-Continued   BYTE        "[MM library]   Error handler returned. "
-            BYTE        "Continue execution.",10,0
+
+Continued1  BYTE        "[MM library]   Error handler returned. "
+            BYTE        "Continue execution at [",0
+Continued2  BYTE        "[MM library]   Special handler value #FFFFFFFFFFFFFFFF. "
+            BYTE        "Continue execution at [",0
+Continued3  BYTE        "].",10,0
 InternErro  BYTE        "[MM library] Internal error: ",10
             BYTE        "[MM library]   ",0
 Error1      BYTE        "[MM library] Called from [rJ=",0
