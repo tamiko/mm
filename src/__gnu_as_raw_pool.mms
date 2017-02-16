@@ -33,13 +33,8 @@
 #endif
 
             .section .text,"ax",@progbits
-#ifdef __MMIXWARE
 #define __MM_INTERNAL
-#include <mm/__internal/__raw_heap.mmh>
-            .global :MM:__RAW_HEAP:Dealloc
-            .global :MM:__RAW_HEAP:Alloc
-            .global :MM:__RAW_HEAP:heap_ptr
-#else
-#error No implementation of :MM:__RAW_SIM available for your platform.
-#endif
-
+#include <mm/__internal/__raw_pool.mmh>
+            .global :MM:__RAW_POOL:Dealloc
+            .global :MM:__RAW_POOL:Alloc
+            .global :MM:__RAW_POOL:pool_ptr

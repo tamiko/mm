@@ -35,8 +35,8 @@
 %    ptr -> OCTAs data
 %           OCTA  checksum2 (nxor size ptr)
 %
-% Actual memory management is delegated to :MM:__RAW_HEAP:Alloc,
-% :MM:__RAW_HEAP:Dealloc.
+% Actual memory management is delegated to :MM:__RAW_POOL:Alloc,
+% :MM:__RAW_POOL:Dealloc.
 %
 
 #ifndef __MM_INTERNAL
@@ -82,7 +82,7 @@ AllocJ      GET         $1,:rJ
             CMPU        t,$0,3*OCT % check for overflow
             BN          t,1F
             SET         $3,$0
-            PUSHJ       $2,:MM:__RAW_HEAP:Alloc
+            PUSHJ       $2,:MM:__RAW_POOL:Alloc
             BZ          $2,1F
             PUT         :rJ,$1
             SET         $1,$2
@@ -148,7 +148,7 @@ DeallocJ    GET         $1,:rJ
             PREST       #8,$3,$4
             ADDU        $4,$4,1*OCT % size
             % And deallocate:
-            PUSHJ       $2,:MM:__RAW_HEAP:Dealloc
+            PUSHJ       $2,:MM:__RAW_POOL:Dealloc
             PUT         :rJ,$1
             POP         0,1
 1H          PUT         :rJ,$1

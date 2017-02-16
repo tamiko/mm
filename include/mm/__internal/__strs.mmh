@@ -56,11 +56,11 @@ ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             BYTE        "(ExcNotImpl).",10,0
 Generic     BYTE        "Something went horribly wrong...",10,0
 
-% Literals used in __RAW_HEAP:
+% Literals used in __RAW_POOL:
 
-HeapGrow1   BYTE        "__RAW_HEAP::Grow failed. "
+PoolGrow1   BYTE        "__RAW_POOL::Grow failed. "
             BYTE        "Out of memory.",10,0
-HeapDeallo1 BYTE        "__RAW_HEAP::Dealloc called with invalid "
+PoolDeallo1 BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
 % Literals used in __HEAP:

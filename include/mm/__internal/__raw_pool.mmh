@@ -25,24 +25,24 @@
 %%
 
 %
-% :MM:__RAW_HEAP:
+% :MM:__RAW_POOL:
 %
 % Internal header file.
 %
-% A very minimalistic heap memory implementation.
+% A very minimalistic memory pool implementation.
 % Inclusion of this header file will consume one GREG.
 %
-% TODO: Implement a heap structure for efficiently storing the heap.
+% TODO: Implement a heap structure for efficiently storing the pool.
 %
 
 #ifndef __MM_INTERNAL
-#error Inclusion of internal header file __raw_heap.mmh
+#error Inclusion of internal header file __raw_pool.mmh
 #endif
 
-#ifndef __MM_RAW_HEAP_MMH
-#define __MM_RAW_HEAP_MMH
+#ifndef __MM_RAW_POOL_MMH
+#define __MM_RAW_POOL_MMH
 
-            PREFIX      :MM:__RAW_HEAP:
+            PREFIX      :MM:__RAW_POOL:
 
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
@@ -50,7 +50,7 @@ Stack_Segment IS        :Stack_Segment
 %%
 % We need a GREG to maintain a pool of memory blocks
 %
-heap_ptr    GREG        0
+pool_ptr    GREG        0
 
 t           IS          $255
 arg0        IS          $0
@@ -58,7 +58,7 @@ arg1        IS          $1
 OCT         IS          #8
 
 %%
-% :MM:__RAW_HEAP:Grow
+% :MM:__RAW_POOL:Grow
 %   Increase available memory by allocating memory from the pool
 %   segment. Ensure that at least a continuous block of arg0 bytes is
 %   available for allocation
@@ -89,18 +89,18 @@ Grow        SLU         $0,arg0,1
             BNP         t,1F
             SET         t,$3
             STO         $3,$1,0
-            STO         heap_ptr,$2,0
+            STO         pool_ptr,$2,0
             STO         $0,$2,OCT
-            SET         heap_ptr,$2
+            SET         pool_ptr,$2
             GET         $0,:rJ
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__STRS:HeapGrow1
+1H          LDA         $1,:MM:__STRS:PoolGrow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
-% :MM:__RAW_HEAP:Dealloc
+% :MM:__RAW_POOL:Dealloc
 %   Deallocate a previously allocated bunch of memory. arg1 is
 %   aligned to 2*OCT and set to at least 2*OCT.
 %
@@ -111,7 +111,7 @@ Grow        SLU         $0,arg0,1
 %
 % Preconditions:
 %   - The memory block defined by arg0, arg1 must have been
-%     allocated via :MM:__RAW_HEAP:Alloc
+%     allocated via :MM:__RAW_POOL:Alloc
 %
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
 Dealloc     CSZ         arg1,arg1,#10
@@ -127,18 +127,18 @@ Dealloc     CSZ         arg1,arg1,#10
             LDA         $2,Stack_Segment
             CMPU        t,$2,$3
             BNP         t,1F
-            STO         heap_ptr,arg0,0 % pointer
+            STO         pool_ptr,arg0,0 % pointer
             STO         arg1,arg0,OCT % size
-            SET         heap_ptr,arg0 % update pointer
+            SET         pool_ptr,arg0 % update pointer
             GET         $0,:rJ
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__STRS:HeapDeallo1
+1H          LDA         $1,:MM:__STRS:PoolDeallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
-% :MM:__RAW_HEAP:Recompact
+% :MM:__RAW_POOL:Recompact
 %
 % A rudimentary reduction strategy: Merge adjacents blocks of memory
 % that can be easily spotted by a linear search
@@ -147,14 +147,14 @@ Dealloc     CSZ         arg1,arg1,#10
 %   no arguments
 %   no return value
 %
-Recompact   BZ          heap_ptr,2F % nothing to do
+Recompact   BZ          pool_ptr,2F % nothing to do
 ptrB        IS          $0
 ptrC        IS          $1
 sizeC       IS          $2
 ptrN        IS          $3
 sizeN       IS          $4
             SET         ptrB,0
-            SET         ptrC,heap_ptr % current ptr
+            SET         ptrC,pool_ptr % current ptr
 9H          LDO         sizeC,ptrC,OCT % current size
             LDO         ptrN,ptrC,0 % next ptr
             CMPU        t,ptrN,0 % nothing more to do
@@ -185,7 +185,7 @@ sizeN       IS          $4
             STO         ptrN,ptrB,0
             SET         ptrC,ptrN
             JMP         9B
-3H          SET         heap_ptr,ptrN
+3H          SET         pool_ptr,ptrN
             SET         ptrC,ptrN
             JMP         9B
             % Advance pointer
@@ -195,7 +195,7 @@ sizeN       IS          $4
 2H          POP         0
 
 %%
-% :MM:__RAW_HEAP:Alloc
+% :MM:__RAW_POOL:Alloc
 %   Allocate a continous block of memory. arg1 is aligned to
 %   2*OCT and set to at least 2*OCT.
 %
@@ -210,36 +210,36 @@ prev_ptr    IS          $2
 Alloc       CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
-            % Initialize the heap if necessary:
-            PBNZ        heap_ptr,1F
+            % Initialize the pool if necessary:
+            PBNZ        pool_ptr,1F
             GET         $1,:rJ
             SET         $3,0
             PUSHJ       $2,Grow
             PUT         :rJ,$1
-            % 1st case: use chunk pointed to by heap_ptr:
-1H          LDO         t,heap_ptr,OCT
+            % 1st case: use chunk pointed to by pool_ptr:
+1H          LDO         t,pool_ptr,OCT
             CMPU        t,arg0,t
             BN          t,1F % chunk too big
             BP          t,2F % chunk too small
-            SET         arg0,heap_ptr
-            LDO         heap_ptr,heap_ptr,0
+            SET         arg0,pool_ptr
+            LDO         pool_ptr,pool_ptr,0
             POP         1,0
-1H          LDO         t,heap_ptr,0
-            STO         t,heap_ptr,arg0
-            LDO         t,heap_ptr,OCT
+1H          LDO         t,pool_ptr,0
+            STO         t,pool_ptr,arg0
+            LDO         t,pool_ptr,OCT
             SUBU        t,t,arg0
             ADDU        arg0,arg0,OCT
-            STO         t,heap_ptr,arg0
+            STO         t,pool_ptr,arg0
             SUBU        arg0,arg0,OCT
-            ADDU        heap_ptr,heap_ptr,arg0
-            SUBU        arg0,heap_ptr,arg0
+            ADDU        pool_ptr,pool_ptr,arg0
+            SUBU        arg0,pool_ptr,arg0
             POP         1,0
             % 2nd case: use some later chunk:
-2H          SET         prev_ptr,heap_ptr
-            LDO         ptr,heap_ptr
+2H          SET         prev_ptr,pool_ptr
+            LDO         ptr,pool_ptr
 3H          CMPU        t,ptr,0
             PBNZ        t,5F
-            % Out of heap memory, allocate new memory from the pool:
+            % Out of pool memory, allocate new memory from the pool:
             GET         $1,:rJ
             SET         $3,arg0
             GET         $1,:rJ
@@ -271,4 +271,4 @@ Alloc       CSZ         arg0,arg0,#10
 
             PREFIX      :
 
-#endif /* __MM_RAW_HEAP_MMH */
+#endif /* __MM_RAW_POOl_MMH */

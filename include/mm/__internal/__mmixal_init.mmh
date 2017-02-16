@@ -90,11 +90,11 @@ Buffer      IS          @
             LOC         :MM:__INIT:__Pos
 
 %
-% Initialize low level HEAP implementation:
+% Initialize low level memory pool implementation:
 %
 
 #include "__sys.mmh"
 #include "__error.mmh"
-#include "__raw_heap.mmh"
+#include "__raw_pool.mmh"
 
 #endif /* __MM_MMIXAL_INIT_MMH */
