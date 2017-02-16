@@ -29,9 +29,7 @@
 %
 % Various printing subroutines. Mainly useful for diagnostics.
 %
-% - Stable ABI, fully implemented -
-%
-% TODO: Some more useful pretty print stuff.
+% - Stable ABI, partially implemented -
 %
 % This header file defines:
 %   :MM:Print:Str (StrG)

@@ -40,8 +40,6 @@
 % :MM:Mem:Rand (RandJ)
 % :MM:Mem.Cmp (CmpJ)
 %
-% TODO:
-%
 
 #ifndef MM_MEM
 #define MM_MEM

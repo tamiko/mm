@@ -29,8 +29,6 @@
 %
 % - unstable, partially implemented -
 %
-% TODO: More description
-%
 % Subroutines for cryptographically strong pseudo random numbers.
 % default, this library attempts to open '/dev/urandom' for a source
 % of random numbers.
