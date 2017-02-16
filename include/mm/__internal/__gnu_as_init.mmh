@@ -45,3 +45,4 @@ EntryPoint  JMP         1F
             GO          $2,$2
             PREFIX      :
             .global :MM:__INIT:EntryPoint
+            .weak :MM:__INIT:EntryPoint
