@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2017 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -24,27 +24,31 @@
 % SOFTWARE.
 %%
 
-#ifndef __MM_INTERNAL
-#error Inclusion of internal header file __init.mmh
+%
+% Assemble data segment structures.
+%
+
+#ifndef __GNU_AS
+#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .text,"ax",@progbits
+            LOC         #100
+
+            %
+            % Hijack program startup by assembling an unconditional jump to
+            % address #100 and assemble the internal startup code there.
+            %
+
+            %LOC         #F0
             PREFIX      :MM:__INIT:
-OnStartup   SET         $2,$255     % store Main in $4
-
-            % $0 - argc
-            % $1 - argv
-            % $2 - Main
-
-            %
-            % Now call into startup code
-            %
-
-            PUT         :rW,$2      % $255 <- Main after RESUME
-            PUT         :rB,$2      % RESUME at Main
-            SETML       $2,#F700
-            PUT         :rX,$2
-            PUT         :rJ,0
-            SET         $2,0
-            RESUME                  % Use resume for a pristine entry into Main
-
+EntryPoint  GO          $2,#100
             PREFIX      :
+            %LOC         #100
+
+#define __MM_INTERNAL
+#include <mm/__internal/__init.mmh>
+#undef __MM_INTERNAL
+
+            .global :MM:__INIT:EntryPoint
+            .global :MM:__INIT:OnStartup

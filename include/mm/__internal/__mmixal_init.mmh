@@ -64,8 +64,10 @@ __Pos       IS          @
 % Hijack program startup by registering :MM:__INIT:OnStartup as entry point
 %
 
-%            LOC         #F0
-%            JMP         :MM:__INIT:OnStartup
+            LOC         #F0
+            PREFIX      :MM:__INIT:
+EntryPoint  JMP         :MM:__INIT:OnStartup
+            PREFIX      :
 
 %
 % Initialize data segment:

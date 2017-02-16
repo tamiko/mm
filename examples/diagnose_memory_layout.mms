@@ -12,6 +12,7 @@ str_data	BYTE	"    Data segment:         [ ",0
 str_pool	BYTE	"    Pool segment:         [ ",0
 str_stack	BYTE	"    Stack segment:        [ ",0
 str_main	BYTE	"    Main:                 [ ",0
+str_entry	BYTE	"    :MM:__Init:EntryPoint [ ",0
 str_onstart	BYTE	"    :MM:__Init:OnStartup  [ ",0
 str_atexit	BYTE	"    :MM:__SYS:AtExitAddr  [ ",0
 str_atabort	BYTE	"    :MM:__SYS:AtAbortAddr [ ",0
@@ -88,6 +89,9 @@ Main		SET		$2,t
 			LDA		t,str_header2
 			PUSHJ	t,MM:Print:StrG
 
+			LDA		$5,:MM:__INIT:EntryPoint
+			LDA		$4,str_entry
+			PUSHJ	$3,AddressOf
 			LDA		$5,:MM:__INIT:OnStartup
 			LDA		$4,str_onstart
 			PUSHJ	$3,AddressOf
