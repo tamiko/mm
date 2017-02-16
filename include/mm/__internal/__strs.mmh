@@ -164,6 +164,8 @@ FileClose2  BYTE        "] locked by user or system.",10,0
 FileClose3  BYTE        "] not opened.",10,0
 FileClose4  BYTE        "File:Close failed. Could not close file handle [arg0=",0
 FileClose5  BYTE        "]. Internal state corrupted.",10,0
+FileRead1   BYTE        "File.Read failed. Could not read from file handle [arg2=",0
+FileRead2   BYTE        "].",10,0
 
             PREFIX      :
 

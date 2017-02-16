@@ -133,6 +133,8 @@ Buffer      IS          @
             .global :MM:__STRS:FileClose3
             .global :MM:__STRS:FileClose4
             .global :MM:__STRS:FileClose5
+            .global :MM:__STRS:FileRead1
+            .global :MM:__STRS:FileRead2
             .global :MM:__STRS:PrintLn
             .global :MM:__SYS:AtExitAddr
             .global :MM:__SYS:AtAbortAddr

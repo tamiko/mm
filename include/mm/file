@@ -32,6 +32,19 @@
 %
 % This header file provides subroutines for file handling
 %
+% This header file defines:
+%   :MM:File:Lock (LockJ, LockG)
+%   :MM:File:Read (ReadJ)
+%   :MM:File:IsOpen (IsOpenJ, IsOpenG)
+%   :MM:File:IsReadable (IsReadableJ, IsReadableG)
+%   :MM:File:IsWritable (IsWritableJ, IsWritableG)
+%   :MM:File:Close (CloseJ, CloseG)
+%   :MM:File:Open (OpenJ)
+%   :MM:File:Unlock (UnlockJ, UnlockG)
+%   :MM:File:Tell (TellJ, TellG)
+%   :MM:File:Seek (SeekJ, SeekG)
+%   :MM:File:Write (WriteJ)
+%
 
 #ifndef MM_FILE
 #define MM_FILE
@@ -51,7 +64,7 @@
 %   Lock the file handle arg0 manually.
 %
 % PUSHJ
-%   arg0 - lowest two bytes define the file handle to lock
+%   arg0 - lowest byte define the file handle to lock
 %   no return value
 %
 % Precondition:
@@ -66,9 +79,9 @@
 %   Variant of File:Lock that returns to :rJ+#4 on success, and
 %   to :rJ+#0 on failure. Same calling sequence.
 %
-:MM:File:Lock  IS       :MM:__FILE:Lock
-:MM:File:LockG IS       :MM:__FILE:LockG
-:MM:File:LockJ IS       :MM:__FILE:LockJ
+File:Lock   IS          :MM:__FILE:Lock
+File:LockG  IS          :MM:__FILE:LockG
+File:LockJ  IS          :MM:__FILE:LockJ
 
 %%
 % :MM:File:Unlock
@@ -89,9 +102,9 @@
 %   Variant of File:Unlock that returns to :rJ+#4 on success, and
 %   to :rJ+#0 on failure. Same calling sequence.
 %
-:MM:File:Unlock  IS     :MM:__FILE:Unlock
-:MM:File:UnlockG IS     :MM:__FILE:UnlockG
-:MM:File:UnlockJ IS     :MM:__FILE:UnlockJ
+File:Unlock  IS         :MM:__FILE:Unlock
+File:UnlockG IS         :MM:__FILE:UnlockG
+File:UnlockJ IS         :MM:__FILE:UnlockJ
 
 %%
 % :MM:File:Open
@@ -128,7 +141,7 @@ File:OpenJ  IS          :MM:__FILE:OpenJ
 %
 % Precondition:
 %   The lowest byte in arg0 must be a succesfully opened file handle
-%   returned by a call to File:Open(J) or File:Reopen(J).
+%   returned by a call to File:Open(J).
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle
@@ -144,16 +157,6 @@ File:OpenJ  IS          :MM:__FILE:OpenJ
 File:Close  IS          :MM:__FILE:Close
 File:CloseG IS          :MM:__FILE:CloseG
 File:CloseJ IS          :MM:__FILE:CloseJ
-
-%%
-% :MM:File:Reopen
-%   arg0 - pointer to string containing filename
-%   arg1 - mode
-%   arg2 - file handle to replace
-%   retm - file handle on success / -1 on failure
-%
-% :MM:File:ReopenJ
-%
 
 %%
 % :MM:File:IsOpen
@@ -215,8 +218,8 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 % :MM:File:ReadJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
 %
+File:Read   IS          :MM:__FILE:Read
 File:ReadJ  IS          :MM:__FILE:ReadJ
-%File:Read   IS          :MM:__FILE:Read
 
 %%
 % :MM:File:Write
@@ -228,6 +231,12 @@ File:ReadJ  IS          :MM:__FILE:ReadJ
 % :MM:File:WriteJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
 %
+
+
+%
+% TODO: Some ideas:
+%
+
 
 %%
 % :MM:File:Gets

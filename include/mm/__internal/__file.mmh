@@ -1182,6 +1182,18 @@ ReadJ       BN          arg1,9F % invalid size
             PUT         :rJ,$3
             POP         1,1
 9H          POP         0,0
+Read        SET         $4,arg2
+            SET         $3,arg1
+            SET         $2,arg0
+            GET         $0,:rJ
+            PUSHJ       $1,ReadJ
+            JMP         9F
+            PUT         :rJ,$0
+            POP         0,0
+9H          SET         :MM:__ERROR:__rJ,$0
+            LDA         $1,:MM:__STRS:FileRead1
+            LDA         $3,:MM:__STRS:FileRead2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 
             PREFIX      :
 
