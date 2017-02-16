@@ -9,7 +9,6 @@
 HelloString BYTE        "Hello World!",10,0
 
             .section .text,"xa",@progbits
-Main
-            LDA         $255,HelloString
+Main        LDA         $255,HelloString
             PUSHJ       $255,MM:Print:StrG
             PUSHJ       $255,MM:Sys:Exit
