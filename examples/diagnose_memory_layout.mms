@@ -22,7 +22,7 @@ str_atexit  BYTE        "    :MM:__SYS:AtExitAddr  [ ",0
 str_atabort BYTE        "    :MM:__SYS:AtAbortAddr [ ",0
 str_aterror BYTE        "    :MM:__SYS:AtErrorAddr [ ",0
 str_fpool   BYTE        "    :MM:__FILE:Pool       [ ",0
-str_buffer  BYTE        "    :MM:__INIT:Buffer     [ ",0
+str_buffer  BYTE        "    :MM:__INTERNAL:Buffer [ ",0
 str_between BYTE        " ]    -->    [ ",0
 str_argc    BYTE        "    argc:                 [ ",0
 str_argv    BYTE        "    argv:                 [ ",0
@@ -113,7 +113,7 @@ Main        SET         $2,t
             LDA         $5,:MM:__FILE:Pool
             LDA         $4,str_fpool
             PUSHJ       $3,AddressOf
-            LDA         $5,:MM:__INIT:Buffer
+            LDA         $5,:MM:__INTERNAL:Buffer
             LDA         $4,str_buffer
             PUSHJ       $3,AddressOf
             PUSHJ       t,:MM:Print:Ln

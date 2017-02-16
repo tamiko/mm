@@ -68,7 +68,7 @@ arg4        IS          $4
 %
 buffer      IS          $1
 ErrByteG    SET         arg0,t
-            LDA         buffer,:MM:__INIT:Buffer
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -101,7 +101,7 @@ ErrRegG     SET         $0,t
             SET         $2,8
             ADD         $5,$1,$1
             ADD         $6,$2,$2
-            LDA         buffer,:MM:__INIT:Buffer
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $3,0
             STB         $3,buffer,17
 1H          SET         $4,$0 % save original value

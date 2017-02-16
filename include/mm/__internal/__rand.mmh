@@ -98,11 +98,11 @@ Octa        GET         $0,:rJ
             PUSHJ       t,Init
             LDA         $4,:MM:__RAND:FileHandle
             LDO         $4,$4
-1H          LDA         $2,:MM:__INIT:Buffer
+1H          LDA         $2,:MM:__INTERNAL:Buffer
             SET         $3,#8
             PUSHJ       $1,:MM:__FILE:ReadJ
             JMP         9F
-            LDA         $1,:MM:__INIT:Buffer
+            LDA         $1,:MM:__INTERNAL:Buffer
             PUT         :rJ,$0
             LDO         $0,$1
             POP         1,0

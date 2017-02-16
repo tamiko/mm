@@ -413,7 +413,7 @@ fh          IS          $3
 1H          ORL         arg1,#8
             STB         arg1,pool,fh
             ANDNL       arg1,#8
-            LDA         $4,:MM:__INIT:Buffer
+            LDA         $4,:MM:__INTERNAL:Buffer
             STO         arg0,$4,0
             STO         arg1,$4,8
             SLU         $3,fh,3 % *8

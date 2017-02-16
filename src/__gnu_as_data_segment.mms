@@ -49,7 +49,7 @@ Pool        BYTE        #EE,#EE,#EE
             PREFIX      :MM:__RAND:
 FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .balign 8
-            PREFIX      :MM:__INIT:
+            PREFIX      :MM:__INTERNAL:
 Buffer      IS          @
             .fill 128*8
             PREFIX      :
@@ -141,4 +141,4 @@ Buffer      IS          @
             .global :MM:__SYS:AtErrorAddr
             .global :MM:__FILE:Pool
             .global :MM:__RAND:FileHandle
-            .global :MM:__INIT:Buffer
+            .global :MM:__INTERNAL:Buffer

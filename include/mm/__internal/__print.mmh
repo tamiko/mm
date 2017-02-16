@@ -103,7 +103,7 @@ RegLn       SET         $1,0
             SET         $2,8
 RegLnP      ADD         $5,$1,$1
             ADD         $6,$2,$2
-            LDA         buffer,:MM:__INIT:Buffer
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $3,10 % newline
             STB         $3,buffer,17
             SET         $3,0
@@ -114,7 +114,7 @@ Reg         SET         $1,0
             SET         $2,8
 RegP        ADD         $5,$1,$1
             ADD         $6,$2,$2
-            LDA         buffer,:MM:__INIT:Buffer
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $3,0
             STB         $3,buffer,17
 1H          SET         $4,$0 % save original value
@@ -154,7 +154,7 @@ RegP        ADD         $5,$1,$1
 %
 buffer      IS          $1
 ByteG       SET         arg0,t
-Byte        LDA         buffer,:MM:__INIT:Buffer
+Byte        LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -195,7 +195,7 @@ buffer      IS          $1
 ptr         IS          $2
 carry       IS          $3
 UnsignedG   SET         arg0,t
-Unsigned    LDA         buffer,:MM:__INIT:Buffer
+Unsigned    LDA         buffer,:MM:__INTERNAL:Buffer
             SET         ptr,128*8-1
             SET         t,0
             STB         t,buffer,ptr
@@ -234,7 +234,7 @@ Signed      GET         $2,:rJ
             BN          arg0,1F
             PUSHJ       t,UnsignedG
             JMP         2F
-1H          LDA         buffer,:MM:__INIT:Buffer
+1H          LDA         buffer,:MM:__INTERNAL:Buffer
             STCO        0,buffer,0
             SET         t,'-'
             STB         t,buffer,0

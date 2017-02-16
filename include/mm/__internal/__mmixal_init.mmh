@@ -84,7 +84,7 @@ Pool        BYTE        #EE,#EE,#EE
             LOC         (@+#7)&-#8
             PREFIX      :MM:__RAND:
 FileHandle  OCTA        #FFFFFFFFFFFFFFFF
-            PREFIX      :MM:__INIT:
+            PREFIX      :MM:__INTERNAL:
 Buffer      IS          @
             LOC         @+128*8
             PREFIX      :
