@@ -97,8 +97,6 @@ Main		SET		$2,t
 			PUSHJ	$3,AddressOf
 			PUSHJ	t,MM:Print:Ln
 
-			LDA		$4,str_atexit
-			PUSHJ	$3,AddressOf
 			LDA		$5,:MM:__SYS:AtExitAddr
 			LDA		$4,str_atexit
 			PUSHJ	$3,AddressOf2

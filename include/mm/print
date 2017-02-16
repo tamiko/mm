@@ -48,9 +48,10 @@
 #ifndef MM_PRINT
 #define MM_PRINT
 
+#include "init"
+
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "__internal/__mmixal_init.mmh"
 #include "__internal/__print.mmh"
 #undef __MM_INTERNAL
 #endif

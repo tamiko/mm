@@ -24,14 +24,6 @@
 % SOFTWARE.
 %%
 
-%
-% :MM:__INIT:
-%
-% Internal header file.
-%
-% Setup internal library routines and data structures.
-%
-
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __mmixal_init.mmh
 #endif
@@ -41,7 +33,7 @@
 #endif
 
 #ifndef __MMIXWARE
-#error Incluseion of internal header file __mmixal_init.mmh for non mmixware platform
+#error Inclusion of internal header file __mmixal_init.mmh for non mmixware platform
 #endif
 
 #ifndef __MM_MMIXAL_INIT_MMH

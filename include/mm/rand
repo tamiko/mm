@@ -44,9 +44,10 @@
 #ifndef MM_RAND
 #define MM_RAND
 
+#include "init"
+
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "__internal/__mmixal_init.mmh"
 #include "__internal/__rand.mmh"
 #undef __MM_INTERNAL
 #endif

@@ -24,6 +24,14 @@
 % SOFTWARE.
 %%
 
+%
+% :MM:__INIT:
+%
+% Internal header file.
+%
+% Setup internal library routines and data structures.
+%
+
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __init.mmh
 #endif

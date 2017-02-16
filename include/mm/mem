@@ -46,9 +46,10 @@
 #ifndef MM_MEM
 #define MM_MEM
 
+#include "init"
+
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "__internal/__mmixal_init.mmh"
 #include "__internal/__rand.mmh"
 #include "__internal/__mem.mmh"
 #undef __MM_INTERNAL

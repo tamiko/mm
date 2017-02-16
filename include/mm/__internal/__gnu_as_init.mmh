@@ -24,22 +24,24 @@
 % SOFTWARE.
 %%
 
-%
-% Set up a raw heap implementation
-%
+#ifndef __MM_INTERNAL
+#error Inclusion of internal header file __gnus_as_init.mmh
+#endif
 
 #ifndef __GNU_AS
-#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
+#error Inclusion of internal header file __gnu_as_init.mmh for foreign assembler
 #endif
+
+            %
+            % Hijack program startup by assembling an unconditional jump to
+            % :MM:__INIT:OnStartup.
+            %
 
             .section .text,"ax",@progbits
-#ifdef __MMIXWARE
-#define __MM_INTERNAL
-#include <mm/__internal/__raw_heap.mmh>
-            .global :MM:__RAW_HEAP:Dealloc
-            .global :MM:__RAW_HEAP:Alloc
-            .global :MM:__RAW_HEAP:heap_ptr
-#else
-#error No implementation of :MM:__RAW_SIM available for your platform.
-#endif
-
+            PREFIX      :MM:__INIT:
+EntryPoint  JMP         1F
+            .org #10
+1H          LDA         $2,:MM:__INIT:OnStartup
+            GO          $2,$2
+            PREFIX      :
+            .global :MM:__INIT:EntryPoint

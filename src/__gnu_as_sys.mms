@@ -32,7 +32,7 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-            .section .mm_text,"ax",@progbits
+            .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__sys.mmh>
             .global :MM:__SYS:Exit

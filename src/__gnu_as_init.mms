@@ -32,23 +32,17 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            %
+            % Set the beginning of the .text section to #F0.
+            % The first instruction assembled into the .text section thus
+            % determines the entry point of the program.
+            %
+
+            .set __.MMIX.start..text,#F0
+            .global __.MMIX.start..text
+
             .section .text,"ax",@progbits
-            LOC         #100
-
-            %
-            % Hijack program startup by assembling an unconditional jump to
-            % address #100 and assemble the internal startup code there.
-            %
-
-            %LOC         #F0
-            PREFIX      :MM:__INIT:
-EntryPoint  GO          $2,#100
-            PREFIX      :
-            %LOC         #100
-
 #define __MM_INTERNAL
 #include <mm/__internal/__init.mmh>
 #undef __MM_INTERNAL
-
-            .global :MM:__INIT:EntryPoint
             .global :MM:__INIT:OnStartup

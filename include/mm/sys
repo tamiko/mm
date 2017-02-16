@@ -44,9 +44,10 @@
 #ifndef MM_SYS
 #define MM_SYS
 
+#include "init"
+
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "__internal/__mmixal_init.mmh"
 #include "__internal/__sys.mmh"
 #undef __MM_INTERNAL
 #endif

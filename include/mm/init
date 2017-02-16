@@ -25,21 +25,29 @@
 %%
 
 %
-% Set up a raw heap implementation
+%
 %
 
-#ifndef __GNU_AS
-#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
-#endif
+#ifndef MM_INIT
+#define MM_INIT
 
-            .section .text,"ax",@progbits
-#ifdef __MMIXWARE
 #define __MM_INTERNAL
-#include <mm/__internal/__raw_heap.mmh>
-            .global :MM:__RAW_HEAP:Dealloc
-            .global :MM:__RAW_HEAP:Alloc
-            .global :MM:__RAW_HEAP:heap_ptr
-#else
-#error No implementation of :MM:__RAW_SIM available for your platform.
+
+#ifdef __MMIXAL
+%
+% Explicitly assemble basic library initialization code for mmixal
+%
+#include "__internal/__mmixal_init.mmh"
 #endif
 
+#ifdef __GNU_AS
+%
+% Explicitly assemble a jmp instruction to :MM:__INIT:OnStartup at the
+% beginning of every .text segment.
+%
+#include "__internal/__gnu_as_init.mmh"
+#endif
+
+#undef __MM_INTERNAL
+
+#endif /* MM_INIT */

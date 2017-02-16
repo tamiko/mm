@@ -36,9 +36,10 @@
 #ifndef MM_FILE
 #define MM_FILE
 
+#include "init"
+
 #ifdef __MMIXAL
 #define __MM_INTERNAL
-#include "__internal/__mmixal_init.mmh"
 #include "__internal/__file.mmh"
 #undef __MM_INTERNAL
 #endif
