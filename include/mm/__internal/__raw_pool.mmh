@@ -48,7 +48,7 @@ Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
 
 %%
-% We need a GREG to maintain a pool of memory blocks
+% We use a GREG to maintain a pool of memory blocks
 %
 pool_ptr    GREG        0
 

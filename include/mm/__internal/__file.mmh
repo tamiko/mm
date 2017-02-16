@@ -35,7 +35,7 @@
 %   #08 - #C   - in use (by us) and opened with the respective mode
 %                +#8.
 %   #EE        - marked as 'controlled by the system' (e.g. fh 0 - 2)
-%   #FF        - markes ad 'manually controlled by the user'
+%   #FF        - markes as 'manually controlled by the user'
 %
 
 #ifndef __MM_INTERNAL
@@ -61,15 +61,15 @@ BinaryWrite IS          :BinaryWrite
 BinaryReadWrite IS      :BinaryReadWrite
 
 %%
-% :MM:File:LockJ
+% :MM:__FILE:LockJ
 %   arg0 - file handle to lock
 %   no return value
 %
-% :MM:File:Lock
+% :MM:__FILE:Lock
 %   arg0 - file handle to lock
 %   no return value
 %
-% :MM:File:LockG
+% :MM:__FILE:LockG
 %
             % Select lowest byte:
 LockJ       AND         arg0,arg0,#FF
@@ -96,15 +96,15 @@ Lock        SET         $3,arg0
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
-% :MM:File:UnlockJ
+% :MM:__FILE:UnlockJ
 %   arg0 - file handle to unlock
 %   no return value
 %
-% :MM:File:Unlock
+% :MM:__FILE:Unlock
 %   arg0 - file handle to unlock
 %   no return value
 %
-% :MM:File:UnlockG
+% :MM:__FILE:UnlockG
 %
             % Select lowest byte:
 UnlockJ     CMPU        arg0,arg0,#FF
@@ -132,7 +132,7 @@ Unlock      SET         $3,arg0
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
-% :MM:File:OpenJ
+% :MM:__FILE:OpenJ
 %   arg0 - pointer to string containing filename
 %   arg1 - mode
 %   retm - file handle on success / 0 on error
@@ -428,7 +428,7 @@ fh          IS          $3
 9H          POP         0,0
 
 %%
-% :MM:File:Open
+% :MM:__FILE:Open
 %   arg0 - pointer to string containing filename
 %   arg1 - mode
 %   retm - file handle on success / -1 on error
@@ -466,7 +466,7 @@ Open        CMPU        t,arg1,4
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
-% :MM:File:CloseJ
+% :MM:__FILE:CloseJ
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle
@@ -749,7 +749,7 @@ CloseJ      AND         arg0,arg0,#FF
 9H          POP         0,0
 
 %%
-% :MM:File:Close
+% :MM:__FILE:Close
 %   arg0 - file handle to close
 %   no return value
 %
@@ -789,14 +789,14 @@ Close       AND         $3,arg0,#FF
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
-% :MM:File:IsOpenJ
+% :MM:__FILE:IsOpenJ
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle
 %   no return value
 %
-% :MM:File:IsOpenG
-% :MM:File:IsOpen
+% :MM:__FILE:IsOpenG
+% :MM:__FILE:IsOpen
 %
 pool        IS          $2
 IsOpenJ     AND         arg0,arg0,#FF
@@ -825,14 +825,14 @@ IsOpen      GET         $1,:rJ
             POP         1,0
 
 %%
-% :MM:File:IsReadableJ
+% :MM:__FILE:IsReadableJ
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle
 %   no return value
 %
-% :MM:File:IsReadableG
-% :MM:File:IsReadable
+% :MM:__FILE:IsReadableG
+% :MM:__FILE:IsReadable
 %
 pool        IS          $2
 IsReadableJ AND         arg0,arg0,#FF
@@ -862,14 +862,14 @@ IsReadable  GET         $1,:rJ
             POP         1,0
 
 %%
-% :MM:File:IsWritableJ
+% :MM:__FILE:IsWritableJ
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle
 %   no return value
 %
-% :MM:File:IsWritableG
-% :MM:File:IsWritable
+% :MM:__FILE:IsWritableG
+% :MM:__FILE:IsWritable
 %
 pool        IS          $2
 IsWritableJ AND         arg0,arg0,#FF
@@ -899,7 +899,7 @@ IsWritable  GET         $1,:rJ
             POP         1,0
 
 %%
-% :MM:File:ReadJ
+% :MM:__FILE:ReadJ
 %
 % PUSHJ:
 %   arg0 - lowest byte defines the file handle

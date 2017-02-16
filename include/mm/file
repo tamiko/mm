@@ -51,7 +51,7 @@
 %   Lock the file handle arg0 manually.
 %
 % PUSHJ
-%   arg0 - lowest byte defines the file handle to lock
+%   arg0 - lowest two bytes define the file handle to lock
 %   no return value
 %
 % Precondition:
