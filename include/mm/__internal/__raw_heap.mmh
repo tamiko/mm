@@ -34,7 +34,6 @@
 %
 % TODO: Implement a heap structure for efficiently storing the heap.
 %
-            SWYM
 
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __raw_heap.mmh

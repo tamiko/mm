@@ -29,7 +29,6 @@
 %
 % Constants used throughout the library.
 %
-            SWYM
 
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __strs.mmh

@@ -29,7 +29,6 @@
 %
 % Facilities for error handling, and program termination.
 %
-            SWYM
 
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __sys.mmh
