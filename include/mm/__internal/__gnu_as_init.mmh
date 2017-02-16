@@ -24,6 +24,8 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_NO_INIT
+
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __gnu_as_init.mmh
 #endif
@@ -53,3 +55,4 @@
 
 
 #endif /* __MM_GNU_AS_INIT_MMH */
+#endif /* MM_NO_INIT */

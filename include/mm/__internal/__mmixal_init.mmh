@@ -24,6 +24,8 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_NO_INIT
+
 %
 % :MM:__INIT:
 %
@@ -83,3 +85,4 @@ __Pos       IS          @
 #include "__mmix_sim_raw_heap.mmh"
 
 #endif /* __MM_MMIXAL_INIT_MMH */
+#endif /* MM_NO_INIT */

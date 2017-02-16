@@ -25,6 +25,10 @@ How to compile and run mmix programs:
 
   TODO: binfmt
 
+
+MM_DATA_SEGMENT
+MM_NO_INIT
+
 %
 % mmixal and GNU as on mmixware:
 %   The heap will be organized as memory blocks inside the pool
