@@ -35,7 +35,7 @@
             .section .mm_text,"ax",@progbits
 #ifdef __MMIXWARE
 #define __MM_INTERNAL
-#include <mm/__internal/__mmix_sim_raw_heap.mmh>
+#include <mm/__internal/__raw_heap.mmh>
             .global :MM:__RAW_HEAP:Dealloc
             .global :MM:__RAW_HEAP:Alloc
             .global :MM:__RAW_HEAP:heap_ptr

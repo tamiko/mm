@@ -16,9 +16,6 @@ sources:=$(wildcard ../src/$(prefix)*.mms)
 preproc:=$(patsubst ../src/$(prefix)%.mms,%.i,$(sources))
 objects:=$(patsubst ../src/$(prefix)%.mms,%.o,$(sources))
 
-%.i: ../src/$(prefix)%.mms ../include/__internal/__%.mmh ../include/__internal/__strs.mmh ../include/__internal/__mmixware_*.mmh
-	$(cpp) $(cpp_args) -I../include $< -o $@
-
 %.i: ../src/$(prefix)%.mms
 	$(cpp) $(cpp_args) -I../include $< -o $@
 

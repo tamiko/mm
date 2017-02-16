@@ -24,8 +24,6 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_NO_INIT
-
 %
 % :MM:__INIT:
 %
@@ -33,7 +31,6 @@
 %
 % Setup internal library routines and data structures.
 %
-            SWYM
 
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __mmixal_init.mmh
@@ -55,25 +52,47 @@
 % Assemble basic library initalization code
 %
 
-            LOC         (@+#FF)&-#100
+            % advance LOC by #100 and further align to #100
+            LOC         (@+#100)&-#100
 #include <mm/__internal/__init.mmh>
+
+            PREFIX      :MM:__INIT:
+__Pos       IS          @
+            PREFIX      :
 
 %
 % Hijack program startup by registering :MM:__INIT:OnStartup as entry point
 %
 
-            PREFIX      :MM:__INIT:
-__Pos       IS          @
-            PREFIX      :
-            LOC         #F0
-            JMP         :MM:__INIT:OnStartup
-            LOC         :MM:__INIT:__Pos
+%            LOC         #F0
+%            JMP         :MM:__INIT:OnStartup
 
 %
 % Initialize data segment:
 %
 
-#include "__mmixal_data_segment.mmh"
+#ifndef MM_DATA_SEGMENT_ADDR
+#define MM_DATA_SEGMENT_ADDR :Data_Segment+#1100000000000000
+#endif
+
+            LOC         MM_DATA_SEGMENT_ADDR
+#undef MM_DATA_SEGMENT_ADDR
+#include "__strs.mmh"
+            LOC         (@+#7)&-#8
+            PREFIX      :MM:__SYS:
+AtExitAddr  OCTA        #0000000000000000
+AtAbortAddr OCTA        #0000000000000000
+AtErrorAddr OCTA        #0000000000000000
+            LOC         (@+#7)&-#8
+            PREFIX      :MM:__FILE:
+Pool        BYTE        #EE,#EE,#EE
+            LOC         @+253*1
+            LOC         (@+#7)&-#8
+            PREFIX      :MM:__INIT:
+Buffer      IS          @
+            LOC         @+128*8
+            PREFIX      :
+
             LOC         :MM:__INIT:__Pos
 
 %
@@ -82,7 +101,6 @@ __Pos       IS          @
 
 #include "__sys.mmh"
 #include "__error.mmh"
-#include "__mmix_sim_raw_heap.mmh"
+#include "__raw_heap.mmh"
 
 #endif /* __MM_MMIXAL_INIT_MMH */
-#endif /* MM_NO_INIT */

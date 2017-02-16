@@ -1,4 +1,3 @@
-			SWYM
 #include <mm/print>
 #include <mm/sys>
 
@@ -27,8 +26,9 @@ str_str		BYTE	" ]    -->    '",0
 str_str2	BYTE	"'",10,0
 str_endl	BYTE	" ]",10,0
 
+
 #ifdef __GNU_AS
-#include <mm/gnu_as_init>
+            .section .text,"xa",@progbits
 #endif
 t			IS		$255
 arg0		IS		$0

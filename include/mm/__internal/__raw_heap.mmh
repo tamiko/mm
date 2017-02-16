@@ -37,11 +37,11 @@
             SWYM
 
 #ifndef __MM_INTERNAL
-#error Inclusion of internal header file __mmix_sim_raw_heap.mmh
+#error Inclusion of internal header file __raw_heap.mmh
 #endif
 
-#ifndef __MM_MMIX_SIM_RAW_HEAP_MMH
-#define __MM_MMIX_SIM_RAW_HEAP_MMH
+#ifndef __MM_RAW_HEAP_MMH
+#define __MM_RAW_HEAP_MMH
 
             PREFIX      :MM:__RAW_HEAP:
 
@@ -272,4 +272,4 @@ Alloc       CSZ         arg0,arg0,#10
 
             PREFIX      :
 
-#endif /* __MM_MMIX_SIM_RAW_HEAP_MMH */
+#endif /* __MM_RAW_HEAP_MMH */
