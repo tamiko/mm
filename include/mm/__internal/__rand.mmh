@@ -107,7 +107,7 @@ Octa        GET         $0,:rJ
             LDO         $0,$1
             POP         1,0
 9H          LDA         $2,:MM:__STRS:RandOcta1
-            PUSHJ       $1,:MM:__ERROR:Error1
+            PUSHJ       $1,:MM:__ERROR:IError1
 
 %%
 % :MM:__RAND:OctaG
