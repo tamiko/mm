@@ -46,6 +46,9 @@ AtErrorAddr OCTA        #0000000000000000
 Pool        BYTE        #EE,#EE,#EE
             .fill 253*1
             .balign 8
+            PREFIX      :MM:__RAND:
+FileHandle  OCTA        #FFFFFFFFFFFFFFFF
+            .balign 8
             PREFIX      :MM:__INIT:
 Buffer      IS          @
             .fill 128*8
@@ -133,4 +136,5 @@ Buffer      IS          @
             .global :MM:__SYS:AtAbortAddr
             .global :MM:__SYS:AtErrorAddr
             .global :MM:__FILE:Pool
+            .global :MM:__RAND:FileHandle
             .global :MM:__INIT:Buffer

@@ -46,6 +46,7 @@
 
 #ifdef __MMIXAL
 #define __MM_INTERNAL
+#include "__internal/__file.mmh"
 #include "__internal/__rand.mmh"
 #undef __MM_INTERNAL
 #endif

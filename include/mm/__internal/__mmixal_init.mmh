@@ -82,6 +82,8 @@ AtErrorAddr OCTA        #0000000000000000
 Pool        BYTE        #EE,#EE,#EE
             LOC         @+253*1
             LOC         (@+#7)&-#8
+            PREFIX      :MM:__RAND:
+FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             PREFIX      :MM:__INIT:
 Buffer      IS          @
             LOC         @+128*8

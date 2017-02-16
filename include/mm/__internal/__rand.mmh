@@ -49,9 +49,6 @@ BinaryRead  IS          :BinaryRead
 t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
-UrandomFH   IS          #FF % TODO: Include into general framework file.mmh
-filehandler GREG        0 % #0 uninitialized, #-1 initialized...,
-                          % TODO: General framework ;-)
 OCT         IS          #8
 
 %%
@@ -62,25 +59,29 @@ OCT         IS          #8
 %   no arguments
 %   no return value
 %
-            % Arguments for :Fopen
-            OCTA        :MM:__STRS:RandUrandom,BinaryRead
-Init        PBNZ        filehandler,1F % Nothing to do ;-)
-            % Make sure our beloved file handler is not used:
-            TRAP        0,Ftell,UrandomFH
-            BNN         t,2F
-            LDA         t,Init
-            SUBU        t,t,#10
-            TRAP        0,Fopen,UrandomFH
-            BN          t,3F
-            SUBU        filehandler,filehandler,1
-            SET         t,filehandler
-1H          POP         0,0
-2H          LDA         $2,:MM:__STRS:RandInit1
+Init        GET         $0,:rJ
+            LDA         $1,:MM:__RAND:FileHandle
+            LDO         $1,$1
+            BN          $1,1F
+            % is the filehandle valid?
+            SET         $3,$1
+            PUSHJ       $2,:MM:__FILE:IsReadableJ
+            JMP         3F
+            JMP         2F
+1H          LDA         $3,:MM:__STRS:RandUrandom
+            SET         $4,BinaryRead
+            PUSHJ       $2,:MM:__FILE:Open
+            LDA         $1,:MM:__RAND:FileHandle
+            STO         $2,$1
+2H          PUT         :rJ,$0
+            POP         0,0
+3H          LDA         $2,:MM:__STRS:RandInit1
             LDA         $3,:MM:__STRS:RandInit2
-            SET         $4,UrandomFH
+            LDA         $4,:MM:__RAND:FileHandle
+            LDO         $4,$4
             LDA         $5,:MM:__STRS:RandInit3
             PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
-3H          LDA         $2,:MM:__STRS:RandInit1
+4H          LDA         $2,:MM:__STRS:RandInit1
             LDA         $3,:MM:__STRS:RandInit4
             PUSHJ       $1,:MM:__ERROR:IError2 % does not return
 
@@ -92,22 +93,23 @@ Init        PBNZ        filehandler,1F % Nothing to do ;-)
 %   retm - a random octabyte
 %
             % Arguments for Fread:
-            OCTA        :MM:__INIT:Buffer,#8
 Octa        GET         $0,:rJ
-            BNZ         filehandler,1F
+            LDA         $4,:MM:__RAND:FileHandle
+            LDO         $4,$4
+            BNN         $4,1F
             PUSHJ       t,Init
-1H          LDA         t,Octa
-            SUBU        t,t,#10
-            TRAP        0,Fread,UrandomFH
-            BN          t,9F
+            LDA         $4,:MM:__RAND:FileHandle
+            LDO         $4,$4
+1H          LDA         $2,:MM:__INIT:Buffer
+            SET         $3,#8
+            PUSHJ       $1,:MM:__FILE:ReadJ
+            JMP         9F
+            LDA         $1,:MM:__INIT:Buffer
             PUT         :rJ,$0
-            LDA         $0,:MM:__INIT:Buffer
-            LDO         $0,$0,0
+            LDO         $0,$1
             POP         1,0
 9H          LDA         $2,:MM:__STRS:RandOcta1
             PUSHJ       $1,:MM:__ERROR:Error1
-            PUT         :rJ,$0
-            POP         0,0
 
 %%
 % :MM:__RAND:OctaG
@@ -115,19 +117,9 @@ Octa        GET         $0,:rJ
 % PUSHJ $255
 %
 OctaG       GET         $0,:rJ
-            BNZ         filehandler,1F
-            PUSHJ       t,Init
-1H          LDA         t,Octa
-            SUBU        t,t,#10
-            TRAP        0,Fread,UrandomFH
-            BN          t,9F
+            PUSHJ       $1,Octa
             PUT         :rJ,$0
-            LDA         $0,:MM:__INIT:Buffer
-            LDO         t,$0,0
-            POP         0,0
-9H          LDA         $2,:MM:__STRS:RandOcta1
-            PUSHJ       $1,:MM:__ERROR:Error1
-            PUT         :rJ,$0
+            SET         t,$1
             POP         0,0
 
 %%
@@ -153,17 +145,19 @@ RangeU      SWYM
 %   no return value
 %
 SetJ        GET         $3,:rJ
-            BNZ         filehandler,1F
+            LDA         $7,:MM:__RAND:FileHandle
+            LDO         $7,$7
+            BNN         $7,1F
             PUSHJ       t,Init
+            LDO         $7,$7
 1H          ADDU        t,arg0,arg1
             CMPU        t,t,arg0
             BN          t,9F
             BZ          arg1,1F % Nothing to do.
-            LDA         t,:MM:__INIT:Buffer
-            STO         arg0,t
-            STO         arg1,t,OCT
-            TRAP        0,Fread,UrandomFH
-            BN          t,9F
+            SET         $5,arg0
+            SET         $6,arg1
+            PUSHJ       $4,:MM:__FILE:ReadJ
+            JMP         9F
 1H          PUT         :rJ,$3
             POP         0,1
 9H          PUT         :rJ,$3

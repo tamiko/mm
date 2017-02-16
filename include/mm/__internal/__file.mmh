@@ -51,9 +51,11 @@ t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
 arg2        IS          $2
+ret0        IS          $0
 
 Fopen       IS          :Fopen
 Fclose      IS          :Fclose
+Fread       IS          :Fread
 TextRead    IS          :TextRead
 TextWrite   IS          :TextWrite
 BinaryRead  IS          :BinaryRead
@@ -1162,25 +1164,24 @@ ReadTable   TRAP 0,Fread,0; JMP 7F
             TRAP 0,Fread,254; JMP 7F
             TRAP 0,Fread,255; JMP 7F
 
+            OCTA        #0,#0
 ReadJ       BN          arg1,9F % invalid size
             AND         arg2,arg2,#FF
             GET         $3,:rJ
             SET         $5,arg2
-            PUSHJ       $4,ReadableJ
+            PUSHJ       $4,IsReadableJ
             JMP         9F % not readable
-
-
             SLU         arg2,arg2,3 % *8
             LDA         $4,ReadTable
+            LDA         t,ReadJ
+            SUBU        t,t,#10
+            STO         arg0,t,#0
+            STO         arg1,t,#8
             GO          $4,$4,arg2
-7H          SRU         arg2,arg2,3 % /8
-            SET         ret0,t
+7H          SET         ret0,t
             PUT         :rJ,$3
             POP         1,1
-9H          NEG         $0,$1
-            SUB         $0,$0,1 % cannot underflow
-            PUT         :rJ,$3
-            POP         1,0
+9H          POP         0,0
 
             PREFIX      :
 

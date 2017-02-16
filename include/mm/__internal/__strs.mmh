@@ -45,7 +45,7 @@ Terminated  BYTE        "[MM library]   Program terminated.",10,0
 Continued   BYTE        "[MM library]   Error handler returned. "
             BYTE        "Continue execution.",10,0
 InternErro  BYTE        "[MM library] Internal error: ",10
-            BYTE        "[MM library]   ",10,0
+            BYTE        "[MM library]   ",0
 Error1      BYTE        "[MM library] Called from [rJ=",0
 Error2      BYTE        "]:",10,"[MM library]   ",0
 
@@ -132,9 +132,9 @@ MemCmp4     BYTE        "], wraps.",10,0
 
 % Literals used in __RAND:
 RandUrandom BYTE        "/dev/urandom",0
-RandInit1   BYTE        "__Rand:Init failed. Unable to open '/dev/urandom'",0
-RandInit2   BYTE        ". File handle [",0
-RandInit3   BYTE        "] is in use.",10,0
+RandInit1   BYTE        "__RAND:Init failed. Unable to open '/dev/urandom'",0
+RandInit2   BYTE        ". Internal error. File handle [",0
+RandInit3   BYTE        "] invalid.",10,0
 RandInit4   BYTE        ".",10,0
 RandOcta1   BYTE        "Rand:Octa failed. Could not read random data.",10,0
 RandRange1  BYTE        "Rand:Range failed. Invalid range specified, [arg0=",0
