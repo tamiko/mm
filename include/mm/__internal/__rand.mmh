@@ -29,8 +29,6 @@
 %
 % Internal header file. Implementation of mm/rand.mmh.
 %
-% Inclusion will consume one GREG.
-%
 
 #ifndef __MM_INTERNAL
 #error Inclusion of internal header file __rand.mmh

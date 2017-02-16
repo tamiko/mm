@@ -55,3 +55,4 @@
             .global :MM:__FILE:IsWritableJ
             .global :MM:__FILE:IsWritableG
             .global :MM:__FILE:IsWritable
+            .global :MM:__FILE:ReadJ
