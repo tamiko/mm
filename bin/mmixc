@@ -32,9 +32,9 @@ lib_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../lib"
 cpp=cpp
 cpp_args=( "-D__GNU_AS" "-D__MMIXWARE" "-I$include_dir" )
 as=mmix-as
-as_args=( "-x" "-linker-allocated-gregs" )
+as_args=( "-g" "-x" "-linker-allocated-gregs" )
 ld=mmix-ld
-ld_args=( "-L$lib_dir" )
+ld_args=( "-g" "-L$lib_dir" )
 out_file=
 
 tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
