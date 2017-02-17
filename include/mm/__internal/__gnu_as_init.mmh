@@ -33,16 +33,26 @@
 #endif
 
             %
-            % Hijack program startup by assembling an unconditional jump to
-            % :MM:__INIT:OnStartup.
+            % Unfortunately, with gnu as and gnu ld we cannot control the
+            % order in which .text sections are assembled. Thus, in order
+            % to successfully register :MM:__INIT:TripHandler and
+            % :MM:__INIT:Entry, we explicitly assemble the first #100
+            % bytes of startup code in every assembly unit.
             %
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__INIT:
-EntryPoint  JMP         1F
+            .org #0
+__trip      PUSHJ       $255,:MM:__INIT:TripHandler
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #10
-1H          LDA         $2,:MM:__INIT:OnStartup
-            GO          $2,$2
+            .org #F0
+__entry     JMP         :MM:__INIT:Entry
+            .org #108
             PREFIX      :
-            .global :MM:__INIT:EntryPoint
-            .weak :MM:__INIT:EntryPoint
+            .global :MM:__INIT:__trip
+            .global :MM:__INIT:__entry
+            .weak :MM:__INIT:__trip
+            .weak :MM:__INIT:__entry

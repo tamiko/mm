@@ -37,7 +37,9 @@
 #endif
 
             PREFIX      :MM:__INIT:
-OnStartup   SET         $2,$255     % store Main in $4
+TripHandler SWYM
+
+Entry       SET         $2,$255     % store Main in $2
 
             % $0 - argc
             % $1 - argv
@@ -47,8 +49,8 @@ OnStartup   SET         $2,$255     % store Main in $4
             % Now call into startup code
             %
 
-            PUT         :rW,$2      % $255 <- Main after RESUME
-            PUT         :rB,$2      % RESUME at Main
+            PUT         :rW,$2      % RESUME at Main
+            PUT         :rB,$2      % $255 <- Main after RESUME
             SETML       $2,#F700
             PUT         :rX,$2
             PUT         :rJ,0

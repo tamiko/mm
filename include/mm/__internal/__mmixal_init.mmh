@@ -44,7 +44,7 @@
 % Assemble basic library initalization code
 %
 
-            % advance LOC by #100 and further align to #100
+            % advance LOC by #200 and further align to #100
             LOC         (@+#100)&-#100
 #include <mm/__internal/__init.mmh>
 
@@ -53,12 +53,17 @@ __Pos       IS          @
             PREFIX      :
 
 %
-% Hijack program startup by registering :MM:__INIT:OnStartup as entry point
+% Hijack program startup by registering :MM:__INIT:Entry as entry point
 %
 
-            LOC         #F0
             PREFIX      :MM:__INIT:
-EntryPoint  JMP         :MM:__INIT:OnStartup
+            LOC         #0
+__trip      PUSHJ       $255,:MM:__INIT:TripHandler
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
+            LOC         #F0
+__entry     JMP         :MM:__INIT:Entry
             PREFIX      :
 
 %
