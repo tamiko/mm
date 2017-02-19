@@ -24,20 +24,21 @@
 % SOFTWARE.
 %%
 
-#ifndef __MM_INTERNAL
-#error Inclusion of internal header file __gnus_as_init.mmh
-#endif
-
 #ifndef __GNU_AS
-#error Inclusion of internal header file __gnu_as_init.mmh for foreign assembler
+#error Tried to assemble __gnu_as_mmrt.mms with foreign assembler.
 #endif
 
             %
-            % Unfortunately, with gnu as and gnu ld we cannot control the
-            % order in which .text sections are assembled. Thus, in order
-            % to successfully register :MM:__INIT:TripHandler and
-            % :MM:__INIT:Entry, we explicitly assemble the first #100
-            % bytes of startup code in every assembly unit.
+            % Set the beginning of the .text section to #00. The first
+            % instructions assembled into the .text section thus determines
+            % the trip handler and entry point of the program.
+            %
+
+            .set __.MMIX.start..text,#00
+            .global __.MMIX.start..text
+
+            %
+            % Register :MM:__INIT:TripHandler and :MM:__INIT:Entry
             %
 
             .section .text,"ax",@progbits
@@ -54,5 +55,14 @@ __entry     JMP         :MM:__INIT:Entry
             PREFIX      :
             .global :MM:__INIT:__trip
             .global :MM:__INIT:__entry
-            .weak :MM:__INIT:__trip
-            .weak :MM:__INIT:__entry
+
+            %
+            % Set up an internal buffer used for various purposes
+            %
+
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__INTERNAL:
+Buffer      IS          @
+            .fill 128*8
+            PREFIX      :
+            .global :MM:__INTERNAL:Buffer

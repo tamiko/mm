@@ -32,18 +32,8 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-            %
-            % Set the beginning of the .text section to #00. The first
-            % instructions assembled into the .text section thus determine
-            % the trip handler and entry point of the program.
-            %
-
-            .set __.MMIX.start..text,#00
-            .global __.MMIX.start..text
-
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__init.mmh>
-#undef __MM_INTERNAL
             .global :MM:__INIT:TripHandler
             .global :MM:__INIT:Entry

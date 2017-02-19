@@ -32,6 +32,16 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__SYS:
+AtExitAddr  OCTA        #0000000000000000
+AtAbortAddr OCTA        #0000000000000000
+AtErrorAddr OCTA        #0000000000000000
+            .global :MM:__SYS:AtExitAddr
+            .global :MM:__SYS:AtAbortAddr
+            .global :MM:__SYS:AtErrorAddr
+
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__sys.mmh>

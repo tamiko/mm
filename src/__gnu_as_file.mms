@@ -32,6 +32,13 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__FILE:
+Pool        BYTE        #EE,#EE,#EE
+            .fill 253*1
+            .global :MM:__FILE:Pool
+
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__file.mmh>

@@ -32,6 +32,13 @@
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__RAND:
+FileHandle  OCTA        #FFFFFFFFFFFFFFFF
+            .balign 8
+            .global :MM:__RAND:FileHandle
+
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
 #include <mm/__internal/__rand.mmh>

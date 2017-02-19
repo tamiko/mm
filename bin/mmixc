@@ -34,7 +34,8 @@ cpp_args=( "-D__GNU_AS" "-D__MMIXWARE" "-I$include_dir" )
 as=mmix-as
 as_args=( "-g" "-x" "-linker-allocated-gregs" )
 ld=mmix-ld
-ld_args=( "-g" "-L$lib_dir" )
+ld_args_pre=( "-g" "$lib_dir/mmi.o" )
+ld_args_post=( "-L$lib_dir" "-lmm" )
 out_file=
 
 tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
@@ -125,11 +126,11 @@ done
 
 
 if ! $compile_only && ! $preprocess_only; then
-  $verbose && echo "$ld" -o "$out_file" \
-    "${obj_files[@]:+${obj_files[@]}}" "${ld_args[@]:+${ld_args[@]}}"
+  $verbose && echo "$ld" -o "$out_file" "${ld_args_pre[@]}" \
+    "${obj_files[@]:+${obj_files[@]}}" "${ld_args_post[@]}"
 
-  if "$ld" -o "$out_file" "${obj_files[@]:+${obj_files[@]}}" \
-    "${ld_args[@]:+${ld_args[@]}}" ; then
+  if "$ld" -o "$out_file" "${ld_args_pre[@]}" "${obj_files[@]:+${obj_files[@]}}" \
+    "${ld_args_post[@]}" ; then
     $keep_tmp || rm -rf "$tmpdir"
   else
     $keep_tmp || rm -rf "$tmpdir"

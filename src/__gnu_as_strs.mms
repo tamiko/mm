@@ -33,26 +33,8 @@
 #endif
 
             .section .data,"wa",@progbits
-            .balign 8
 #define __MM_INTERNAL
 #include <mm/__internal/__strs.mmh>
-            .balign 8
-            PREFIX      :MM:__SYS:
-AtExitAddr  OCTA        #0000000000000000
-AtAbortAddr OCTA        #0000000000000000
-AtErrorAddr OCTA        #0000000000000000
-            .balign 8
-            PREFIX      :MM:__FILE:
-Pool        BYTE        #EE,#EE,#EE
-            .fill 253*1
-            .balign 8
-            PREFIX      :MM:__RAND:
-FileHandle  OCTA        #FFFFFFFFFFFFFFFF
-            .balign 8
-            PREFIX      :MM:__INTERNAL:
-Buffer      IS          @
-            .fill 128*8
-            PREFIX      :
             .global :MM:__STRS:Terminated
             .global :MM:__STRS:Continued1
             .global :MM:__STRS:Continued2
@@ -136,9 +118,3 @@ Buffer      IS          @
             .global :MM:__STRS:FileRead1
             .global :MM:__STRS:FileRead2
             .global :MM:__STRS:PrintLn
-            .global :MM:__SYS:AtExitAddr
-            .global :MM:__SYS:AtAbortAddr
-            .global :MM:__SYS:AtErrorAddr
-            .global :MM:__FILE:Pool
-            .global :MM:__RAND:FileHandle
-            .global :MM:__INTERNAL:Buffer

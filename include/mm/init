@@ -29,11 +29,6 @@
 %
 % Internal initialization code
 %
-% In a program using the mm libray every source file that gets assembled
-% into a separate object file has to include this header *first* (before
-% any code). Either implicitly by including one of the other header files,
-% or explicitly by including this header file.
-%
 
 #ifndef MM_INIT
 #define MM_INIT
@@ -42,10 +37,6 @@
 
 #ifdef __MMIXAL
 #include "__internal/__mmixal_init.mmh"
-#endif
-
-#ifdef __GNU_AS
-#include "__internal/__gnu_as_init.mmh"
 #endif
 
 #undef __MM_INTERNAL

@@ -10,13 +10,13 @@ ar=mmix-ar
 ar_args=cru
 ranlib=mmix-ranlib
 
-all: libmm.a $(objects)
-
 sources:=$(wildcard ../src/$(prefix)*.mms)
-preproc:=$(patsubst ../src/$(prefix)%.mms,%.i,$(sources))
 objects:=$(patsubst ../src/$(prefix)%.mms,%.o,$(sources))
+objects:=$(filter-out mmi.o,$(objects))
 
-%.i: ../src/$(prefix)%.mms
+all: libmm.a mmi.o $(objects)
+
+%.i: ../src/$(prefix)%.mms ../include/mm/__internal/__%.mmh
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
 %.o: %.i
