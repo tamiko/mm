@@ -53,7 +53,7 @@ __Pos       IS          @
             PREFIX      :
 
 %
-% Hijack program startup by registering :MM:__INIT:Entry as entry point
+% Register :MM:__INIT:TripHandler and :MM:__INIT:Entry:
 %
 
             PREFIX      :MM:__INIT:
@@ -75,8 +75,6 @@ __entry     JMP         :MM:__INIT:Entry
 #endif
 
             LOC         MM_DATA_SEGMENT_ADDR
-#undef MM_DATA_SEGMENT_ADDR
-#include "__strs.mmh"
             LOC         (@+#7)&-#8
             PREFIX      :MM:__SYS:
 AtExitAddr  OCTA        #0000000000000000
@@ -93,6 +91,9 @@ FileHandle  OCTA        #FFFFFFFFFFFFFFFF
 Buffer      IS          @
             LOC         @+128*8
             PREFIX      :
+
+#undef MM_DATA_SEGMENT_ADDR
+#include "__strs.mmh"
 
             LOC         :MM:__INIT:__Pos
 
