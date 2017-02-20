@@ -1,0 +1,65 @@
+%%
+% MMIX support library for various purposes.
+%
+% Copyright (C) 2013-2017 Matthias Maier <tamiko@kyomu.43-1.org>
+%
+% Permission is hereby granted, free of charge, to any person
+% obtaining a copy of this software and associated documentation files
+% (the "Software"), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge,
+% publish, distribute, sublicense, and/or sell copies of the Software,
+% and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be
+% included in all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+% BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+% ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+% SOFTWARE.
+%%
+
+            .section .data,"wa",@progbits
+__STACK:size IS         #1000
+            .balign 8
+__STACK:ptr OCTA        #0000000000000000
+            .if 0
+            LOC         @ + __STACK:size*8
+            .else
+            .fill __STACK:size * 8
+            .endif
+
+            .section .text,"ax",@progbits
+Size        LDO         $0,__STACK:ptr
+            SRU         $0,$0,3
+            POP         1,0
+
+Push        LDA         $1,__STACK:ptr
+            LDO         $2,$1
+            ADDU        $2,$2,8
+            SET         $3,__STACK:size
+            SLU         $3,$3,3
+            CMP         $3,$2,$3 % overflow?
+            BP          $3,1F
+            STO         $2,$1    % new offset
+            STO         $0,$1,$2 % new value
+            POP         0,0
+1H          GET         :MM:__ERROR:__rJ,:rJ
+            LDA         $1,:MM:__STRS:StackOverfl
+            PUSHJ       $0,:MM:__ERROR:Error1 % does not return
+
+Pop         LDA         $1,__STACK:ptr
+            LDO         $2,$1
+            BZ          $2,1F
+            LDO         $0,$1,$2 % value
+            SUBU        $2,$2,8
+            STO         $2,$1 % new offset
+            POP         1,0
+1H          GET         :MM:__ERROR:__rJ,:rJ
+            LDA         $1,:MM:__STRS:StackUnderf
+            PUSHJ       $0,:MM:__ERROR:Error1 % does not return

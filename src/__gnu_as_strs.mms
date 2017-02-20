@@ -118,3 +118,5 @@
             .global :MM:__STRS:FileRead1
             .global :MM:__STRS:FileRead2
             .global :MM:__STRS:PrintLn
+            .global :MM:__STRS:StackUnderf
+            .global :MM:__STRS:StackOverfl

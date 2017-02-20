@@ -540,4 +540,6 @@ Rand        GET         $1,:rJ
             LDA         $3,:MM:__STRS:HeapRand2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
+            PREFIX      :
+
 #endif /* __MM_HEAP_MMH */

@@ -157,7 +157,7 @@ FileUnlock1 BYTE        "File:Unlock failed. Could not unlock handle [arg0=",0
 FileUnlock2 BYTE        "]. File handle is not locked.",10,0
 FileOpen1   BYTE        "File:Open failed. Invalid file mode [arg1=",0
 FileOpen2   BYTE        "] specified.",10,0
-FileOpen3   BYTE        "File.Open failed. No free file handler "
+FileOpen3   BYTE        "File:Open failed. No free file handler "
             BYTE        "available.",10,0
 FileClose1  BYTE        "File:Close failed. File handle [arg0=",0
 FileClose2  BYTE        "] locked by user or system.",10,0
@@ -166,6 +166,10 @@ FileClose4  BYTE        "File:Close failed. Could not close file handle [arg0=",
 FileClose5  BYTE        "]. Internal state corrupted.",10,0
 FileRead1   BYTE        "File.Read failed. Could not read from file handle [arg2=",0
 FileRead2   BYTE        "].",10,0
+
+% Literals used in stack:
+StackUnderf BYTE        "Stack:Pop failed. Underflow - stack empty.",10,0
+StackOverfl BYTE        "Stack:Push failed. Overflow - stack full.",10,0
 
             PREFIX      :
 
