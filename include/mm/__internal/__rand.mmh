@@ -58,8 +58,7 @@ OCT         IS          #8
 %   no return value
 %
 Init        GET         $0,:rJ
-            LDA         $1,:MM:__RAND:FileHandle
-            LDO         $1,$1
+            LDO         $1,:MM:__RAND:FileHandle
             BN          $1,1F
             % is the filehandle valid?
             SET         $3,$1
@@ -69,14 +68,12 @@ Init        GET         $0,:rJ
 1H          LDA         $3,:MM:__STRS:RandUrandom
             SET         $4,BinaryRead
             PUSHJ       $2,:MM:__FILE:Open
-            LDA         $1,:MM:__RAND:FileHandle
-            STO         $2,$1
+            STO         $2,:MM:__RAND:FileHandle
 2H          PUT         :rJ,$0
             POP         0,0
 3H          LDA         $2,:MM:__STRS:RandInit1
             LDA         $3,:MM:__STRS:RandInit2
-            LDA         $4,:MM:__RAND:FileHandle
-            LDO         $4,$4
+            LDO         $4,:MM:__RAND:FileHandle
             LDA         $5,:MM:__STRS:RandInit3
             PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
 4H          LDA         $2,:MM:__STRS:RandInit1
@@ -92,19 +89,16 @@ Init        GET         $0,:rJ
 %
             % Arguments for Fread:
 Octa        GET         $0,:rJ
-            LDA         $4,:MM:__RAND:FileHandle
-            LDO         $4,$4
+            LDO         $4,:MM:__RAND:FileHandle
             BNN         $4,1F
             PUSHJ       t,Init
-            LDA         $4,:MM:__RAND:FileHandle
-            LDO         $4,$4
+            LDO         $4,:MM:__RAND:FileHandle
 1H          LDA         $2,:MM:__INTERNAL:Buffer
             SET         $3,#8
             PUSHJ       $1,:MM:__FILE:ReadJ
             JMP         9F
-            LDA         $1,:MM:__INTERNAL:Buffer
             PUT         :rJ,$0
-            LDO         $0,$1
+            LDO         $0,:MM:__INTERNAL:Buffer
             POP         1,0
 9H          LDA         $2,:MM:__STRS:RandOcta1
             PUSHJ       $1,:MM:__ERROR:IError1
@@ -143,11 +137,10 @@ RangeU      SWYM
 %   no return value
 %
 SetJ        GET         $3,:rJ
-            LDA         $7,:MM:__RAND:FileHandle
-            LDO         $7,$7
+            LDO         $7,:MM:__RAND:FileHandle
             BNN         $7,1F
             PUSHJ       t,Init
-            LDO         $7,$7
+            LDO         $7,:MM:__RAND:FileHandle
 1H          ADDU        t,arg0,arg1
             CMPU        t,t,arg0
             BN          t,9F

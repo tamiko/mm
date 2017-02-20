@@ -76,7 +76,7 @@ Grow        SLU         $0,arg0,1
             ADDU        $0,$0,#F
             ANDN        $0,$0,#F
             LDA         $1,Pool_Segment
-            LDO         $2,$1,0
+            LDO         $2,$1
             ADDU        $2,$2,#F
             ANDN        $2,$2,#F % align
             ADDU        $3,$2,$0

@@ -51,8 +51,7 @@ arg0        IS          $0
 %   no arguments
 %   does not return
 %
-Exit        LDA         $0,:MM:__SYS:AtExitAddr
-            LDO         $0,$0
+Exit        LDO         $0,:MM:__SYS:AtExitAddr
             BZ          $0,1F
             GO          $0,$0
 1H          SET         t,0
@@ -66,8 +65,7 @@ Exit        LDA         $0,:MM:__SYS:AtExitAddr
 %   no arguments
 %   does not return
 %
-Abort       LDA         $0,:MM:__SYS:AtAbortAddr
-            LDO         $0,$0
+Abort       LDO         $0,:MM:__SYS:AtAbortAddr
             BZ          $0,1F
             GO          $0,$0
 1H          SET         t,1

@@ -331,8 +331,7 @@ Error5R24   LDA         t,:MM:__STRS:Error1
 
 
             % Respect a possible error handler:
-ErrorHndl   LDA         $0,:MM:__SYS:AtErrorAddr
-            LDO         $0,$0
+ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             BZ          $0,1F
             % Check for special value #-1
             SET         $1,1
@@ -345,8 +344,7 @@ ErrorHndl   LDA         $0,:MM:__SYS:AtErrorAddr
             % Print a message and hand over to error handler:
 3H          LDA         t,:MM:__STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
-            LDA         t,:MM:__SYS:AtErrorAddr
-            LDO         t,t
+            LDO         t,:MM:__SYS:AtErrorAddr
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
