@@ -72,10 +72,10 @@ Entry       SWYM
             % $0 - argc
             % $1 - argv
             % $2 - Main
-            SET         $2,$255     % store Main in $2
             %
             % TODO: Now call into startup code
             %
+            SET         $2,$255     % store Main in $2
             PUT         :rW,$2      % RESUME at Main
             PUT         :rB,$2      % $255 <- Main after RESUME
             SETML       $2,#F700
