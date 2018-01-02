@@ -24,30 +24,5 @@
 % SOFTWARE.
 %%
 
-%
-% :MM:__INIT:
-%
-% Setup internal library routines and data structures.
-%
+% TODO
 
-            .section .text,"ax",@progbits
-            .global :MM:__INIT:TripHandler
-            .global :MM:__INIT:Entry
-            PREFIX      :MM:__INIT:
-TripHandler SWYM
-            % TODO: implement
-Entry       SWYM
-            % $0 - argc
-            % $1 - argv
-            % $2 - Main
-            SET         $2,$255     % store Main in $2
-            %
-            % TODO: Now call into startup code
-            %
-            PUT         :rW,$2      % RESUME at Main
-            PUT         :rB,$2      % $255 <- Main after RESUME
-            SETML       $2,#F700
-            PUT         :rX,$2
-            PUT         :rJ,0
-            SET         $2,0
-            RESUME                  % Use resume for a pristine entry into Main

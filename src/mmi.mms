@@ -38,6 +38,8 @@
             %
 
             .section .text,"ax",@progbits
+            .global :MM:__INIT:__trip
+            .global :MM:__INIT:__entry
             PREFIX      :MM:__INIT:
             .org #0
 __trip      PUSHJ       $255,:MM:__INIT:TripHandler
@@ -48,17 +50,36 @@ __trip      PUSHJ       $255,:MM:__INIT:TripHandler
             .org #F0
 __entry     JMP         :MM:__INIT:Entry
             .org #108
-            PREFIX      :
-            .global :MM:__INIT:__trip
-            .global :MM:__INIT:__entry
 
             %
             % Set up an internal buffer used for various purposes
             %
 
             .section .data,"wa",@progbits
+            .global :MM:__INTERNAL:Buffer
             PREFIX      :MM:__INTERNAL:
 Buffer      IS          @
             .fill 128*8
-            PREFIX      :
-            .global :MM:__INTERNAL:Buffer
+
+
+            .section .text,"ax",@progbits
+            .global :MM:__INIT:TripHandler
+            .global :MM:__INIT:Entry
+            PREFIX      :MM:__INIT:
+TripHandler SWYM
+            % TODO: implement
+Entry       SWYM
+            % $0 - argc
+            % $1 - argv
+            % $2 - Main
+            SET         $2,$255     % store Main in $2
+            %
+            % TODO: Now call into startup code
+            %
+            PUT         :rW,$2      % RESUME at Main
+            PUT         :rB,$2      % $255 <- Main after RESUME
+            SETML       $2,#F700
+            PUT         :rX,$2
+            PUT         :rJ,0
+            SET         $2,0
+            RESUME                  % Use resume for a pristine entry into Main

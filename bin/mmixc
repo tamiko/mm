@@ -35,7 +35,7 @@ as=mmix-as
 as_args=( "-g" "-x" "-linker-allocated-gregs" )
 ld=mmix-ld
 ld_args_pre=( "-g" "$lib_dir/mmi.o" )
-ld_args_post=( "-L$lib_dir" "-lmm" )
+ld_args_post=( "-L$lib_dir" "-lmm" "$lib_dir/mmo.o" )
 out_file=
 
 tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
