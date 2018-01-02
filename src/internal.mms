@@ -33,3 +33,23 @@
             PREFIX      :MM:__INTERNAL:
 Buffer      IS          @
             .fill 128*8
+
+
+            %
+            % The glorious trip handler
+            %
+
+            .section .data,"wa",@progbits
+__hell_trip BYTE        "Hello Trip!",10,0
+
+
+            .section .text,"ax",@progbits
+            .global :MM:__INTERNAL:TripHandler
+            PREFIX      :MM:__INTERNAL:
+TripHandler SWYM
+            SET         $0,$255
+            GET         $1,:rJ
+
+            SET         $255,$0
+            PUT         :rJ,$1
+            POP 0

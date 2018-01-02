@@ -9,25 +9,25 @@
 str_header  BYTE        "Diagnose startup",10,10,0
 str_header2 BYTE        "Library specific adresses:",10,10,0
 str_header3 BYTE        "Program parameters (argc, argv):",10,10,0
-str_text    BYTE        "    Text segment:          [ ",0
-str_data    BYTE        "    Data segment:          [ ",0
-str_pool    BYTE        "    Pool segment:          [ ",0
-str_stack   BYTE        "    Stack segment:         [ ",0
-str_main    BYTE        "    Main:                  [ ",0
-str_hndl1   BYTE        "    :MM:__Init:__trip      [ ",0
-str_entry1  BYTE        "    :MM:__Init:__entry     [ ",0
-str_hndl2   BYTE        "    :MM:__Init:TripHandler [ ",0
-str_entry2  BYTE        "    :MM:__Init:__init      [ ",0
-str_entry3  BYTE        "    :MM:__Init:__init2     [ ",0
-str_atexit  BYTE        "    :MM:__SYS:AtExitAddr   [ ",0
-str_atabort BYTE        "    :MM:__SYS:AtAbortAddr  [ ",0
-str_aterror BYTE        "    :MM:__SYS:AtErrorAddr  [ ",0
-str_fpool   BYTE        "    :MM:__FILE:Pool        [ ",0
-str_buffer  BYTE        "    :MM:__INTERNAL:Buffer  [ ",0
+str_text    BYTE        "    Text segment:              [ ",0
+str_data    BYTE        "    Data segment:              [ ",0
+str_pool    BYTE        "    Pool segment:              [ ",0
+str_stack   BYTE        "    Stack segment:             [ ",0
+str_main    BYTE        "    Main:                      [ ",0
+str_hndl1   BYTE        "    :MM:__Init:__trip          [ ",0
+str_entry1  BYTE        "    :MM:__Init:__entry         [ ",0
+str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
+str_entry3  BYTE        "    :MM:__Init:__init2         [ ",0
+str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
+str_atexit  BYTE        "    :MM:__SYS:AtExitAddr       [ ",0
+str_atabort BYTE        "    :MM:__SYS:AtAbortAddr      [ ",0
+str_aterror BYTE        "    :MM:__SYS:AtErrorAddr      [ ",0
+str_fpool   BYTE        "    :MM:__FILE:Pool            [ ",0
+str_buffer  BYTE        "    :MM:__INTERNAL:Buffer      [ ",0
 str_between BYTE        " ]    -->    [ ",0
-str_argc    BYTE        "    argc:                  [ ",0
-str_argv    BYTE        "    argv:                  [ ",0
-str_argv2   BYTE        "                           [ ",0
+str_argc    BYTE        "    argc:                      [ ",0
+str_argv    BYTE        "    argv:                      [ ",0
+str_argv2   BYTE        "                               [ ",0
 str_str     BYTE        " ]    -->    '",0
 str_str2    BYTE        "'",10,0
 str_endl    BYTE        " ]",10,0
@@ -106,7 +106,7 @@ Main        SET         $2,t
             PUSHJ       $3,AddressOf
             PUSHJ       t,MM:Print:Ln
 
-            LDA         $5,:MM:__INIT:TripHandler
+            LDA         $5,:MM:__INTERNAL:TripHandler
             LDA         $4,str_hndl2
             PUSHJ       $3,AddressOf
             PUSHJ       t,MM:Print:Ln

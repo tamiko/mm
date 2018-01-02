@@ -34,7 +34,7 @@
             .global __.MMIX.start..text
 
             %
-            % Register :MM:__INIT:TripHandler and :MM:__INIT:__init
+            % Register :MM:__INTERNAL:TripHandler and :MM:__INIT:__init
             %
 
             .section .text,"ax",@progbits
@@ -42,7 +42,7 @@
             .global :MM:__INIT:__entry
             PREFIX      :MM:__INIT:
             .org #0
-__trip      PUSHJ       $255,:MM:__INIT:TripHandler
+__trip      PUSHJ       $255,:MM:__INTERNAL:TripHandler
             PUT         :rJ,$255
             GET         $255,:rB
             RESUME
@@ -50,16 +50,6 @@ __trip      PUSHJ       $255,:MM:__INIT:TripHandler
             .org #F0
 __entry     JMP         :MM:__INIT:__init
             .org #108
-
-            %
-            % Set up an internal buffer used for various purposes
-            %
-
-            .section .data,"wa",@progbits
-            .global :MM:__INTERNAL:Buffer
-            PREFIX      :MM:__INTERNAL:
-Buffer      IS          @
-            .fill 128*8
 
             %
             % Startup code: hide argc, argv and address of Main.
@@ -80,17 +70,3 @@ __init      SET         $2,$255     % store Main in $2
             PUSHJ       $3,1F
 1H          SWYM
             % mmo.mms containes the final call to Main
-
-
-            %
-            % The glorious trip handler
-            %
-
-            .section .text,"ax",@progbits
-            .global :MM:__INIT:TripHandler
-            PREFIX      :MM:__INIT:
-TripHandler SWYM
-
-            % TODO: implement
-
-            POP 0
