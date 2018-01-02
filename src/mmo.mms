@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -29,16 +29,16 @@
             PREFIX      :MM:__INIT:
 
             %
-            % undo PUSHJ and use RESUME for a pristine entry into Main
+            % undo PUSHJ, restore initial state and use RESUME for a
+            % pristine entry into Main
             %
-
             LDA $0,__init2
             PUT :rJ,$0
             POP 0
-__init2     PUT         :rW,$2      % RESUME at Main
-            PUT         :rB,$2      % $255 <- Main after RESUME
-            SETML       $2,#F700
-            PUT         :rX,$2
+__init2     UNSAVE      0,$0
+            PUT         :rW,$255      % RESUME at Main
+            PUT         :rB,$255      % $255 <- Main after RESUME
+            SETML       $255,#F700
+            PUT         :rX,$255
             PUT         :rJ,0
-            SET         $2,0
             RESUME

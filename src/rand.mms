@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files

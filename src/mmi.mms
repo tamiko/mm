@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2014 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -61,12 +61,14 @@ __entry     JMP         :MM:__INIT:__init
             .section .init,"ax",@progbits
             .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
-__init      SET         $2,$255     % store Main in $2
-            % $0 - argc
-            % $1 - argv
-            % $2 - Main
-
-            % PUSHJ to hide $0,$1,$2
-            PUSHJ       $3,1F
+__init      SWYM
+            %
+            % Save initial state, store stack address in $0, and hide $0
+            % with a PUSHJ:
+            %
+            SAVE        $255,0
+            SET         $0,$255
+            SET         $255,#0
+            PUSHJ       $1,1F
 1H          SWYM
-            % mmo.mms containes the final call to Main
+
