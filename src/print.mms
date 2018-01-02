@@ -29,9 +29,14 @@
 %
 %
 
+            .section .data,"wa",@progbits
+            .global :MM:__PRINT:STRS:Ln
+            PREFIX      :MM:__PRINT:STRS:
+Ln          BYTE        10,0
+
+
             .section .text,"ax",@progbits
             PREFIX      :MM:__PRINT:
-
 t           IS          $255
 arg0        IS          $0
 Fputs       IS          :Fputs
@@ -308,7 +313,7 @@ MemLn       GET         $2,:rJ
 %
             .global :MM:__PRINT:Ln
 Ln          SET         $0,t
-            LDA         t,:MM:__STRS:PrintLn
+            LDA         t,:MM:__PRINT:STRS:Ln
             TRAP        0,Fputs,StdOut
             SET         t,$0
             POP         0,0

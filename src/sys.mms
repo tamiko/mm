@@ -41,15 +41,6 @@ AtErrorAddr OCTA        #0000000000000000
             .global :MM:__SYS:AtErrorAddr
 
             .section .text,"ax",@progbits
-            .global :MM:__SYS:Exit
-            .global :MM:__SYS:Abort
-            .global :MM:__SYS:AtExit
-            .global :MM:__SYS:AtExitG
-            .global :MM:__SYS:AtAbort
-            .global :MM:__SYS:AtAbortG
-            .global :MM:__SYS:AtError
-            .global :MM:__SYS:AtErrorG
-
             PREFIX      :MM:__SYS:
 
 Halt        IS          :Halt
@@ -65,6 +56,8 @@ arg0        IS          $0
 %   no arguments
 %   does not return
 %
+
+            .global :MM:__SYS:Exit
 Exit        LDO         $0,:MM:__SYS:AtExitAddr
             BZ          $0,1F
             GO          $0,$0
@@ -80,6 +73,8 @@ Exit        LDO         $0,:MM:__SYS:AtExitAddr
 %   no arguments
 %   does not return
 %
+
+            .global :MM:__SYS:Abort
 Abort       LDO         $0,:MM:__SYS:AtAbortAddr
             BZ          $0,1F
             GO          $0,$0
@@ -100,6 +95,9 @@ Abort       LDO         $0,:MM:__SYS:AtAbortAddr
 %
 % PUSHJ %255
 %
+
+            .global :MM:__SYS:AtExit
+            .global :MM:__SYS:AtExitG
 AtExitG     SET         arg0,t
 AtExit      LDA         $1,:MM:__SYS:AtExitAddr
             STO         arg0,$1
@@ -119,6 +117,9 @@ AtExit      LDA         $1,:MM:__SYS:AtExitAddr
 %
 % PUSHJ %255
 %
+
+            .global :MM:__SYS:AtAbort
+            .global :MM:__SYS:AtAbortG
 AtAbortG    SET         arg0,t
 AtAbort     LDA         $1,:MM:__SYS:AtAbortAddr
             STO         arg0,$1
@@ -138,6 +139,9 @@ AtAbort     LDA         $1,:MM:__SYS:AtAbortAddr
 %
 % PUSHJ %255
 %
+
+            .global :MM:__SYS:AtError
+            .global :MM:__SYS:AtErrorG
 AtErrorG    SET         arg0,t
 AtError     LDA         $1,:MM:__SYS:AtErrorAddr
             STO         arg0,$1

@@ -27,6 +27,41 @@
 %
 % :MM:__File:
 %
+
+            .section .data,"wa",@progbits
+            .global :MM:__FILE:STRS:Lock1
+            .global :MM:__FILE:STRS:Lock2
+            .global :MM:__FILE:STRS:Unlock1
+            .global :MM:__FILE:STRS:Unlock2
+            .global :MM:__FILE:STRS:Open1
+            .global :MM:__FILE:STRS:Open2
+            .global :MM:__FILE:STRS:Open3
+            .global :MM:__FILE:STRS:Close1
+            .global :MM:__FILE:STRS:Close2
+            .global :MM:__FILE:STRS:Close3
+            .global :MM:__FILE:STRS:Close4
+            .global :MM:__FILE:STRS:Close5
+            .global :MM:__FILE:STRS:Read1
+            .global :MM:__FILE:STRS:Read2
+            PREFIX      :MM:__FILE:STRS:
+Lock1       BYTE        "File:Lock failed. Could not lock handle [arg0=",0
+Lock2       BYTE        "]. Already locked.",10,0
+Unlock1     BYTE        "File:Unlock failed. Could not unlock handle [arg0=",0
+Unlock2     BYTE        "]. File handle is not locked.",10,0
+Open1       BYTE        "File:Open failed. Invalid file mode [arg1=",0
+Open2       BYTE        "] specified.",10,0
+Open3       BYTE        "File:Open failed. No free file handler "
+            BYTE        "available.",10,0
+Close1      BYTE        "File:Close failed. File handle [arg0=",0
+Close2      BYTE        "] locked by user or system.",10,0
+Close3      BYTE        "] not opened.",10,0
+Close4      BYTE        "File:Close failed. Could not close file handle [arg0=",0
+Close5      BYTE        "]. Internal state corrupted.",10,0
+Read1       BYTE        "File.Read failed. Could not read from file handle [arg2=",0
+Read2       BYTE        "].",10,0
+
+
+%
 % We have 256 Bytes at address :MM:__FILE:Pool to store some internal
 % data for file descriptors. Therefore,
 %   #00        - not in use
@@ -35,17 +70,16 @@
 %   #EE        - marked as 'controlled by the system' (e.g. fh 0 - 2)
 %   #FF        - markes as 'manually controlled by the user'
 %
-
             .section .data,"wa",@progbits
             .balign 8
+            .global :MM:__FILE:Pool
             PREFIX      :MM:__FILE:
 Pool        BYTE        #EE,#EE,#EE
             .fill 253*1
-            .global :MM:__FILE:Pool
+
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__FILE:
-
 t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
@@ -96,9 +130,9 @@ Lock        SET         $3,arg0
             SET         t,arg0
             POP         0
 9H          SET         :MM:__ERROR:__rJ,$1
-            LDA         $1,:MM:__STRS:FileLock1
+            LDA         $1,:MM:__FILE:STRS:Lock1
             SET         $2,arg0
-            LDA         $3,:MM:__STRS:FileLock2
+            LDA         $3,:MM:__FILE:STRS:Lock2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -137,9 +171,9 @@ Unlock      SET         $3,arg0
             SET         t,arg0
             POP         0
 9H          SET         :MM:__ERROR:__rJ,$1
-            LDA         $1,:MM:__STRS:FileUnlock1
+            LDA         $1,:MM:__FILE:STRS:Unlock1
             SET         $2,arg0
-            LDA         $3,:MM:__STRS:FileUnlock2
+            LDA         $3,:MM:__FILE:STRS:Unlock2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -474,12 +508,12 @@ Open        CMPU        t,arg1,4
             PUT         :rJ,$2
             POP         1,0
 8H          GET         :MM:__ERROR:__rJ,:rJ
-            LDA         $1,:MM:__STRS:FileOpen3
+            LDA         $1,:MM:__FILE:STRS:Open3
             PUSHJ       $0,:MM:__ERROR:Error1
 9H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $2,arg1
-            LDA         $1,:MM:__STRS:FileOpen1
-            LDA         $3,:MM:__STRS:FileOpen2
+            LDA         $1,:MM:__FILE:STRS:Open1
+            LDA         $3,:MM:__FILE:STRS:Open2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -797,19 +831,19 @@ Close       AND         $3,arg0,#FF
             SET         $4,0
             STBU        $4,pool,$3
             SET         :MM:__ERROR:__rJ,$1
-            LDA         $3,:MM:__STRS:FileClose4
+            LDA         $3,:MM:__FILE:STRS:Close4
             SET         $4,arg0
-            LDA         $5,:MM:__STRS:FileClose5
+            LDA         $5,:MM:__FILE:STRS:Close5
             PUSHJ       $2,:MM:__ERROR:Error3RB2
 8H          SET         :MM:__ERROR:__rJ,$1
-            LDA         $1,:MM:__STRS:FileClose1
+            LDA         $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
-            LDA         $3,:MM:__STRS:FileClose2
+            LDA         $3,:MM:__FILE:STRS:Close2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 9H          GET         :MM:__ERROR:__rJ,:rJ
-            LDA         $1,:MM:__STRS:FileClose1
+            LDA         $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
-            LDA         $3,:MM:__STRS:FileClose3
+            LDA         $3,:MM:__FILE:STRS:Close3
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -1233,6 +1267,6 @@ Read        SET         $4,arg2
             PUT         :rJ,$0
             POP         0,0
 9H          SET         :MM:__ERROR:__rJ,$0
-            LDA         $1,:MM:__STRS:FileRead1
-            LDA         $3,:MM:__STRS:FileRead2
+            LDA         $1,:MM:__FILE:STRS:Read1
+            LDA         $3,:MM:__FILE:STRS:Read2
             PUSHJ       $0,:MM:__ERROR:Error3RB2

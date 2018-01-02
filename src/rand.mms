@@ -30,15 +30,41 @@
 %
 
             .section .data,"wa",@progbits
+            .global :MM:__RAND:STRS:Urandom
+            .global :MM:__RAND:STRS:Init1
+            .global :MM:__RAND:STRS:Init2
+            .global :MM:__RAND:STRS:Init3
+            .global :MM:__RAND:STRS:Init4
+            .global :MM:__RAND:STRS:Octa1
+            .global :MM:__RAND:STRS:OctaG1
+            .global :MM:__RAND:STRS:Range1
+            .global :MM:__RAND:STRS:Range2
+            .global :MM:__RAND:STRS:Range3
+            .global :MM:__RAND:STRS:Range4
+            PREFIX      :MM:__RAND:STRS:
+Urandom     BYTE        "/dev/urandom",0
+Init1       BYTE        "__RAND:Init failed. Unable to open '/dev/urandom'",0
+Init2       BYTE        ". Internal error. File handle [",0
+Init3       BYTE        "] invalid.",10,0
+Init4       BYTE        ".",10,0
+Octa1       BYTE        "Rand:Octa failed. Could not read random data.",10,0
+Range1      BYTE        "Rand:Range failed. Invalid range specified, [arg0=",0
+Range2      BYTE        "] and [arg1=",0
+Range3      BYTE        "] do not define a valid interval.",10,0
+Range4      BYTE        "Heap:Range failed. Could not read from "
+            BYTE        "filehandler [",0
+
+
+            .section .data,"wa",@progbits
             .balign 8
+            .global :MM:__RAND:FileHandle
             PREFIX      :MM:__RAND:
 FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .balign 8
-            .global :MM:__RAND:FileHandle
+
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__RAND:
-
 Ftell       IS          :Ftell
 Fopen       IS          :Fopen
 Fread       IS          :Fread
@@ -66,19 +92,19 @@ Init        GET         $0,:rJ
             PUSHJ       $2,:MM:__FILE:IsReadableJ
             JMP         3F
             JMP         2F
-1H          LDA         $3,:MM:__STRS:RandUrandom
+1H          LDA         $3,:MM:__RAND:STRS:Urandom
             SET         $4,BinaryRead
             PUSHJ       $2,:MM:__FILE:Open
             STO         $2,:MM:__RAND:FileHandle
 2H          PUT         :rJ,$0
             POP         0,0
-3H          LDA         $2,:MM:__STRS:RandInit1
-            LDA         $3,:MM:__STRS:RandInit2
+3H          LDA         $2,:MM:__RAND:STRS:Init1
+            LDA         $3,:MM:__RAND:STRS:Init2
             LDO         $4,:MM:__RAND:FileHandle
-            LDA         $5,:MM:__STRS:RandInit3
+            LDA         $5,:MM:__RAND:STRS:Init3
             PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
-4H          LDA         $2,:MM:__STRS:RandInit1
-            LDA         $3,:MM:__STRS:RandInit4
+4H          LDA         $2,:MM:__RAND:STRS:Init1
+            LDA         $3,:MM:__RAND:STRS:Init4
             PUSHJ       $1,:MM:__ERROR:IError2 % does not return
 
 
@@ -102,7 +128,7 @@ Octa        GET         $0,:rJ
             PUT         :rJ,$0
             LDO         $0,:MM:__INTERNAL:Buffer
             POP         1,0
-9H          LDA         $2,:MM:__STRS:RandOcta1
+9H          LDA         $2,:MM:__RAND:STRS:Octa1
             PUSHJ       $1,:MM:__ERROR:IError1
 
 

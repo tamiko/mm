@@ -37,12 +37,66 @@
 % :MM:__RAW_POOL:Dealloc.
 %
 
+            .section .data,"wa",@progbits
+            .global :MM:__HEAP:STRS:Alloc1
+            .global :MM:__HEAP:STRS:Alloc2
+            .global :MM:__HEAP:STRS:Free1
+            .global :MM:__HEAP:STRS:Free2
+            .global :MM:__HEAP:STRS:Size1
+            .global :MM:__HEAP:STRS:Size2
+            .global :MM:__HEAP:STRS:Move1
+            .global :MM:__HEAP:STRS:Move2
+            .global :MM:__HEAP:STRS:Move3
+            .global :MM:__HEAP:STRS:Move4
+            .global :MM:__HEAP:STRS:Reallo1
+            .global :MM:__HEAP:STRS:Reallo2
+            .global :MM:__HEAP:STRS:Reallo3
+            .global :MM:__HEAP:STRS:Reallo4
+            .global :MM:__HEAP:STRS:Reallo5
+            .global :MM:__HEAP:STRS:Set1
+            .global :MM:__HEAP:STRS:Set2
+            .global :MM:__HEAP:STRS:Zero1
+            .global :MM:__HEAP:STRS:Zero2
+            .global :MM:__HEAP:STRS:SetZero
+            .global :MM:__HEAP:STRS:Rand1
+            .global :MM:__HEAP:STRS:Rand2
+            .global :MM:__HEAP:STRS:Rand3
+            PREFIX      :MM:__HEAP:STRS:
+Alloc1      BYTE        "Heap:Alloc failed. Could not request a memory "
+            BYTE        "block of size [arg0=",0
+Alloc2      BYTE        "]. Out of memory.",10,0
+Free1       BYTE        "Heap:Free failed. Invalid pointer [arg0=",0
+Free2       BYTE        "]. Double free or corruption.",10,0
+Size1       BYTE        "Heap:Size failed. Invalid pointer [arg0=",0
+Size2       BYTE        "].",10,0
+Move1       BYTE        "Heap:Move failed. Invalid pointer [arg0=",0
+Move2       BYTE        "Heap:Move failed. Invalid pointer [arg1=",0
+Move3       BYTE        "].",10,0
+Move4       BYTE        "Heap::Move failed. Something went horribly "
+            BYTE        "wrong",10,0
+Reallo1     BYTE        "Heap:Realloc failed. Invalid pointer [arg0=",0
+Reallo2     BYTE        "].",10,0
+Reallo3     BYTE        "Heap:Realloc failed. Could not request a Heapory "
+            BYTE        "block of size [arg1=",0
+Reallo4     BYTE        "]. Out of Heapory.",10,0
+Reallo5     BYTE        "Heap::Realloc failed. Something went horribly "
+            BYTE        "wrong",10,0
+Set1        BYTE        "Heap:Set failed. Invalid pointer [arg0=",0
+Set2        BYTE        "].",10,0
+Zero1       BYTE        "Heap:Zero failed. Invalid pointer [arg0=",0
+Zero2       BYTE        "].",10,0
+SetZero     BYTE        "Heap:Set/Zero failed. Something went horribly "
+            BYTE        "wrong",10,0
+Rand1       BYTE        "Heap:Rand failed. Invalid pointer [arg0=",0
+Rand2       BYTE        "].",10,0
+Rand3       BYTE        "Heap:Rand failed. Something went horribly "
+            BYTE        "wrong",10,0
+
+
             .section .text,"ax",@progbits
             PREFIX      :MM:__HEAP:
-
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
-
 t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
@@ -110,8 +164,8 @@ AllocG      SET         $3,t
             POP         0,0
 1H          GET         :MM:__ERROR:__rJ,:rJ
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapAlloc1
-            LDA         $3,:MM:__STRS:HeapAlloc2
+            LDA         $1,:MM:__HEAP:STRS:Alloc1
+            LDA         $3,:MM:__HEAP:STRS:Alloc2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
@@ -164,8 +218,8 @@ Dealloc     SET         $3,arg0
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$1
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapFree1
-            LDA         $3,:MM:__STRS:HeapFree2
+            LDA         $1,:MM:__HEAP:STRS:Free1
+            LDA         $3,:MM:__HEAP:STRS:Free2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
@@ -199,7 +253,7 @@ ReallocJ    GET         $2,:rJ
             POP         1,1
 1H          PUT         :rJ,$2
             POP         0,0
-2H          LDA         $1,:MM:__STRS:HeapReallo5
+2H          LDA         $1,:MM:__HEAP:STRS:Reallo5
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -232,15 +286,15 @@ Realloc     GET         $2,:rJ
             POP         1,0
 1H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapReallo1
-            LDA         $3,:MM:__STRS:HeapReallo2
+            LDA         $1,:MM:__HEAP:STRS:Reallo1
+            LDA         $3,:MM:__HEAP:STRS:Reallo2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 2H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg1
-            LDA         $1,:MM:__STRS:HeapReallo3
-            LDA         $3,:MM:__STRS:HeapReallo4
+            LDA         $1,:MM:__HEAP:STRS:Reallo3
+            LDA         $3,:MM:__HEAP:STRS:Reallo4
             PUSHJ       $0,:MM:__ERROR:Error3R2
-3H          LDA         $1,:MM:__STRS:HeapReallo5
+3H          LDA         $1,:MM:__HEAP:STRS:Reallo5
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -322,8 +376,8 @@ Size        SET         $3,arg0
             POP         1,0
 1H          SET         :MM:__ERROR:__rJ,$1
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapSize1
-            LDA         $3,:MM:__STRS:HeapSize2
+            LDA         $1,:MM:__HEAP:STRS:Size1
+            LDA         $3,:MM:__HEAP:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 SizeG       SET         $3,t
             GET         $1,:rJ
@@ -334,8 +388,8 @@ SizeG       SET         $3,t
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$1
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapSize1
-            LDA         $3,:MM:__STRS:HeapSize2
+            LDA         $1,:MM:__HEAP:STRS:Size1
+            LDA         $3,:MM:__HEAP:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
@@ -399,7 +453,7 @@ CopyJ       GET         $2,:rJ
             POP         0,1
 1H          PUT         :rJ,$2
             POP         0,0
-3H          LDA         $1,:MM:__STRS:HeapMove4
+3H          LDA         $1,:MM:__HEAP:STRS:Move4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
@@ -430,15 +484,15 @@ Copy        GET         $2,:rJ
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapMove1
-            LDA         $3,:MM:__STRS:HeapMove3
+            LDA         $1,:MM:__HEAP:STRS:Move1
+            LDA         $3,:MM:__HEAP:STRS:Move3
             PUSHJ       $0,:MM:__ERROR:Error3R2
 2H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg1
-            LDA         $1,:MM:__STRS:HeapMove2
-            LDA         $3,:MM:__STRS:HeapMove3
+            LDA         $1,:MM:__HEAP:STRS:Move2
+            LDA         $3,:MM:__HEAP:STRS:Move3
             PUSHJ       $0,:MM:__ERROR:Error3R2
-3H          LDA         $1,:MM:__STRS:HeapMove4
+3H          LDA         $1,:MM:__HEAP:STRS:Move4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -472,7 +526,7 @@ SetJ        GET         $2,:rJ
             POP         0,1
 1H          PUT         :rJ,$2
             POP         0,0
-2H          LDA         $1,:MM:__STRS:HeapSetZero
+2H          LDA         $1,:MM:__HEAP:STRS:SetZero
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -495,8 +549,8 @@ Set         GET         $2,:rJ
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$2
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapSet1
-            LDA         $3,:MM:__STRS:HeapSet2
+            LDA         $1,:MM:__HEAP:STRS:Set1
+            LDA         $3,:MM:__HEAP:STRS:Set2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
@@ -524,8 +578,8 @@ Zero        GET         $1,:rJ
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$1
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapZero1
-            LDA         $3,:MM:__STRS:HeapZero2
+            LDA         $1,:MM:__HEAP:STRS:Zero1
+            LDA         $3,:MM:__HEAP:STRS:Zero2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
@@ -549,7 +603,7 @@ RandJ       GET         $1,:rJ
             POP         0,1
 1H          PUT         :rJ,$1
             POP         0,0
-2H          LDA         $1,:MM:__STRS:HeapRand3
+2H          LDA         $1,:MM:__HEAP:STRS:Rand3
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -577,6 +631,6 @@ Rand        GET         $1,:rJ
             POP         0,0
 1H          SET         :MM:__ERROR:__rJ,$1
             SET         $2,arg0
-            LDA         $1,:MM:__STRS:HeapRand1
-            LDA         $3,:MM:__STRS:HeapRand2
+            LDA         $1,:MM:__HEAP:STRS:Rand1
+            LDA         $3,:MM:__HEAP:STRS:Rand2
             PUSHJ       $0,:MM:__ERROR:Error3R2

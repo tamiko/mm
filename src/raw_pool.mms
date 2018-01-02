@@ -33,19 +33,25 @@
 % TODO: Implement a heap structure for efficiently storing the pool.
 %
 
+            .section .data,"wa",@progbits
+            .global :MM:__RAW_POOL:STRS:Grow1
+            .global :MM:__RAW_POOL:STRS:Deallo1
+            PREFIX      :MM:__RAW_POOL:STRS:
+Grow1       BYTE        "__RAW_POOL::Grow failed. "
+            BYTE        "Out of memory.",10,0
+Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
+            BYTE        "range specified.",10,0
+
+
             .section .text,"ax",@progbits
-            .global :MM:__RAW_POOL:Dealloc
-            .global :MM:__RAW_POOL:Alloc
-            .global :MM:__RAW_POOL:pool_ptr
-
             PREFIX      :MM:__RAW_POOL:
-
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
 
 %%
 % We use a GREG to maintain a pool of memory blocks
 %
+            .global :MM:__RAW_POOL:pool_ptr
 pool_ptr    GREG        0
 
 t           IS          $255
@@ -92,7 +98,7 @@ Grow        SLU         $0,arg0,1
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__STRS:PoolGrow1
+1H          LDA         $1,:MM:__POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
@@ -109,6 +115,7 @@ Grow        SLU         $0,arg0,1
 %   - The memory block defined by arg0, arg1 must have been
 %     allocated via :MM:__RAW_POOL:Alloc
 %
+            .global :MM:__RAW_POOL:Dealloc
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
 Dealloc     CSZ         arg1,arg1,#10
             ADDU        arg1,arg1,#F
@@ -130,7 +137,7 @@ Dealloc     CSZ         arg1,arg1,#10
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__STRS:PoolDeallo1
+1H          LDA         $1,:MM:__POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
@@ -199,6 +206,7 @@ sizeN       IS          $4
 %   arg0 - size of memory block to allocate (in bytes)
 %   retm - the address of the allocated block;
 %
+            .global :MM:__RAW_POOL:Alloc
 ptr         IS          $1
 prev_ptr    IS          $2
             % Align arg1 to 2 * 8 and make sure to request at least

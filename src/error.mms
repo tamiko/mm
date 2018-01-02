@@ -37,9 +37,38 @@
 %   Error condition caused by invalid user input. Respect Sys:AtError
 %
 
+            .section .data,"wa",@progbits
+            .global :MM:__ERROR:STRS:Terminated
+            .global :MM:__ERROR:STRS:Continued1
+            .global :MM:__ERROR:STRS:Continued2
+            .global :MM:__ERROR:STRS:Continued3
+            .global :MM:__ERROR:STRS:InternErro
+            .global :MM:__ERROR:STRS:Error1
+            .global :MM:__ERROR:STRS:Error2
+            .global :MM:__ERROR:STRS:ErrorHndlC1
+            .global :MM:__ERROR:STRS:ErrorHndlC2
+            .global :MM:__ERROR:STRS:ExcNotImpl
+            .global :MM:__ERROR:STRS:Generic
+            PREFIX      :MM:__ERROR:STRS:
+Terminated  BYTE        "[MM library]   Program terminated.",10,0
+Continued1  BYTE        "[MM library]   Error handler returned. "
+            BYTE        "Continue execution at [",0
+Continued2  BYTE        "[MM library]   Special handler value #FFFFFFFFFFFFFFFF. "
+            BYTE        "Continue execution at [",0
+Continued3  BYTE        "].",10,0
+InternErro  BYTE        "[MM library] Internal error: ",10
+            BYTE        "[MM library]   ",0
+Error1      BYTE        "[MM library] Called from [rJ=",0
+Error2      BYTE        "]:",10,"[MM library]   ",0
+ErrorHndlC1 BYTE        "[MM library]   Calling error handler [",0
+ErrorHndlC2 BYTE        "].",10,0
+ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
+            BYTE        "(ExcNotImpl).",10,0
+Generic     BYTE        "Something went horribly wrong...",10,0
+
+
             .section .text,"ax",@progbits
             PREFIX      :MM:__ERROR:
-
             .global :MM:__ERROR:__rJ
 __rJ        GREG        0
 
@@ -133,7 +162,7 @@ ErrRegG     SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:IError0
-IError0     LDA         t,:MM:__STRS:InternErro
+IError0     LDA         t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -147,7 +176,7 @@ IError0     LDA         t,:MM:__STRS:InternErro
 %   - routine does not return -
 %
             .global :MM:__ERROR:IError1
-IError1     LDA         t,:MM:__STRS:InternErro
+IError1     LDA         t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -164,7 +193,7 @@ IError1     LDA         t,:MM:__STRS:InternErro
 %   - routine does not return -
 %
             .global :MM:__ERROR:IError2
-IError2     LDA         t,:MM:__STRS:InternErro
+IError2     LDA         t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -185,7 +214,7 @@ IError2     LDA         t,:MM:__STRS:InternErro
 %   - routine does not return -
 %
             .global :MM:__ERROR:IError4R3
-IError4R3   LDA         t,:MM:__STRS:InternErro
+IError4R3   LDA         t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -211,11 +240,11 @@ IError4R3   LDA         t,:MM:__STRS:InternErro
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error0
-Error0      LDA         t,:MM:__STRS:Error1
+Error0      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             JMP         ErrorHndl
 
@@ -229,11 +258,11 @@ Error0      LDA         t,:MM:__STRS:Error1
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error1
-Error1      LDA         t,:MM:__STRS:Error1
+Error1      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -250,11 +279,11 @@ Error1      LDA         t,:MM:__STRS:Error1
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error2
-Error2      LDA         t,:MM:__STRS:Error1
+Error2      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -274,11 +303,11 @@ Error2      LDA         t,:MM:__STRS:Error1
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error3R2
-Error3R2    LDA         t,:MM:__STRS:Error1
+Error3R2    LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -300,11 +329,11 @@ Error3R2    LDA         t,:MM:__STRS:Error1
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error3RB2
-Error3RB2   LDA         t,:MM:__STRS:Error1
+Error3RB2   LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -328,11 +357,11 @@ Error3RB2   LDA         t,:MM:__STRS:Error1
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error5R24
-Error5R24   LDA         t,:MM:__STRS:Error1
+Error5R24   LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Error2
+            LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -355,28 +384,28 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             NEG         $1,0,$1
             CMP         $1,$1,$0
             BNZ         $1,3F
-            LDA         t,:MM:__STRS:Continued2
+            LDA         t,:MM:__ERROR:STRS:Continued2
             TRAP        0,Fputs,StdErr
             JMP         2F
             % Print a message and hand over to error handler:
-3H          LDA         t,:MM:__STRS:ErrorHndlC1
+3H          LDA         t,:MM:__ERROR:STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
             LDO         t,:MM:__SYS:AtErrorAddr
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:ErrorHndlC2
+            LDA         t,:MM:__ERROR:STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
             SET         t,__rJ
             GO          $0,$0 % call error handler
-            LDA         t,:MM:__STRS:Continued1
+            LDA         t,:MM:__ERROR:STRS:Continued1
             TRAP        0,Fputs,StdErr
 2H          SET         t,__rJ
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__STRS:Continued3
+            LDA         t,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
             PUT         :rJ,__rJ
             POP         0,0 % continue execution
 
-1H          LDA         t,:MM:__STRS:Terminated
+1H          LDA         t,:MM:__ERROR:STRS:Terminated
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
             SET         t,1
