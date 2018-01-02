@@ -25,12 +25,9 @@
 %%
 
 %
-% Assemble __rand.mmh
+% :MM:__RAND:
 %
-
-#ifndef __GNU_AS
-#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
-#endif
+%
 
             .section .data,"wa",@progbits
             .balign 8
@@ -40,10 +37,124 @@ FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .global :MM:__RAND:FileHandle
 
             .section .text,"ax",@progbits
-#define __MM_INTERNAL
-#include "__internal/__rand.mmh"
-            .global :MM:__RAND:Octa
-            .global :MM:__RAND:OctaG
-            .global :MM:__RAND:Range
-            .global :MM:__RAND:RangeU
-            .global :MM:__RAND:SetJ
+            PREFIX      :MM:__RAND:
+
+Ftell       IS          :Ftell
+Fopen       IS          :Fopen
+Fread       IS          :Fread
+BinaryRead  IS          :BinaryRead
+
+t           IS          $255
+arg0        IS          $0
+arg1        IS          $1
+OCT         IS          #8
+
+
+%%
+%
+% :MM:__RAND:Init
+%
+% PUSHJ
+%   no arguments
+%   no return value
+%
+Init        GET         $0,:rJ
+            LDO         $1,:MM:__RAND:FileHandle
+            BN          $1,1F
+            % is the filehandle valid?
+            SET         $3,$1
+            PUSHJ       $2,:MM:__FILE:IsReadableJ
+            JMP         3F
+            JMP         2F
+1H          LDA         $3,:MM:__STRS:RandUrandom
+            SET         $4,BinaryRead
+            PUSHJ       $2,:MM:__FILE:Open
+            STO         $2,:MM:__RAND:FileHandle
+2H          PUT         :rJ,$0
+            POP         0,0
+3H          LDA         $2,:MM:__STRS:RandInit1
+            LDA         $3,:MM:__STRS:RandInit2
+            LDO         $4,:MM:__RAND:FileHandle
+            LDA         $5,:MM:__STRS:RandInit3
+            PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
+4H          LDA         $2,:MM:__STRS:RandInit1
+            LDA         $3,:MM:__STRS:RandInit4
+            PUSHJ       $1,:MM:__ERROR:IError2 % does not return
+
+
+%%
+% :MM:__RAND:Octa
+%
+% PUSHJ
+%   no arguments
+%   retm - a random octabyte
+%
+            % Arguments for Fread:
+Octa        GET         $0,:rJ
+            LDO         $4,:MM:__RAND:FileHandle
+            BNN         $4,1F
+            PUSHJ       t,Init
+            LDO         $4,:MM:__RAND:FileHandle
+1H          LDA         $2,:MM:__INTERNAL:Buffer
+            SET         $3,#8
+            PUSHJ       $1,:MM:__FILE:ReadJ
+            JMP         9F
+            PUT         :rJ,$0
+            LDO         $0,:MM:__INTERNAL:Buffer
+            POP         1,0
+9H          LDA         $2,:MM:__STRS:RandOcta1
+            PUSHJ       $1,:MM:__ERROR:IError1
+
+
+%%
+% :MM:__RAND:OctaG
+%
+% PUSHJ $255
+%
+OctaG       GET         $0,:rJ
+            PUSHJ       $1,Octa
+            PUT         :rJ,$0
+            SET         t,$1
+            POP         0,0
+
+
+%%
+% :MM:__RAND:Range
+% :MM:__RAND:RangeU
+%
+% PUSHJ
+%   arg0 - minimal value
+%   arg1 - maximal value
+%   retm - a random octabyte within [arg0,arg1]
+%
+Range       SWYM
+RangeU      SWYM
+            LDA         $1,:MM:__STRS:ExcNotImpl
+            PUSHJ       $0,:MM:__ERROR:IError1
+
+
+%%
+% :MM:__RAND:SetJ
+%
+% PUSHJ
+%   arg0 - starting address
+%   arg1 - size (in bytes)
+%   no return value
+%
+SetJ        GET         $3,:rJ
+            LDO         $7,:MM:__RAND:FileHandle
+            BNN         $7,1F
+            PUSHJ       t,Init
+            LDO         $7,:MM:__RAND:FileHandle
+1H          ADDU        t,arg0,arg1
+            CMPU        t,t,arg0
+            BN          t,9F
+            BZ          arg1,1F % Nothing to do.
+            SET         $5,arg0
+            SET         $6,arg1
+            PUSHJ       $4,:MM:__FILE:ReadJ
+            JMP         9F
+1H          PUT         :rJ,$3
+            POP         0,1
+9H          PUT         :rJ,$3
+            POP         0,0

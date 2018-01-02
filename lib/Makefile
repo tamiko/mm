@@ -14,7 +14,7 @@ objects:=$(filter-out mmi.o,$(objects))
 
 all: libmm.a mmi.o $(objects)
 
-%.i: ../src/%.mms ../src/__internal/__%.mmh
+%.i: ../src/%.mms
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
 %.o: %.i

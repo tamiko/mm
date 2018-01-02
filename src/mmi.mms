@@ -24,10 +24,6 @@
 % SOFTWARE.
 %%
 
-#ifndef __GNU_AS
-#error Tried to assemble __gnu_as_mmrt.mms with foreign assembler.
-#endif
-
             %
             % Set the beginning of the .text section to #00. The first
             % instructions assembled into the .text section thus determines
