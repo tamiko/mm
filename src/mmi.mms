@@ -34,7 +34,7 @@
             .global __.MMIX.start..text
 
             %
-            % Register :MM:__INIT:TripHandler and :MM:__INIT:Entry
+            % Register :MM:__INIT:TripHandler and :MM:__INIT:__init
             %
 
             .section .text,"ax",@progbits
@@ -48,7 +48,7 @@ __trip      PUSHJ       $255,:MM:__INIT:TripHandler
             RESUME
             .org #10
             .org #F0
-__entry     JMP         :MM:__INIT:Entry
+__entry     JMP         :MM:__INIT:__init
             .org #108
 
             %
@@ -61,25 +61,36 @@ __entry     JMP         :MM:__INIT:Entry
 Buffer      IS          @
             .fill 128*8
 
+            %
+            % Startup code: hide argc, argv and address of Main.
+            % Compilations units can assemble initialization code into the
+            % .init section that gets run at program startup before Main is
+            % called.
+            %
 
-            .section .text,"ax",@progbits
-            .global :MM:__INIT:TripHandler
-            .global :MM:__INIT:Entry
+            .section .init,"ax",@progbits
+            .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
-TripHandler SWYM
-            % TODO: implement
-Entry       SWYM
+__init      SET         $2,$255     % store Main in $2
             % $0 - argc
             % $1 - argv
             % $2 - Main
+
+            % PUSHJ to hide $0,$1,$2
+            PUSHJ       $3,1F
+1H          SWYM
+            % mmo.mms containes the final call to Main
+
+
             %
-            % TODO: Now call into startup code
+            % The glorious trip handler
             %
-            SET         $2,$255     % store Main in $2
-            PUT         :rW,$2      % RESUME at Main
-            PUT         :rB,$2      % $255 <- Main after RESUME
-            SETML       $2,#F700
-            PUT         :rX,$2
-            PUT         :rJ,0
-            SET         $2,0
-            RESUME                  % Use resume for a pristine entry into Main
+
+            .section .text,"ax",@progbits
+            .global :MM:__INIT:TripHandler
+            PREFIX      :MM:__INIT:
+TripHandler SWYM
+
+            % TODO: implement
+
+            POP 0

@@ -24,21 +24,12 @@
 % SOFTWARE.
 %%
 
-            .section .init,"ax",@progbits
-            .global :MM:__INIT:__init2
-            PREFIX      :MM:__INIT:
-
             %
-            % undo PUSHJ and use RESUME for a pristine entry into Main
+            % Set up an internal buffer used for various purposes
             %
 
-            LDA $0,__init2
-            PUT :rJ,$0
-            POP 0
-__init2     PUT         :rW,$2      % RESUME at Main
-            PUT         :rB,$2      % $255 <- Main after RESUME
-            SETML       $2,#F700
-            PUT         :rX,$2
-            PUT         :rJ,0
-            SET         $2,0
-            RESUME
+            .section .data,"wa",@progbits
+            .global :MM:__INTERNAL:Buffer
+            PREFIX      :MM:__INTERNAL:
+Buffer      IS          @
+            .fill 128*8
