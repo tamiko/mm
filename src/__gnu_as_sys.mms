@@ -25,7 +25,7 @@
 %%
 
 %
-% Assemble __rand.mmh
+% Assemble __sys.mmh
 %
 
 #ifndef __GNU_AS
