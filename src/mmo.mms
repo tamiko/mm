@@ -32,12 +32,11 @@
             % undo PUSHJ, restore initial state and use RESUME for a
             % pristine entry into Main
             %
-            LDA $0,__init2
-            PUT :rJ,$0
-            POP 0
+            LDA         $0,__init2
+            PUT         :rJ,$0
+            POP         0
 __init2     UNSAVE      0,$0
             PUT         :rW,$255      % RESUME at Main
-            PUT         :rB,$255      % $255 <- Main after RESUME
             SETML       $255,#F700
             PUT         :rX,$255
             PUT         :rJ,#0
