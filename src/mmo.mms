@@ -40,5 +40,6 @@ __init2     UNSAVE      0,$0
             PUT         :rB,$255      % $255 <- Main after RESUME
             SETML       $255,#F700
             PUT         :rX,$255
-            PUT         :rJ,0
+            PUT         :rJ,#0
+            GET         $255,:rW
             RESUME
