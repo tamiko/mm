@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_MEM
+#define MM_MEM
+
+            PREFIX      :MM:
+
 %
 % :MM:Mem:
 %
@@ -40,20 +45,6 @@
 % :MM:Mem:Rand (RandJ)
 % :MM:Mem.Cmp (CmpJ)
 %
-
-#ifndef MM_MEM
-#define MM_MEM
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "__internal/__rand.mmh"
-#include "__internal/__mem.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
 %%
 % :MM:Mem:Copy

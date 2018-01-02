@@ -25,25 +25,16 @@
 %%
 
 %
-% Assemble __rand.mmh
+% Set up a raw heap implementation
 %
 
 #ifndef __GNU_AS
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-            .section .data,"wa",@progbits
-            .balign 8
-            PREFIX      :MM:__RAND:
-FileHandle  OCTA        #FFFFFFFFFFFFFFFF
-            .balign 8
-            .global :MM:__RAND:FileHandle
-
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__rand.mmh>
-            .global :MM:__RAND:Octa
-            .global :MM:__RAND:OctaG
-            .global :MM:__RAND:Range
-            .global :MM:__RAND:RangeU
-            .global :MM:__RAND:SetJ
+#include "__internal/__raw_pool.mmh"
+            .global :MM:__RAW_POOL:Dealloc
+            .global :MM:__RAW_POOL:Alloc
+            .global :MM:__RAW_POOL:pool_ptr

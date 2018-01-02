@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_STR
+#define MM_STR
+
+            PREFIX      :MM:
+
 %
 % :MM:String:
 %
@@ -52,19 +57,6 @@
 % strtok();
 % strxfrm();
 %
-
-#ifndef MM_STR
-#define MM_STR
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-%#include "__internal/impl/__str.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
             PREFIX      :
 

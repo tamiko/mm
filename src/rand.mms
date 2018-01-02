@@ -25,23 +25,25 @@
 %%
 
 %
-% Assemble __mem.mmh
+% Assemble __rand.mmh
 %
 
 #ifndef __GNU_AS
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__RAND:
+FileHandle  OCTA        #FFFFFFFFFFFFFFFF
+            .balign 8
+            .global :MM:__RAND:FileHandle
+
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__mem.mmh>
-            .global :MM:__MEM:Copy
-            .global :MM:__MEM:CopyJ
-            .global :MM:__MEM:Zero
-            .global :MM:__MEM:ZeroJ
-            .global :MM:__MEM:Set
-            .global :MM:__MEM:SetJ
-            .global :MM:__MEM:Rand
-            .global :MM:__MEM:RandJ
-            .global :MM:__MEM:Cmp
-            .global :MM:__MEM:CmpJ
+#include "__internal/__rand.mmh"
+            .global :MM:__RAND:Octa
+            .global :MM:__RAND:OctaG
+            .global :MM:__RAND:Range
+            .global :MM:__RAND:RangeU
+            .global :MM:__RAND:SetJ

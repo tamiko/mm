@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_FILE
+#define MM_FILE
+
+            PREFIX      :MM:
+
 %
 % :MM:File:
 %
@@ -45,19 +50,6 @@
 %   :MM:File:Seek (SeekJ, SeekG)
 %   :MM:File:Write (WriteJ)
 %
-
-#ifndef MM_FILE
-#define MM_FILE
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "__internal/__file.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
 %%
 % :MM:File:Lock

@@ -34,7 +34,7 @@
 
             .section .data,"wa",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__strs.mmh>
+#include "__internal/__strs.mmh"
             .global :MM:__STRS:Terminated
             .global :MM:__STRS:Continued1
             .global :MM:__STRS:Continued2

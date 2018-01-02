@@ -25,31 +25,31 @@
 %%
 
 %
-% Assemble __print.mmh
+% Assemble __sys.mmh
 %
 
 #ifndef __GNU_AS
 #error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__SYS:
+AtExitAddr  OCTA        #0000000000000000
+AtAbortAddr OCTA        #0000000000000000
+AtErrorAddr OCTA        #0000000000000000
+            .global :MM:__SYS:AtExitAddr
+            .global :MM:__SYS:AtAbortAddr
+            .global :MM:__SYS:AtErrorAddr
+
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__print.mmh>
-            .global :MM:__PRINT:Str
-            .global :MM:__PRINT:StrG
-            .global :MM:__PRINT:StrLn
-            .global :MM:__PRINT:StrLnG
-            .global :MM:__PRINT:Reg
-            .global :MM:__PRINT:RegG
-            .global :MM:__PRINT:RegLn
-            .global :MM:__PRINT:RegLnG
-            .global :MM:__PRINT:RegP
-            .global :MM:__PRINT:RegLnP
-            .global :MM:__PRINT:Byte
-            .global :MM:__PRINT:ByteG
-            .global :MM:__PRINT:Unsigned
-            .global :MM:__PRINT:UnsignedG
-            .global :MM:__PRINT:Signed
-            .global :MM:__PRINT:SignedG
-            .global :MM:__PRINT:MemLn
-            .global :MM:__PRINT:Ln
+#include "__internal/__sys.mmh"
+            .global :MM:__SYS:Exit
+            .global :MM:__SYS:Abort
+            .global :MM:__SYS:AtExit
+            .global :MM:__SYS:AtExitG
+            .global :MM:__SYS:AtAbort
+            .global :MM:__SYS:AtAbortG
+            .global :MM:__SYS:AtError
+            .global :MM:__SYS:AtErrorG

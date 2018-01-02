@@ -25,20 +25,24 @@
 %%
 
 %
-% :MM:Init:
-%
-% Internal initialization code
+% Assemble __error.mmh
 %
 
-#ifndef MM_INIT
-#define MM_INIT
-
-#define __MM_INTERNAL
-
-#ifdef __MMIXAL
-#include "__internal/__mmixal_init.mmh"
+#ifndef __GNU_AS
+#error Tried to assemble __gnu_as_data_segment.mms with foreign assembler.
 #endif
 
-#undef __MM_INTERNAL
-
-#endif /* MM_INIT */
+            .section .text,"ax",@progbits
+#define __MM_INTERNAL
+#include "__internal/__error.mmh"
+            .global :MM:__ERROR:__rJ
+            .global :MM:__ERROR:IError0
+            .global :MM:__ERROR:IError1
+            .global :MM:__ERROR:IError2
+            .global :MM:__ERROR:IError4R3
+            .global :MM:__ERROR:Error0
+            .global :MM:__ERROR:Error1
+            .global :MM:__ERROR:Error2
+            .global :MM:__ERROR:Error3R2
+            .global :MM:__ERROR:Error3RB2
+            .global :MM:__ERROR:Error5R24

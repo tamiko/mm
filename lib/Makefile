@@ -1,5 +1,3 @@
-prefix=__gnu_as_
-
 cpp=cpp
 cpp_args=-D__GNU_AS -D__MMIXWARE
 as=mmix-as
@@ -10,13 +8,13 @@ ar=mmix-ar
 ar_args=cru
 ranlib=mmix-ranlib
 
-sources:=$(wildcard ../src/$(prefix)*.mms)
-objects:=$(patsubst ../src/$(prefix)%.mms,%.o,$(sources))
+sources:=$(wildcard ../src/*.mms)
+objects:=$(patsubst ../src/%.mms,%.o,$(sources))
 objects:=$(filter-out mmi.o,$(objects))
 
 all: libmm.a mmi.o $(objects)
 
-%.i: ../src/$(prefix)%.mms ../include/mm/__internal/__%.mmh
+%.i: ../src/%.mms ../src/__internal/__%.mmh
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
 %.o: %.i

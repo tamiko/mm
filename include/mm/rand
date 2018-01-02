@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_RAND
+#define MM_RAND
+
+            PREFIX      :MM:
+
 %
 % :MM:Rand:
 %
@@ -38,20 +43,6 @@
 %   :MM:Rand:Range
 %   :MM:Rand:RangU
 %
-
-#ifndef MM_RAND
-#define MM_RAND
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "__internal/__file.mmh"
-#include "__internal/__rand.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
 %%
 % :MM:Rand:Octa

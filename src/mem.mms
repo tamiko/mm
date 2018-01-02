@@ -25,7 +25,7 @@
 %%
 
 %
-% Assemble __error.mmh
+% Assemble __mem.mmh
 %
 
 #ifndef __GNU_AS
@@ -34,15 +34,14 @@
 
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__error.mmh>
-            .global :MM:__ERROR:__rJ
-            .global :MM:__ERROR:IError0
-            .global :MM:__ERROR:IError1
-            .global :MM:__ERROR:IError2
-            .global :MM:__ERROR:IError4R3
-            .global :MM:__ERROR:Error0
-            .global :MM:__ERROR:Error1
-            .global :MM:__ERROR:Error2
-            .global :MM:__ERROR:Error3R2
-            .global :MM:__ERROR:Error3RB2
-            .global :MM:__ERROR:Error5R24
+#include "__internal/__mem.mmh"
+            .global :MM:__MEM:Copy
+            .global :MM:__MEM:CopyJ
+            .global :MM:__MEM:Zero
+            .global :MM:__MEM:ZeroJ
+            .global :MM:__MEM:Set
+            .global :MM:__MEM:SetJ
+            .global :MM:__MEM:Rand
+            .global :MM:__MEM:RandJ
+            .global :MM:__MEM:Cmp
+            .global :MM:__MEM:CmpJ

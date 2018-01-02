@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_PRINT
+#define MM_PRINT
+
+            PREFIX      :MM:
+
 %
 % :MM:Print:
 %
@@ -42,19 +47,6 @@
 %   :MM:Print:MemLn
 %   :MM:Print:Ln
 %
-
-#ifndef MM_PRINT
-#define MM_PRINT
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "__internal/__print.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
 %%
 % :MM:Print:Str

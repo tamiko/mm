@@ -25,7 +25,7 @@
 %%
 
 %
-% Assemble __heap.mmh
+% Assemble data segment structures.
 %
 
 #ifndef __GNU_AS
@@ -34,29 +34,6 @@
 
             .section .text,"ax",@progbits
 #define __MM_INTERNAL
-#include <mm/__internal/__heap.mmh>
-            .global :MM:__HEAP:Alloc
-            .global :MM:__HEAP:AllocJ
-            .global :MM:__HEAP:AllocG
-            .global :MM:__HEAP:Dealloc
-            .global :MM:__HEAP:DeallocJ
-            .global :MM:__HEAP:DeallocG
-            .global :MM:__HEAP:Realloc
-            .global :MM:__HEAP:ReallocJ
-            .global :MM:__HEAP:ReallocG
-            .global :MM:__HEAP:Valid
-            .global :MM:__HEAP:ValidJ
-            .global :MM:__HEAP:ValidG
-            .global :MM:__HEAP:Size
-            .global :MM:__HEAP:SizeJ
-            .global :MM:__HEAP:SizeG
-            .global :MM:__HEAP:Copy
-            .global :MM:__HEAP:CopyJ
-            .global :MM:__HEAP:Set
-            .global :MM:__HEAP:SetJ
-            .global :MM:__HEAP:Zero
-            .global :MM:__HEAP:ZeroJ
-            .global :MM:__HEAP:ZeroG
-            .global :MM:__HEAP:Rand
-            .global :MM:__HEAP:RandJ
-            .global :MM:__HEAP:RandG
+#include "__internal/__init.mmh"
+            .global :MM:__INIT:TripHandler
+            .global :MM:__INIT:Entry

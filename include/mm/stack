@@ -35,7 +35,6 @@
 #ifndef MM_STACK
 #define MM_STACK
 
-#include "init"
 #include "__internal/__stack.mmh"
 
 #endif

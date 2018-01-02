@@ -24,6 +24,11 @@
 % SOFTWARE.
 %%
 
+#ifndef MM_HEAP
+#define MM_HEAP
+
+            PREFIX      :MM:
+
 %
 % :MM:Heap:
 %
@@ -43,22 +48,6 @@
 %   :MM:Heap:Set (SetJ, SetG)
 %   :MM:Heap:Zero (ZeroJ, ZeroG)
 %
-
-#ifndef MM_HEAP
-#define MM_HEAP
-
-#include "init"
-
-#ifdef __MMIXAL
-#define __MM_INTERNAL
-#include "__internal/__file.mmh"
-#include "__internal/__rand.mmh"
-#include "__internal/__mem.mmh"
-#include "__internal/__heap.mmh"
-#undef __MM_INTERNAL
-#endif
-
-            PREFIX      :MM:
 
 %%
 % :MM:Heap:Alloc
