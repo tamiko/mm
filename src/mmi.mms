@@ -26,8 +26,8 @@
 
             %
             % Set the beginning of the .text section to #00. The first
-            % instructions assembled into the .text section thus determines
-            % the trip handler and entry point of the program.
+            % instructions assembled into the .text section determine the
+            % trip handlers and the entry point into the program.
             %
 
             .set __.MMIX.start..text,#00
@@ -41,13 +41,28 @@
             .global :MM:__INIT:__trip
             .global :MM:__INIT:__entry
             PREFIX      :MM:__INIT:
-            .org #0
-__trip      PUSHJ       $255,:MM:__INTERNAL:TripHandler
+            .org #00    % trip handler
+__trip      JMP 1F
+            .org #10    % arithmetic exception D
+            JMP 1F
+            .org #20    % arithmetic exception V
+            JMP 1F
+            .org #30    % arithmetic exception W
+            JMP 1F
+            .org #40    % arithmetic exception I
+            JMP 1F
+            .org #50    % arithmetic exception O
+            JMP 1F
+            .org #60    % arithmetic exception U
+            JMP 1F
+            .org #70    % arithmetic exception Z
+            JMP 1F
+            .org #80    % arithmetic exception X
+1H          PUSHJ       $255,:MM:__INTERNAL:TripHandler
             PUT         :rJ,$255
             GET         $255,:rB
             RESUME
-            .org #10
-            .org #F0
+            .org #F0    % entry point
 __entry     JMP         :MM:__INIT:__init
             .org #108
 

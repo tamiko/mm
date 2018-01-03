@@ -50,6 +50,16 @@ TripHandler SWYM
             SET         $0,$255
             GET         $1,:rJ
 
+            LDA         $255,__hell_trip
+            PUSHJ       $255,:MM:__PRINT:StrG
+
+            GET         $255,:rX
+            PUSHJ       $255,:MM:__PRINT:RegLnG
+            GET         $255,:rY
+            PUSHJ       $255,:MM:__PRINT:RegLnG
+            GET         $255,:rZ
+            PUSHJ       $255,:MM:__PRINT:RegLnG
+
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
