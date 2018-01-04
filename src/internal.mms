@@ -58,7 +58,7 @@ TripHandler SWYM
             ANDNML      $2,#00FF
             SETML       $3,#FF00
             CMPU        $2,$2,$3
-            BZ          $2,2F
+            BZ          $2,1F
             % we do not handle other TRIPS yet.
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:Error1
@@ -69,11 +69,7 @@ TripHandler SWYM
             % For now, run the callback handler in case of a callback and
             % in case we got tripped...
             %
-1H          SWYM
-2H          SWYM
-
-
-
+1H          PUSHJ       $255,:MM:__INIT:__callback
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
