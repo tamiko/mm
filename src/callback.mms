@@ -24,40 +24,61 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_STR
-#define MM_STR
-
-            PREFIX      :MM:
-
 %
-% :MM:String:
-%
-% This header file provides Subroutines for character string
-% manipulation:
-%
-% - to be implemented -
-%
-% TODO:
-%
-% strcat();
-% strncat();
-% strchr();
-% strcmp();
-% strncmp();
-% strcoll();
-% strcpy();
-% strncpy();
-% strcspn();
-% strerror();
-% strlen();
-% strpbrk();
-% strrchr();
-% strspn();
-% strstr();
-% strtok();
-% strxfrm();
+% :MM:__CALLBACK:
 %
 
-            PREFIX      :
+            .section .data,"wa",@progbits
+            .balign 8
+            PREFIX      :MM:__CALLBACK:
+interval    OCTA        #FFFFFFFFFFFFFFFF
 
-#endif /* MM_STR */
+            .section .text,"ax",@progbits
+            PREFIX      :MM:__CALLBACK:
+
+t           IS          $255
+arg0        IS          $0
+
+
+
+%%
+% :MM:__CALLBACK:Enable
+%
+% PUSHJ
+%   arg0 - interval in oops
+%   no return values
+%
+% :MM:__CALLBACK:EnableG
+%
+% PUSHJ %255
+%
+            .global :MM:__CALLBACK:Enable
+            .global :MM:__CALLBACK:EnableG
+EnableG     SET         arg0,t
+Enable      LDA         $1,:MM:__CALLBACK:interval
+            STO         arg0,$1
+            PUT         :rI,arg0
+            SET         t,arg0
+            POP         0
+
+
+%%
+% :MM:__CALLBACK:Disable
+%
+% PUSHJ
+%   arg0 - interval in oops
+%   no return values
+%
+% :MM:__CALLBACK:DisableG
+%
+% PUSHJ %255
+%
+            .global :MM:__CALLBACK:Disable
+            .global :MM:__CALLBACK:DisableG
+DisableG    SET         arg0,t
+Disable     NEG         $2,0,1
+            LDA         $1,:MM:__CALLBACK:interval
+            STO         $2,$1
+            PUT         :rI,$2
+            SET         t,arg0
+            POP         0

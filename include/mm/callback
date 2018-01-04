@@ -24,40 +24,48 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_STR
-#define MM_STR
+#ifndef MM_CALLBACK
+#define MM_CALLBACK
 
             PREFIX      :MM:
 
 %
-% :MM:String:
+% :MM:Callback:
 %
-% This header file provides Subroutines for character string
-% manipulation:
+% TODO
 %
-% - to be implemented -
+% - Stable ABI,  fully implemented -
 %
-% TODO:
+% This header file defines:
+%   :MM:Callback:Enable (EnableG)
+%   :MM:Callback:Disable (DisableG)
 %
-% strcat();
-% strncat();
-% strchr();
-% strcmp();
-% strncmp();
-% strcoll();
-% strcpy();
-% strncpy();
-% strcspn();
-% strerror();
-% strlen();
-% strpbrk();
-% strrchr();
-% strspn();
-% strstr();
-% strtok();
-% strxfrm();
+
+%%
+% :MM:Callback:Enable
 %
+%   TODO
+%
+%   PUSHJ:
+%   arg0 - timer interval in oops
+%   no return value
+%
+Callback:Enable  IS     :MM:__CALLBACK:Enable
+Callback:EnableG IS     :MM:__CALLBACK:EnableG
+
+%%
+% :MM:Callback:Disable
+%
+%   TODO
+%
+%   PUSHJ:
+%   no arguments
+%   no return value
+%
+Callback:Enable  IS     :MM:__CALLBACK:Enable
+Callback:EnableG IS     :MM:__CALLBACK:EnableG
+
 
             PREFIX      :
 
-#endif /* MM_STR */
+#endif /* MM_CALLBACK */
