@@ -41,23 +41,23 @@
             .global :MM:__INIT:__trip
             .global :MM:__INIT:__entry
             PREFIX      :MM:__INIT:
-            .org #00    % trip handler
+            .org #00    % H TRIP command / rI timer
 __trip      JMP 1F
-            .org #10    % arithmetic exception D
+            .org #10    % D "integer divide check"
             JMP 1F
-            .org #20    % arithmetic exception V
+            .org #20    % V "integer overflow"
             JMP 1F
-            .org #30    % arithmetic exception W
+            .org #30    % W "float-to-fix overflow"
             JMP 1F
-            .org #40    % arithmetic exception I
+            .org #40    % I "floating invalid operation"
             JMP 1F
-            .org #50    % arithmetic exception O
+            .org #50    % O "floating overflow"
             JMP 1F
-            .org #60    % arithmetic exception U
+            .org #60    % U "floating underflow"
             JMP 1F
-            .org #70    % arithmetic exception Z
+            .org #70    % Z "floating division by zero"
             JMP 1F
-            .org #80    % arithmetic exception X
+            .org #80    % X "floating inexact"
 1H          PUSHJ       $255,:MM:__INTERNAL:TripHandler
             PUT         :rJ,$255
             GET         $255,:rB
