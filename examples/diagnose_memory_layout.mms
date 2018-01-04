@@ -17,7 +17,7 @@ str_main    BYTE        "    Main:                      [ ",0
 str_hndl1   BYTE        "    :MM:__Init:__trip          [ ",0
 str_entry1  BYTE        "    :MM:__Init:__entry         [ ",0
 str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
-str_entry3  BYTE        "    :MM:__Init:__init2         [ ",0
+str_entry3  BYTE        "    :MM:__Init:__callback      [ ",0
 str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
 str_atexit  BYTE        "    :MM:__SYS:AtExitAddr       [ ",0
 str_atabort BYTE        "    :MM:__SYS:AtAbortAddr      [ ",0
@@ -101,7 +101,7 @@ Main        SET         $2,t
             LDA         $5,:MM:__INIT:__init
             LDA         $4,str_entry2
             PUSHJ       $3,AddressOf
-            LDA         $5,:MM:__INIT:__init2
+            LDA         $5,:MM:__INIT:__callback
             LDA         $4,str_entry3
             PUSHJ       $3,AddressOf
             PUSHJ       t,MM:Print:Ln

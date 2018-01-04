@@ -40,8 +40,9 @@ Buffer      IS          @
             %
 
             .section .data,"wa",@progbits
-__hell_trip BYTE        "Hello Trip!",10,0
-
+            .global :MM:__INTERNAL:STRS:Unhandled
+            PREFIX      :MM:__INTERNAL:STRS:
+Unhandled   BYTE        "Unhandled TRIP.\n",0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:TripHandler
@@ -49,16 +50,30 @@ __hell_trip BYTE        "Hello Trip!",10,0
 TripHandler SWYM
             SET         $0,$255
             GET         $1,:rJ
+            % timer interrupt:
+            GET         $2,:rX
+            ANDNH       $2,#F000
+            BZ          $2,1F
+            % explicit TRIP:
+            ANDNL       $2,#FFFF
+            ANDNML      $2,#00FF
+            SETML       $3,#FF00
+            CMPU        $2,$2,$3
+            BZ          $2,2F
+            % we do not handle other TRIPS yet.
+            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            PUSHJ       $0,:MM:__ERROR:Error1
+            SET         $255,$0
+            PUT         :rJ,$1
+            POP 0
+            %
+            % For now, run the callback handler in case of a callback and
+            % in case we got tripped...
+            %
+1H          SWYM
+2H          SWYM
 
-            LDA         $255,__hell_trip
-            PUSHJ       $255,:MM:__PRINT:StrG
 
-            GET         $255,:rX
-            PUSHJ       $255,:MM:__PRINT:RegLnG
-            GET         $255,:rY
-            PUSHJ       $255,:MM:__PRINT:RegLnG
-            GET         $255,:rZ
-            PUSHJ       $255,:MM:__PRINT:RegLnG
 
             SET         $255,$0
             PUT         :rJ,$1

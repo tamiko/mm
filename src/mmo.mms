@@ -25,20 +25,28 @@
 %%
 
             .section .init,"ax",@progbits
-            .global :MM:__INIT:__init2
-            PREFIX      :MM:__INIT:
-
             %
             % undo PUSHJ, restore initial state and use RESUME for a
             % pristine entry into Main
             %
-            LDA         $0,__init2
+            GETA        $0,1F
             PUT         :rJ,$0
             POP         0
-__init2     UNSAVE      0,$0
+1H          UNSAVE      0,$0
             PUT         :rW,$255      % RESUME at Main
             SETML       $255,#F700
             PUT         :rX,$255
             PUT         :rJ,#0
             GET         $255,:rW
             RESUME
+
+
+            .section .callback,"ax",@progbits
+            %
+            % undo PUSHJ, restore initial state and POP
+            %
+            GETA        $0,1F
+            PUT         :rJ,$0
+            POP         0
+1H          UNSAVE      0,$0
+            POP         0

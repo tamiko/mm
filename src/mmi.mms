@@ -87,3 +87,22 @@ __init      SWYM
             PUSHJ       $1,1F
 1H          SWYM
 
+            %
+            % Compilations units can assemble callback code into the
+            % .callback section that gets run at regular intervals
+            % (whenever the :rI counter fires).
+            %
+
+            .section .callback,"ax",@progbits
+            .global :MM:__INIT:__callback
+            PREFIX      :MM:__INIT:
+__callback  SWYM
+            %
+            % Save state, store stack address in $0, and hide $0
+            % with a PUSHJ:
+            %
+            SAVE        $255,0
+            SET         $0,$255
+            SET         $255,#0
+            PUSHJ       $1,1F
+1H          SWYM
