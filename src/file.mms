@@ -29,20 +29,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__FILE:STRS:Lock1
-            .global :MM:__FILE:STRS:Lock2
-            .global :MM:__FILE:STRS:Unlock1
-            .global :MM:__FILE:STRS:Unlock2
-            .global :MM:__FILE:STRS:Open1
-            .global :MM:__FILE:STRS:Open2
-            .global :MM:__FILE:STRS:Open3
-            .global :MM:__FILE:STRS:Close1
-            .global :MM:__FILE:STRS:Close2
-            .global :MM:__FILE:STRS:Close3
-            .global :MM:__FILE:STRS:Close4
-            .global :MM:__FILE:STRS:Close5
-            .global :MM:__FILE:STRS:Read1
-            .global :MM:__FILE:STRS:Read2
             PREFIX      :MM:__FILE:STRS:
 Lock1       BYTE        "File:Lock failed. Could not lock handle [arg0=",0
 Lock2       BYTE        "]. Already locked.",10,0

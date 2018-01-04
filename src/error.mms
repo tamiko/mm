@@ -38,17 +38,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__ERROR:STRS:Terminated
-            .global :MM:__ERROR:STRS:Continued1
-            .global :MM:__ERROR:STRS:Continued2
-            .global :MM:__ERROR:STRS:Continued3
-            .global :MM:__ERROR:STRS:InternErro
-            .global :MM:__ERROR:STRS:Error1
-            .global :MM:__ERROR:STRS:Error2
-            .global :MM:__ERROR:STRS:ErrorHndlC1
-            .global :MM:__ERROR:STRS:ErrorHndlC2
-            .global :MM:__ERROR:STRS:ExcNotImpl
-            .global :MM:__ERROR:STRS:Generic
             PREFIX      :MM:__ERROR:STRS:
 Terminated  BYTE        "[MM library]   Program terminated.",10,0
 Continued1  BYTE        "[MM library]   Error handler returned. "

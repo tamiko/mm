@@ -34,8 +34,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__RAW_POOL:STRS:Grow1
-            .global :MM:__RAW_POOL:STRS:Deallo1
             PREFIX      :MM:__RAW_POOL:STRS:
 Grow1       BYTE        "__RAW_POOL::Grow failed. "
             BYTE        "Out of memory.",10,0

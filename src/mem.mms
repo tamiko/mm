@@ -29,27 +29,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__MEM:STRS:Copy1
-            .global :MM:__MEM:STRS:Copy2
-            .global :MM:__MEM:STRS:Copy3
-            .global :MM:__MEM:STRS:Copy4
-            .global :MM:__MEM:STRS:Copy5
-            .global :MM:__MEM:STRS:Set1
-            .global :MM:__MEM:STRS:Set2
-            .global :MM:__MEM:STRS:Set3
-            .global :MM:__MEM:STRS:Set4
-            .global :MM:__MEM:STRS:Zero1
-            .global :MM:__MEM:STRS:Zero2
-            .global :MM:__MEM:STRS:Zero3
-            .global :MM:__MEM:STRS:Zero4
-            .global :MM:__MEM:STRS:Rand1
-            .global :MM:__MEM:STRS:Rand2
-            .global :MM:__MEM:STRS:Rand3
-            .global :MM:__MEM:STRS:Rand4
-            .global :MM:__MEM:STRS:Cmp1
-            .global :MM:__MEM:STRS:Cmp2
-            .global :MM:__MEM:STRS:Cmp3
-            .global :MM:__MEM:STRS:Cmp4
             PREFIX      :MM:__MEM:STRS:
 Copy1       BYTE        "Mem:Copy failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0

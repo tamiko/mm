@@ -38,29 +38,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__HEAP:STRS:Alloc1
-            .global :MM:__HEAP:STRS:Alloc2
-            .global :MM:__HEAP:STRS:Free1
-            .global :MM:__HEAP:STRS:Free2
-            .global :MM:__HEAP:STRS:Size1
-            .global :MM:__HEAP:STRS:Size2
-            .global :MM:__HEAP:STRS:Move1
-            .global :MM:__HEAP:STRS:Move2
-            .global :MM:__HEAP:STRS:Move3
-            .global :MM:__HEAP:STRS:Move4
-            .global :MM:__HEAP:STRS:Reallo1
-            .global :MM:__HEAP:STRS:Reallo2
-            .global :MM:__HEAP:STRS:Reallo3
-            .global :MM:__HEAP:STRS:Reallo4
-            .global :MM:__HEAP:STRS:Reallo5
-            .global :MM:__HEAP:STRS:Set1
-            .global :MM:__HEAP:STRS:Set2
-            .global :MM:__HEAP:STRS:Zero1
-            .global :MM:__HEAP:STRS:Zero2
-            .global :MM:__HEAP:STRS:SetZero
-            .global :MM:__HEAP:STRS:Rand1
-            .global :MM:__HEAP:STRS:Rand2
-            .global :MM:__HEAP:STRS:Rand3
             PREFIX      :MM:__HEAP:STRS:
 Alloc1      BYTE        "Heap:Alloc failed. Could not request a memory "
             BYTE        "block of size [arg0=",0

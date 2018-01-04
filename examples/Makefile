@@ -5,7 +5,7 @@ objects:=$(patsubst %.mms,%.mmo,$(sources))
 
 all: $(objects)
 
-%.mmo: %.mms
+%.mmo: %.mms ../lib/libmm.a ../lib/mmi.o ../lib/mmo.o
 	$(mmixc) $< -o $@
 
 clean:

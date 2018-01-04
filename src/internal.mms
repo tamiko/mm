@@ -40,7 +40,6 @@ Buffer      IS          @
             %
 
             .section .data,"wa",@progbits
-            .global :MM:__INTERNAL:STRS:Unhandled
             PREFIX      :MM:__INTERNAL:STRS:
 Unhandled   BYTE        "Unhandled TRIP.\n",0
 

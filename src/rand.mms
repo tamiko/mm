@@ -30,17 +30,6 @@
 %
 
             .section .data,"wa",@progbits
-            .global :MM:__RAND:STRS:Urandom
-            .global :MM:__RAND:STRS:Init1
-            .global :MM:__RAND:STRS:Init2
-            .global :MM:__RAND:STRS:Init3
-            .global :MM:__RAND:STRS:Init4
-            .global :MM:__RAND:STRS:Octa1
-            .global :MM:__RAND:STRS:OctaG1
-            .global :MM:__RAND:STRS:Range1
-            .global :MM:__RAND:STRS:Range2
-            .global :MM:__RAND:STRS:Range3
-            .global :MM:__RAND:STRS:Range4
             PREFIX      :MM:__RAND:STRS:
 Urandom     BYTE        "/dev/urandom",0
 Init1       BYTE        "__RAND:Init failed. Unable to open '/dev/urandom'",0
