@@ -964,8 +964,10 @@ IsWritable  GET         $1,:rJ
 % :MM:__FILE:ReadJ
 %
 % PUSHJ:
-%   arg0 - lowest byte defines the file handle
-%   no return value
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to read
+%   retm - (n - arg2), where n is the number of bytes that have been read
 %
 % :MM:__FILE:Read
 %
@@ -1229,19 +1231,19 @@ ReadTable   TRAP 0,Fread,0; JMP 7F
             TRAP 0,Fread,254; JMP 7F
             TRAP 0,Fread,255; JMP 7F
             OCTA        #0,#0
-ReadJ       BN          arg1,9F % invalid size
-            AND         arg2,arg2,#FF
+ReadJ       BN          arg2,9F % invalid size
+            AND         arg0,arg0,#FF
             GET         $3,:rJ
-            SET         $5,arg2
+            SET         $5,arg0
             PUSHJ       $4,IsReadableJ
             JMP         9F % not readable
-            SLU         arg2,arg2,3 % *8
+            SLU         arg0,arg0,3 % *8
             LDA         $4,ReadTable
             LDA         t,ReadJ
             SUBU        t,t,#10
-            STO         arg0,t,#0
-            STO         arg1,t,#8
-            GO          $4,$4,arg2
+            STO         arg1,t,#0
+            STO         arg2,t,#8
+            GO          $4,$4,arg0
 7H          SET         ret0,t
             % check that ret0 != - size - 1
             NEG         $1,0,$1
@@ -1536,19 +1538,19 @@ WriteTable  TRAP 0,Fwrite,0; JMP 7F
             TRAP 0,Fwrite,254; JMP 7F
             TRAP 0,Fwrite,255; JMP 7F
             OCTA        #0,#0
-WriteJ      BN          arg1,9F % invalid size
-            AND         arg2,arg2,#FF
+WriteJ      BN          arg2,9F % invalid size
+            AND         arg0,arg0,#FF
             GET         $3,:rJ
-            SET         $5,arg2
+            SET         $5,arg0
             PUSHJ       $4,IsWritableJ
             JMP         9F % not writable
-            SLU         arg2,arg2,3 % *8
+            SLU         arg0,arg0,3 % *8
             LDA         $4,WriteTable
             LDA         t,WriteJ
             SUBU        t,t,#10
-            STO         arg0,t,#0
-            STO         arg1,t,#8
-            GO          $4,$4,arg2
+            STO         arg1,t,#0
+            STO         arg2,t,#8
+            GO          $4,$4,arg0
 7H          SET         ret0,t
             % check that ret0 != - size - 1
             NEG         $1,0,$1

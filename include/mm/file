@@ -51,6 +51,7 @@
 %   :MM:File:Write (WriteJ)
 %
 
+
 %%
 % :MM:File:Lock
 %   Lock the file handle arg0 manually.
@@ -75,6 +76,7 @@ File:Lock   IS          :MM:__FILE:Lock
 File:LockG  IS          :MM:__FILE:LockG
 File:LockJ  IS          :MM:__FILE:LockJ
 
+
 %%
 % :MM:File:Unlock
 %   Unlock a previously locked file handle arg0.
@@ -97,6 +99,7 @@ File:LockJ  IS          :MM:__FILE:LockJ
 File:Unlock  IS         :MM:__FILE:Unlock
 File:UnlockG IS         :MM:__FILE:UnlockG
 File:UnlockJ IS         :MM:__FILE:UnlockJ
+
 
 %%
 % :MM:File:Open
@@ -125,6 +128,7 @@ File:UnlockJ IS         :MM:__FILE:UnlockJ
 File:Open   IS          :MM:__FILE:Open
 File:OpenJ  IS          :MM:__FILE:OpenJ
 
+
 %%
 % :MM:File:Close
 %   Close the open file described by the file handle given by the
@@ -136,7 +140,7 @@ File:OpenJ  IS          :MM:__FILE:OpenJ
 %   returned by a call to File:Open(J).
 %
 % PUSHJ:
-%   arg0 - lowest byte defines the file handle
+%   arg0 - lowest byte defining the file handle
 %   no return value
 %
 % :MM:File:CloseG
@@ -150,6 +154,7 @@ File:Close  IS          :MM:__FILE:Close
 File:CloseG IS          :MM:__FILE:CloseG
 File:CloseJ IS          :MM:__FILE:CloseJ
 
+
 %%
 % :MM:File:IsOpen
 % :MM:File:IsReadable
@@ -158,7 +163,7 @@ File:CloseJ IS          :MM:__FILE:CloseJ
 %   valid and open|readable|writable file handle.
 %
 % PUSHJ:
-%   arg0 - lowest byte defines the file handle
+%   arg0 - lowest byte defining the file handle
 %   retm - 0 true | -1 false
 %
 % :MM:File:IsOpenG
@@ -181,31 +186,56 @@ File:IsWritable IS      :MM:__FILE:IsWritable
 File:IsWritableG IS     :MM:__FILE:IsWritableG
 File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 
+
 %%
 % :MM:File:Seek
-%   arg0 - pointer to string containing filename
+%   arg0 - lowest byte defining file handle
 %   arg1 - offset
 %   retm - actual offset (todo)
 %
-% :MM:File:SeekJ
 % :MM:File:SeekG
+%   Variant of above function that passes arg0 in the general register
+%   $255.
 %
+% :MM:File:SeekJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+
 
 %%
 % :MM:File:Tell
-%   arg0 - file handler
-%   retm - current position
+%   arg0 - lowest byte defining file handle
+%   retm - current position in bytes from the beginning
+%
+% :MM:File:TellG
+%   Variant of above function that passes arg0 in the general register
+%   $255.
 %
 % :MM:File:TellJ
-% :MM:File:TellG
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
+
+
+%%
+% :MM:File:Size TODO
+%   arg0 - lowest byte defining file handle
+%   retm - file size in bytes
+%
+% :MM:File:SizeG
+%   Variant of above function that passes arg0 in the general register
+%   $255.
+%
+% :MM:File:SizeJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+
 
 %%
 % :MM:File:Read
-%   arg0 - pointer to buffer
-%   arg1 - number of bytes to read
-%   arg2 - file handle
-%   retm - (n - arg1), where n is the number of bytes that have been read
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to read
+%   retm - (n - arg2), where n is the number of bytes that have been read
 %
 % :MM:File:ReadJ
 %   :rJ if an error occured, :rJ+#4 otherwise
@@ -213,18 +243,39 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 File:Read   IS          :MM:__FILE:Read
 File:ReadJ  IS          :MM:__FILE:ReadJ
 
+
 %%
 % :MM:File:Write
-%   arg0 - pointer to buffer
-%   arg1 - number of bytes to write
-%   arg2 - file handle
-%   retm - number of bytes actually written
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to write
+%   retm - (n - arg2), where n is the number of bytes actually written
 %
 % :MM:File:WriteJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
 %
 File:Write  IS          :MM:__FILE:Write
 File:WriteJ IS          :MM:__FILE:WRiteJ
+
+
+%%
+% :MM:File:ReadIn TODO
+%   arg0 - pointer to string containing filename
+%   retm - memory containing file content
+%
+% :MM:File:ReadInJ
+% :MM:File:ReadInG
+%
+
+
+%%
+% :MM:File:WriteOut TODO
+%   arg0 - memory containing file content
+%   no return value
+%
+% :MM:File:WriteOutJ
+% :MM:File:WriteOutG
+%
 
 
 %
@@ -258,43 +309,6 @@ File:WriteJ IS          :MM:__FILE:WRiteJ
 %
 % :MM:File:PutsJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
-%
-
-
-%%
-% :MM:File:Exists
-%   arg0 - pointer to string containing filename
-%   retm - ..
-%
-% :MM:File:ExistsJ
-% :MM:File:ExistsG
-%
-
-%%
-% :MM:File:Size TODO
-%   arg0 - pointer to string containing filename
-%   retm - ..
-%
-% :MM:File:SizeJ
-% :MM:File:SizeG
-%
-
-%%
-% :MM:File:ReadIn TODO
-%   arg0 - pointer to string containing filename
-%   retm - memory containing file content
-%
-% :MM:File:ReadInJ
-% :MM:File:ReadInG
-%
-
-%%
-% :MM:File:WriteOut TODO
-%   arg0 - memory containing file content
-%   no return value
-%
-% :MM:File:WriteOutJ
-% :MM:File:WriteOutG
 %
 
             PREFIX      :
