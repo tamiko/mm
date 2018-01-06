@@ -1316,7 +1316,8 @@ Size        GET         $1,:rJ
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-9H          LDA         $1,:MM:__FILE:STRS:Size1
+9H          SET         :MM:__ERROR:__rJ,$1
+            LDA         $1,:MM:__FILE:STRS:Size1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
