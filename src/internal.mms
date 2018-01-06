@@ -35,14 +35,13 @@ Buffer      IS          @
             .fill 128*8
 
 
-            .section .data,"wa",@progbits
-            PREFIX      :MM:__INTERNAL:STRS:
-Unhandled   BYTE        "Unhandled TRIP.\n",0
-NotImplem   BYTE        "Arithmetic exception handler not implemented.\n",0
-
             %
             % Arithmetic exception handler
             %
+
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__INTERNAL:STRS:
+NotImplem   BYTE        "Arithmetic exception handler not implemented.\n",0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:ExcHandler
@@ -54,79 +53,77 @@ ExcHandler  SWYM
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
+
             %
             % The glorious trip handler
             %
-            PREFIX      :MM:Thread:
+
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__INTERNAL:STRS:
+Unhandled   BYTE        "Unhandled TRIP.\n",0
+
+            .section .text,"ax",@progbits
+            .global :MM:__INTERNAL:Yield
+            .global :MM:__INTERNAL:Create
+            .global :MM:__INTERNAL:Clone
+            .global :MM:__INTERNAL:Exit
+            .global :MM:__INTERNAL:TripHandler
+            PREFIX      :MM:__INTERNAL:
+
 Yield       IS          #00
 Create      IS          #D0
 Clone       IS          #E0
 Exit        IS          #F0
-
-            .section .text,"ax",@progbits
-            .global :MM:__INTERNAL:TripHandler
-            PREFIX      :MM:__INTERNAL:
-TripHandler SWYM
+TripHandler SET         $0,$255
+            GET         $1,:rJ
             %
             % Determine whether we got tripped by the timer callback
             % (rX=#8000000000000000), or by an explicit TRIP
             % (rX=#80000000FF00XXXX).
             %
-            SET         $0,$255
-            GET         $1,:rJ
-            % timer interrupt:
             GET         $2,:rX
             ANDNH       $2,#F000
-            BZ          $2,1F
-            % explicit TRIP:
+            BZ          $2,1F % timer interrupt
             ANDNL       $2,#FFFF
             ANDNML      $2,#00FF
             SETML       $3,#FF00
             CMPU        $2,$2,$3
-            BZ          $2,1F
-            % We do not handle arithmetic exceptions.
+            BZ          $2,1F % explicit TRIP
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
-            PUSHJ       $0,:MM:__ERROR:Error1
+            PUSHJ       $0,:MM:__ERROR:IError1
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
-1H          SWYM
+1H          GET         $3,:rX
+            SRU         $3,$3,8
+            AND         $3,$3,#FF
+            SET         $255,$3
+            PUSHJ       $255,:MM:__PRINT:RegLnG
+            CMP         $2,$3,Yield
+            BZ          $2,1F
+            CMP         $2,$3,Create
+            BZ          $2,2F
+            CMP         $2,$3,Clone
+            BZ          $2,3F
+            CMP         $2,$3,Exit
+            BZ          $2,4F
+            LDA         $3,:MM:__INTERNAL:STRS:Unhandled
+            PUSHJ       $2,:MM:__ERROR:IError1
+            SET         $255,$0
+            PUT         :rJ,$1
+            POP 0
+1H          SWYM % yield
+            JMP         9F
+2H          SWYM % create
+            JMP         9F
+3H          SWYM % clone
+            JMP         9F
+4H          SWYM % exit
+            JMP         9F
             % reenable timer
-            LDA         $2,:MM:__THREAD:interval
+9H          LDA         $2,:MM:__THREAD:interval
             LDO         $2,$2
             PUT         :rI,$2
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
-
-
-
-            %
-            % Compilations units can assemble callback code into the
-            % .callback section that gets run at regular intervals
-            % (whenever the :rI counter fires).
-            %
-
-            .section .callback,"ax",@progbits
-            .global :MM:__INIT:__callback
-            PREFIX      :MM:__INIT:
-__callback  SWYM
-            %
-            % Save state, store stack address in $0, and hide $0
-            % with a PUSHJ:
-            %
-            SAVE        $255,0
-            SET         $0,$255
-            SET         $255,#0
-            PUSHJ       $1,1F
-1H          SWYM
-
-            .section .callback,"ax",@progbits
-            %
-            % undo PUSHJ, restore initial state and POP
-            %
-            GETA        $0,1F
-            PUT         :rJ,$0
-            POP         0
-1H          UNSAVE      0,$0
-            POP         0

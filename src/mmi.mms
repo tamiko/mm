@@ -42,7 +42,10 @@
             .global :MM:__INIT:__entry
             PREFIX      :MM:__INIT:
             .org #00    % H TRIP command / rI timer
-__trip      JMP 1F
+__trip      PUSHJ       $255,:MM:__INTERNAL:TripHandler
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #10    % D "integer divide check"
             JMP 1F
             .org #20    % V "integer overflow"
@@ -58,7 +61,7 @@ __trip      JMP 1F
             .org #70    % Z "floating division by zero"
             JMP 1F
             .org #80    % X "floating inexact"
-1H          PUSHJ       $255,:MM:__INTERNAL:TripHandler
+1H          PUSHJ       $255,:MM:__INTERNAL:ExcHandler
             PUT         :rJ,$255
             GET         $255,:rB
             RESUME

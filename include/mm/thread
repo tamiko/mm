@@ -50,7 +50,7 @@
 %   no return value
 %
 Thread:PrEnable IS    :MM:__THREAD:PrEnable
-Thread:PrEnable IS    :MM:__THREAD:PrEnableG
+Thread:PrEnableG IS   :MM:__THREAD:PrEnableG
 
 
 %%

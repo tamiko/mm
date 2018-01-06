@@ -43,20 +43,20 @@ arg0        IS          $0
 
 
 %%
-% :MM:__THREAD:Enable
+% :MM:__THREAD:PrEnable
 %
 % PUSHJ
 %   arg0 - interval in oops
 %   no return values
 %
-% :MM:__THREAD:EnableG
+% :MM:__THREAD:PrEnableG
 %
 % PUSHJ %255
 %
             .global :MM:__THREAD:Enable
             .global :MM:__THREAD:EnableG
-EnableG     SET         arg0,t
-Enable      LDA         $1,:MM:__THREAD:interval
+PrEnableG   SET         arg0,t
+PrEnable    LDA         $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
             SET         t,arg0
@@ -64,20 +64,20 @@ Enable      LDA         $1,:MM:__THREAD:interval
 
 
 %%
-% :MM:__THREAD:Disable
+% :MM:__THREAD:PrDisable
 %
 % PUSHJ
 %   arg0 - interval in oops
 %   no return values
 %
-% :MM:__THREAD:DisableG
+% :MM:__THREAD:PrDisableG
 %
 % PUSHJ %255
 %
             .global :MM:__THREAD:Disable
             .global :MM:__THREAD:DisableG
-DisableG    SET         arg0,t
-Disable     NEG         $2,0,1
+PrDisableG  SET         arg0,t
+PrDisable   NEG         $2,0,1
             LDA         $1,:MM:__THREAD:interval
             STO         $2,$1
             PUT         :rI,$2
