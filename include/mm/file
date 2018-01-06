@@ -216,6 +216,9 @@ File:TellJ IS           :MM:__FILE:TellJ
 % :MM:File:SizeJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
+File:Size IS            :MM:__FILE:Size
+File:SizeG IS           :MM:__FILE:SizeG
+File:SizeJ IS           :MM:__FILE:SizeJ
 
 
 %%

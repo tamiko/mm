@@ -48,6 +48,8 @@ Close4      BYTE        "File:Close failed. Could not close file handle [arg0=",
 Close5      BYTE        "]. Internal state corrupted.",10,0
 Tell1       BYTE        "File:Tell failed. Could not read from file handle [arg0=",0
 Tell2       BYTE        "].",10,0
+Size1       BYTE        "File:Size failed. Could not read from file handle [arg0=",0
+Size2       BYTE        "].",10,0
 Seek1       BYTE        "File:Seek failed. Could not seek file handle [arg0=",0
 Seek2       BYTE        "] to position [arg1=",0
 Seek3       BYTE        "].",10,0
@@ -1272,6 +1274,58 @@ TellG       SET         $2,t
             SET         t,$1
             PUT         :rJ,$0
             POP         0,0
+
+
+%%
+% :MM:__FILE:SizeJ
+%
+% PUSHJ:
+%   arg0 - file handle
+%   retm - file size in bytes
+%
+% :MM:__FILE:Size
+% :MM:__FILE:SizeG
+%
+            .global :MM:__FILE:SizeJ
+            .global :MM:__FILE:SizeG
+            .global :MM:__FILE:Size
+SizeJ       GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,TellJ % save pointer
+            JMP         9F
+            SET         $4,arg0
+            NEG         $5,0,1
+            PUSHJ       $3,SeekJ % move pointer to end
+            JMP         9F
+            SET         $4,arg0
+            PUSHJ       $3,TellJ % get file size
+            JMP         9F
+            SET         $5,arg0
+            SET         $6,$2
+            PUSHJ       $4,SeekJ % restore file pointer
+            JMP         9F
+            PUT         :rJ,$1
+            SET         ret0,$3
+            POP         1,1
+9H          PUT         :rJ,$1
+            POP         0,0
+Size        GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,SizeJ
+            JMP         9F
+            PUT         :rJ,$1
+            SET         ret0,$2
+            POP         1,0
+9H          LDA         $1,:MM:__FILE:STRS:Size1
+            SET         $2,arg0
+            LDA         $3,:MM:__FILE:STRS:Size2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
+SizeG       GET         $0,:rJ
+            SET         $2,t
+            PUSHJ       $1,Size
+            SET         t,$1
+            PUT         :rJ,$0
+            POP         1,0
 
 
 %%
