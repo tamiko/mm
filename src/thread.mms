@@ -25,17 +25,17 @@
 %%
 
 %
-% :MM:__CALLBACK:
+% :MM:__THREAD:
 %
 
             .section .data,"wa",@progbits
             .balign 8
-            .global :MM:__CALLBACK:interval
-            PREFIX      :MM:__CALLBACK:
+            .global :MM:__THREAD:interval
+            PREFIX      :MM:__THREAD:
 interval    OCTA        #FFFFFFFFFFFFFFFF
 
             .section .text,"ax",@progbits
-            PREFIX      :MM:__CALLBACK:
+            PREFIX      :MM:__THREAD:
 
 t           IS          $255
 arg0        IS          $0
@@ -43,20 +43,20 @@ arg0        IS          $0
 
 
 %%
-% :MM:__CALLBACK:Enable
+% :MM:__THREAD:Enable
 %
 % PUSHJ
 %   arg0 - interval in oops
 %   no return values
 %
-% :MM:__CALLBACK:EnableG
+% :MM:__THREAD:EnableG
 %
 % PUSHJ %255
 %
-            .global :MM:__CALLBACK:Enable
-            .global :MM:__CALLBACK:EnableG
+            .global :MM:__THREAD:Enable
+            .global :MM:__THREAD:EnableG
 EnableG     SET         arg0,t
-Enable      LDA         $1,:MM:__CALLBACK:interval
+Enable      LDA         $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
             SET         t,arg0
@@ -64,21 +64,21 @@ Enable      LDA         $1,:MM:__CALLBACK:interval
 
 
 %%
-% :MM:__CALLBACK:Disable
+% :MM:__THREAD:Disable
 %
 % PUSHJ
 %   arg0 - interval in oops
 %   no return values
 %
-% :MM:__CALLBACK:DisableG
+% :MM:__THREAD:DisableG
 %
 % PUSHJ %255
 %
-            .global :MM:__CALLBACK:Disable
-            .global :MM:__CALLBACK:DisableG
+            .global :MM:__THREAD:Disable
+            .global :MM:__THREAD:DisableG
 DisableG    SET         arg0,t
 Disable     NEG         $2,0,1
-            LDA         $1,:MM:__CALLBACK:interval
+            LDA         $1,:MM:__THREAD:interval
             STO         $2,$1
             PUT         :rI,$2
             SET         t,arg0

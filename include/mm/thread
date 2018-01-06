@@ -24,48 +24,48 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_CALLBACK
-#define MM_CALLBACK
+#ifndef MM_THREAD
+#define MM_THREAD
 
             PREFIX      :MM:
 
 %
-% :MM:Callback:
+% :MM:Thread:
 %
-% TODO
-%
-% - Stable ABI,  fully implemented -
+% Routines for cooperative and preemptive (threaded) multitasking.
 %
 % This header file defines:
-%   :MM:Callback:Enable (EnableG)
-%   :MM:Callback:Disable (DisableG)
+%   :MM:Thread:Enable (EnableG)
+%   :MM:Thread:Disable (DisableG)
 %
 
+
 %%
-% :MM:Callback:Enable
+% :MM:Thread:EnablePreempt
 %
-%   TODO
+%   Enable preemptive threaded multitasking.
 %
 %   PUSHJ:
 %   arg0 - timer interval in oops
 %   no return value
 %
-Callback:Enable  IS     :MM:__CALLBACK:Enable
-Callback:EnableG IS     :MM:__CALLBACK:EnableG
+Thread:PrEnable IS    :MM:__THREAD:PrEnable
+Thread:PrEnable IS    :MM:__THREAD:PrEnableG
+
 
 %%
-% :MM:Callback:Disable
+% :MM:Thread:Disable
 %
-%   TODO
+%   Disable preemptive threaded multitasking.
 %
 %   PUSHJ:
 %   no arguments
 %   no return value
 %
-Callback:Disable  IS    :MM:__CALLBACK:Disable
-Callback:DisableG IS    :MM:__CALLBACK:DisableG
+Thread:PrDisable  IS  :MM:__THREAD:PrDisable
+Thread:PrDisableG IS  :MM:__THREAD:PrDisableG
 
 
             PREFIX      :
 
-#endif /* MM_CALLBACK */
+#endif /* MM_THREAD */

@@ -35,21 +35,42 @@ Buffer      IS          @
             .fill 128*8
 
 
-            %
-            % The glorious trip handler
-            %
-
             .section .data,"wa",@progbits
             PREFIX      :MM:__INTERNAL:STRS:
 Unhandled   BYTE        "Unhandled TRIP.\n",0
+NotImplem   BYTE        "Arithmetic exception handler not implemented.\n",0
+
+            %
+            % Arithmetic exception handler
+            %
+
+            .section .text,"ax",@progbits
+            .global :MM:__INTERNAL:ExcHandler
+            PREFIX      :MM:__INTERNAL:
+ExcHandler  SWYM
+            SET         $0,$255
+            GET         $1,:rJ
+            % We do not handle arithmetic exceptions at the moment.
+            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+
+            %
+            % The glorious trip handler
+            %
+            PREFIX      :MM:Thread:
+Yield       IS          #00
+Create      IS          #D0
+Clone       IS          #E0
+Exit        IS          #F0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:TripHandler
             PREFIX      :MM:__INTERNAL:
 TripHandler SWYM
             %
-            % For now, just run the callback handler in case of a callback
-            % and in case we got tripped...
+            % Determine whether we got tripped by the timer callback
+            % (rX=#8000000000000000), or by an explicit TRIP
+            % (rX=#80000000FF00XXXX).
             %
             SET         $0,$255
             GET         $1,:rJ
@@ -63,17 +84,49 @@ TripHandler SWYM
             SETML       $3,#FF00
             CMPU        $2,$2,$3
             BZ          $2,1F
-            % we do not handle other TRIPS yet.
+            % We do not handle arithmetic exceptions.
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:Error1
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
-1H          PUSHJ       $255,:MM:__INIT:__callback
+1H          SWYM
             % reenable timer
-            LDA         $2,:MM:__CALLBACK:interval
+            LDA         $2,:MM:__THREAD:interval
             LDO         $2,$2
             PUT         :rI,$2
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
+
+
+
+            %
+            % Compilations units can assemble callback code into the
+            % .callback section that gets run at regular intervals
+            % (whenever the :rI counter fires).
+            %
+
+            .section .callback,"ax",@progbits
+            .global :MM:__INIT:__callback
+            PREFIX      :MM:__INIT:
+__callback  SWYM
+            %
+            % Save state, store stack address in $0, and hide $0
+            % with a PUSHJ:
+            %
+            SAVE        $255,0
+            SET         $0,$255
+            SET         $255,#0
+            PUSHJ       $1,1F
+1H          SWYM
+
+            .section .callback,"ax",@progbits
+            %
+            % undo PUSHJ, restore initial state and POP
+            %
+            GETA        $0,1F
+            PUT         :rJ,$0
+            POP         0
+1H          UNSAVE      0,$0
+            POP         0

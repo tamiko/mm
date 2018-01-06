@@ -39,14 +39,3 @@
             PUT         :rJ,#0
             GET         $255,:rW
             RESUME
-
-
-            .section .callback,"ax",@progbits
-            %
-            % undo PUSHJ, restore initial state and POP
-            %
-            GETA        $0,1F
-            PUT         :rJ,$0
-            POP         0
-1H          UNSAVE      0,$0
-            POP         0
