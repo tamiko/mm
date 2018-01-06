@@ -47,6 +47,10 @@ Unhandled   BYTE        "Unhandled TRIP.\n",0
             .global :MM:__INTERNAL:TripHandler
             PREFIX      :MM:__INTERNAL:
 TripHandler SWYM
+            %
+            % For now, just run the callback handler in case of a callback
+            % and in case we got tripped...
+            %
             SET         $0,$255
             GET         $1,:rJ
             % timer interrupt:
@@ -65,11 +69,11 @@ TripHandler SWYM
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
-            %
-            % For now, run the callback handler in case of a callback and
-            % in case we got tripped...
-            %
 1H          PUSHJ       $255,:MM:__INIT:__callback
+            % reenable timer
+            LDA         $2,:MM:__CALLBACK:interval
+            LDO         $2,$2
+            PUT         :rI,$2
             SET         $255,$0
             PUT         :rJ,$1
             POP 0

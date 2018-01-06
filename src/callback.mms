@@ -30,6 +30,7 @@
 
             .section .data,"wa",@progbits
             .balign 8
+            .global :MM:__CALLBACK:interval
             PREFIX      :MM:__CALLBACK:
 interval    OCTA        #FFFFFFFFFFFFFFFF
 

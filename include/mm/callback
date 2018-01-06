@@ -62,8 +62,8 @@ Callback:EnableG IS     :MM:__CALLBACK:EnableG
 %   no arguments
 %   no return value
 %
-Callback:Enable  IS     :MM:__CALLBACK:Enable
-Callback:EnableG IS     :MM:__CALLBACK:EnableG
+Callback:Disable  IS    :MM:__CALLBACK:Disable
+Callback:DisableG IS    :MM:__CALLBACK:DisableG
 
 
             PREFIX      :

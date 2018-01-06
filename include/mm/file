@@ -205,10 +205,10 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 %   arg0 - pointer to buffer
 %   arg1 - number of bytes to read
 %   arg2 - file handle
-%   retm - number of bytes actually read
+%   retm - (n - arg1), where n is the number of bytes that have been read
 %
 % :MM:File:ReadJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
+%   :rJ if an error occured, :rJ+#4 otherwise
 %
 File:Read   IS          :MM:__FILE:Read
 File:ReadJ  IS          :MM:__FILE:ReadJ
@@ -223,6 +223,8 @@ File:ReadJ  IS          :MM:__FILE:ReadJ
 % :MM:File:WriteJ
 %   :rJ if retm < arg0, :rJ+#4 otherwise
 %
+File:Write  IS          :MM:__FILE:Write
+File:WriteJ IS          :MM:__FILE:WRiteJ
 
 
 %
