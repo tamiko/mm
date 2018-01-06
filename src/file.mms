@@ -38,6 +38,9 @@ Open1       BYTE        "File:Open failed. Invalid file mode [arg1=",0
 Open2       BYTE        "] specified.",10,0
 Open3       BYTE        "File:Open failed. No free file handler "
             BYTE        "available.",10,0
+Open4       BYTE        "File:Open failed. Could not open file with "
+            BYTE        "specified file mode [arg1=",0
+Open5       BYTE        "].",10,0
 Close1      BYTE        "File:Close failed. File handle [arg0=",0
 Close2      BYTE        "] locked by user or system.",10,0
 Close3      BYTE        "] not opened.",10,0
@@ -45,6 +48,9 @@ Close4      BYTE        "File:Close failed. Could not close file handle [arg0=",
 Close5      BYTE        "]. Internal state corrupted.",10,0
 Tell1       BYTE        "File:Tell failed. Could not read from file handle [arg0=",0
 Tell2       BYTE        "].",10,0
+Seek1       BYTE        "File:Seek failed. Could not seek file handle [arg0=",0
+Seek2       BYTE        "] to position [arg1=",0
+Seek3       BYTE        "].",10,0
 Read1       BYTE        "File:Read failed. Could not read from file handle [arg0=",0
 Read2       BYTE        "].",10,0
 Write1      BYTE        "File:Write failed. Could not write to file handle [arg0=",0
@@ -473,7 +479,7 @@ fh          IS          $3
 % :MM:__FILE:Open
 %   arg0 - pointer to string containing filename
 %   arg1 - mode
-%   retm - file handle on success / -1 on error
+%   retm - file handle
 %
 
             .global :MM:__FILE:Open
@@ -496,9 +502,11 @@ Open        CMPU        t,arg1,4
             SET         $0,$3
             PUT         :rJ,$2
             POP         1,0
-7H          NEG         $0,0,1
-            PUT         :rJ,$2
-            POP         1,0
+7H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg1
+            LDA         $1,:MM:__FILE:STRS:Open4
+            LDA         $3,:MM:__FILE:STRS:Open5
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
 8H          GET         :MM:__ERROR:__rJ,:rJ
             LDA         $1,:MM:__FILE:STRS:Open3
             PUSHJ       $0,:MM:__ERROR:Error1
@@ -976,7 +984,7 @@ IsWritable  GET         $1,:rJ
 %
 
             .global :MM:__FILE:TellJ
-            .global :MM:__FILE:Tell
+            .global :MM:__FILE:TellG
             .global :MM:__FILE:Tell
 TellTable   TRAP 0,Ftell,0; JMP 7F
             TRAP 0,Ftell,1; JMP 7F
@@ -1246,22 +1254,322 @@ TellJ       AND         arg0,arg0,#FF
             POP         1,1
 9H          PUT         :rJ,$1
             POP         0,0
-Tell        SET         $2,arg0
-            GET         $0,:rJ
-            PUSHJ       $1,TellJ
+Tell        SET         $3,arg0
+            GET         $1,:rJ
+            PUSHJ       $2,TellJ
             JMP         9F
-            PUT         :rJ,$0
-            SET         ret0,$1
+            PUT         :rJ,$1
+            SET         ret0,$2
             POP         1,0
-9H          SET         :MM:__ERROR:__rJ,$0
+9H          SET         :MM:__ERROR:__rJ,$1
             LDA         $1,:MM:__FILE:STRS:Tell1
+            SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Tell2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 TellG       SET         $2,t
             GET         $0,:rJ
             PUSHJ       $1,Tell
             SET         t,$1
+            PUT         :rJ,$0
             POP         0,0
+
+
+%%
+% :MM:__FILE:SeekJ
+%
+% PUSHJ:
+%   arg0 - file handle
+%   arg1 - offset
+%   no return values
+%
+% :MM:__FILE:Seek
+%
+
+            .global :MM:__FILE:SeekJ
+            .global :MM:__FILE:Seek
+SeekTable   TRAP 0,Fseek,0; JMP 7F
+            TRAP 0,Fseek,1; JMP 7F
+            TRAP 0,Fseek,2; JMP 7F
+            TRAP 0,Fseek,3; JMP 7F
+            TRAP 0,Fseek,4; JMP 7F
+            TRAP 0,Fseek,5; JMP 7F
+            TRAP 0,Fseek,6; JMP 7F
+            TRAP 0,Fseek,7; JMP 7F
+            TRAP 0,Fseek,8; JMP 7F
+            TRAP 0,Fseek,9; JMP 7F
+            TRAP 0,Fseek,10; JMP 7F
+            TRAP 0,Fseek,11; JMP 7F
+            TRAP 0,Fseek,12; JMP 7F
+            TRAP 0,Fseek,13; JMP 7F
+            TRAP 0,Fseek,14; JMP 7F
+            TRAP 0,Fseek,15; JMP 7F
+            TRAP 0,Fseek,16; JMP 7F
+            TRAP 0,Fseek,17; JMP 7F
+            TRAP 0,Fseek,18; JMP 7F
+            TRAP 0,Fseek,19; JMP 7F
+            TRAP 0,Fseek,20; JMP 7F
+            TRAP 0,Fseek,21; JMP 7F
+            TRAP 0,Fseek,22; JMP 7F
+            TRAP 0,Fseek,23; JMP 7F
+            TRAP 0,Fseek,24; JMP 7F
+            TRAP 0,Fseek,25; JMP 7F
+            TRAP 0,Fseek,26; JMP 7F
+            TRAP 0,Fseek,27; JMP 7F
+            TRAP 0,Fseek,28; JMP 7F
+            TRAP 0,Fseek,29; JMP 7F
+            TRAP 0,Fseek,30; JMP 7F
+            TRAP 0,Fseek,31; JMP 7F
+            TRAP 0,Fseek,32; JMP 7F
+            TRAP 0,Fseek,33; JMP 7F
+            TRAP 0,Fseek,34; JMP 7F
+            TRAP 0,Fseek,35; JMP 7F
+            TRAP 0,Fseek,36; JMP 7F
+            TRAP 0,Fseek,37; JMP 7F
+            TRAP 0,Fseek,38; JMP 7F
+            TRAP 0,Fseek,39; JMP 7F
+            TRAP 0,Fseek,40; JMP 7F
+            TRAP 0,Fseek,41; JMP 7F
+            TRAP 0,Fseek,42; JMP 7F
+            TRAP 0,Fseek,43; JMP 7F
+            TRAP 0,Fseek,44; JMP 7F
+            TRAP 0,Fseek,45; JMP 7F
+            TRAP 0,Fseek,46; JMP 7F
+            TRAP 0,Fseek,47; JMP 7F
+            TRAP 0,Fseek,48; JMP 7F
+            TRAP 0,Fseek,49; JMP 7F
+            TRAP 0,Fseek,50; JMP 7F
+            TRAP 0,Fseek,51; JMP 7F
+            TRAP 0,Fseek,52; JMP 7F
+            TRAP 0,Fseek,53; JMP 7F
+            TRAP 0,Fseek,54; JMP 7F
+            TRAP 0,Fseek,55; JMP 7F
+            TRAP 0,Fseek,56; JMP 7F
+            TRAP 0,Fseek,57; JMP 7F
+            TRAP 0,Fseek,58; JMP 7F
+            TRAP 0,Fseek,59; JMP 7F
+            TRAP 0,Fseek,60; JMP 7F
+            TRAP 0,Fseek,61; JMP 7F
+            TRAP 0,Fseek,62; JMP 7F
+            TRAP 0,Fseek,63; JMP 7F
+            TRAP 0,Fseek,64; JMP 7F
+            TRAP 0,Fseek,65; JMP 7F
+            TRAP 0,Fseek,66; JMP 7F
+            TRAP 0,Fseek,67; JMP 7F
+            TRAP 0,Fseek,68; JMP 7F
+            TRAP 0,Fseek,69; JMP 7F
+            TRAP 0,Fseek,70; JMP 7F
+            TRAP 0,Fseek,71; JMP 7F
+            TRAP 0,Fseek,72; JMP 7F
+            TRAP 0,Fseek,73; JMP 7F
+            TRAP 0,Fseek,74; JMP 7F
+            TRAP 0,Fseek,75; JMP 7F
+            TRAP 0,Fseek,76; JMP 7F
+            TRAP 0,Fseek,77; JMP 7F
+            TRAP 0,Fseek,78; JMP 7F
+            TRAP 0,Fseek,79; JMP 7F
+            TRAP 0,Fseek,80; JMP 7F
+            TRAP 0,Fseek,81; JMP 7F
+            TRAP 0,Fseek,82; JMP 7F
+            TRAP 0,Fseek,83; JMP 7F
+            TRAP 0,Fseek,84; JMP 7F
+            TRAP 0,Fseek,85; JMP 7F
+            TRAP 0,Fseek,86; JMP 7F
+            TRAP 0,Fseek,87; JMP 7F
+            TRAP 0,Fseek,88; JMP 7F
+            TRAP 0,Fseek,89; JMP 7F
+            TRAP 0,Fseek,90; JMP 7F
+            TRAP 0,Fseek,91; JMP 7F
+            TRAP 0,Fseek,92; JMP 7F
+            TRAP 0,Fseek,93; JMP 7F
+            TRAP 0,Fseek,94; JMP 7F
+            TRAP 0,Fseek,95; JMP 7F
+            TRAP 0,Fseek,96; JMP 7F
+            TRAP 0,Fseek,97; JMP 7F
+            TRAP 0,Fseek,98; JMP 7F
+            TRAP 0,Fseek,99; JMP 7F
+            TRAP 0,Fseek,100; JMP 7F
+            TRAP 0,Fseek,101; JMP 7F
+            TRAP 0,Fseek,102; JMP 7F
+            TRAP 0,Fseek,103; JMP 7F
+            TRAP 0,Fseek,104; JMP 7F
+            TRAP 0,Fseek,105; JMP 7F
+            TRAP 0,Fseek,106; JMP 7F
+            TRAP 0,Fseek,107; JMP 7F
+            TRAP 0,Fseek,108; JMP 7F
+            TRAP 0,Fseek,109; JMP 7F
+            TRAP 0,Fseek,110; JMP 7F
+            TRAP 0,Fseek,111; JMP 7F
+            TRAP 0,Fseek,112; JMP 7F
+            TRAP 0,Fseek,113; JMP 7F
+            TRAP 0,Fseek,114; JMP 7F
+            TRAP 0,Fseek,115; JMP 7F
+            TRAP 0,Fseek,116; JMP 7F
+            TRAP 0,Fseek,117; JMP 7F
+            TRAP 0,Fseek,118; JMP 7F
+            TRAP 0,Fseek,119; JMP 7F
+            TRAP 0,Fseek,120; JMP 7F
+            TRAP 0,Fseek,121; JMP 7F
+            TRAP 0,Fseek,122; JMP 7F
+            TRAP 0,Fseek,123; JMP 7F
+            TRAP 0,Fseek,124; JMP 7F
+            TRAP 0,Fseek,125; JMP 7F
+            TRAP 0,Fseek,126; JMP 7F
+            TRAP 0,Fseek,127; JMP 7F
+            TRAP 0,Fseek,128; JMP 7F
+            TRAP 0,Fseek,129; JMP 7F
+            TRAP 0,Fseek,130; JMP 7F
+            TRAP 0,Fseek,131; JMP 7F
+            TRAP 0,Fseek,132; JMP 7F
+            TRAP 0,Fseek,133; JMP 7F
+            TRAP 0,Fseek,134; JMP 7F
+            TRAP 0,Fseek,135; JMP 7F
+            TRAP 0,Fseek,136; JMP 7F
+            TRAP 0,Fseek,137; JMP 7F
+            TRAP 0,Fseek,138; JMP 7F
+            TRAP 0,Fseek,139; JMP 7F
+            TRAP 0,Fseek,140; JMP 7F
+            TRAP 0,Fseek,141; JMP 7F
+            TRAP 0,Fseek,142; JMP 7F
+            TRAP 0,Fseek,143; JMP 7F
+            TRAP 0,Fseek,144; JMP 7F
+            TRAP 0,Fseek,145; JMP 7F
+            TRAP 0,Fseek,146; JMP 7F
+            TRAP 0,Fseek,147; JMP 7F
+            TRAP 0,Fseek,148; JMP 7F
+            TRAP 0,Fseek,149; JMP 7F
+            TRAP 0,Fseek,150; JMP 7F
+            TRAP 0,Fseek,151; JMP 7F
+            TRAP 0,Fseek,152; JMP 7F
+            TRAP 0,Fseek,153; JMP 7F
+            TRAP 0,Fseek,154; JMP 7F
+            TRAP 0,Fseek,155; JMP 7F
+            TRAP 0,Fseek,156; JMP 7F
+            TRAP 0,Fseek,157; JMP 7F
+            TRAP 0,Fseek,158; JMP 7F
+            TRAP 0,Fseek,159; JMP 7F
+            TRAP 0,Fseek,160; JMP 7F
+            TRAP 0,Fseek,161; JMP 7F
+            TRAP 0,Fseek,162; JMP 7F
+            TRAP 0,Fseek,163; JMP 7F
+            TRAP 0,Fseek,164; JMP 7F
+            TRAP 0,Fseek,165; JMP 7F
+            TRAP 0,Fseek,166; JMP 7F
+            TRAP 0,Fseek,167; JMP 7F
+            TRAP 0,Fseek,168; JMP 7F
+            TRAP 0,Fseek,169; JMP 7F
+            TRAP 0,Fseek,170; JMP 7F
+            TRAP 0,Fseek,171; JMP 7F
+            TRAP 0,Fseek,172; JMP 7F
+            TRAP 0,Fseek,173; JMP 7F
+            TRAP 0,Fseek,174; JMP 7F
+            TRAP 0,Fseek,175; JMP 7F
+            TRAP 0,Fseek,176; JMP 7F
+            TRAP 0,Fseek,177; JMP 7F
+            TRAP 0,Fseek,178; JMP 7F
+            TRAP 0,Fseek,179; JMP 7F
+            TRAP 0,Fseek,180; JMP 7F
+            TRAP 0,Fseek,181; JMP 7F
+            TRAP 0,Fseek,182; JMP 7F
+            TRAP 0,Fseek,183; JMP 7F
+            TRAP 0,Fseek,184; JMP 7F
+            TRAP 0,Fseek,185; JMP 7F
+            TRAP 0,Fseek,186; JMP 7F
+            TRAP 0,Fseek,187; JMP 7F
+            TRAP 0,Fseek,188; JMP 7F
+            TRAP 0,Fseek,189; JMP 7F
+            TRAP 0,Fseek,190; JMP 7F
+            TRAP 0,Fseek,191; JMP 7F
+            TRAP 0,Fseek,192; JMP 7F
+            TRAP 0,Fseek,193; JMP 7F
+            TRAP 0,Fseek,194; JMP 7F
+            TRAP 0,Fseek,195; JMP 7F
+            TRAP 0,Fseek,196; JMP 7F
+            TRAP 0,Fseek,197; JMP 7F
+            TRAP 0,Fseek,198; JMP 7F
+            TRAP 0,Fseek,199; JMP 7F
+            TRAP 0,Fseek,200; JMP 7F
+            TRAP 0,Fseek,201; JMP 7F
+            TRAP 0,Fseek,202; JMP 7F
+            TRAP 0,Fseek,203; JMP 7F
+            TRAP 0,Fseek,204; JMP 7F
+            TRAP 0,Fseek,205; JMP 7F
+            TRAP 0,Fseek,206; JMP 7F
+            TRAP 0,Fseek,207; JMP 7F
+            TRAP 0,Fseek,208; JMP 7F
+            TRAP 0,Fseek,209; JMP 7F
+            TRAP 0,Fseek,210; JMP 7F
+            TRAP 0,Fseek,211; JMP 7F
+            TRAP 0,Fseek,212; JMP 7F
+            TRAP 0,Fseek,213; JMP 7F
+            TRAP 0,Fseek,214; JMP 7F
+            TRAP 0,Fseek,215; JMP 7F
+            TRAP 0,Fseek,216; JMP 7F
+            TRAP 0,Fseek,217; JMP 7F
+            TRAP 0,Fseek,218; JMP 7F
+            TRAP 0,Fseek,219; JMP 7F
+            TRAP 0,Fseek,220; JMP 7F
+            TRAP 0,Fseek,221; JMP 7F
+            TRAP 0,Fseek,222; JMP 7F
+            TRAP 0,Fseek,223; JMP 7F
+            TRAP 0,Fseek,224; JMP 7F
+            TRAP 0,Fseek,225; JMP 7F
+            TRAP 0,Fseek,226; JMP 7F
+            TRAP 0,Fseek,227; JMP 7F
+            TRAP 0,Fseek,228; JMP 7F
+            TRAP 0,Fseek,229; JMP 7F
+            TRAP 0,Fseek,230; JMP 7F
+            TRAP 0,Fseek,231; JMP 7F
+            TRAP 0,Fseek,232; JMP 7F
+            TRAP 0,Fseek,233; JMP 7F
+            TRAP 0,Fseek,234; JMP 7F
+            TRAP 0,Fseek,235; JMP 7F
+            TRAP 0,Fseek,236; JMP 7F
+            TRAP 0,Fseek,237; JMP 7F
+            TRAP 0,Fseek,238; JMP 7F
+            TRAP 0,Fseek,239; JMP 7F
+            TRAP 0,Fseek,240; JMP 7F
+            TRAP 0,Fseek,241; JMP 7F
+            TRAP 0,Fseek,242; JMP 7F
+            TRAP 0,Fseek,243; JMP 7F
+            TRAP 0,Fseek,244; JMP 7F
+            TRAP 0,Fseek,245; JMP 7F
+            TRAP 0,Fseek,246; JMP 7F
+            TRAP 0,Fseek,247; JMP 7F
+            TRAP 0,Fseek,248; JMP 7F
+            TRAP 0,Fseek,249; JMP 7F
+            TRAP 0,Fseek,250; JMP 7F
+            TRAP 0,Fseek,251; JMP 7F
+            TRAP 0,Fseek,252; JMP 7F
+            TRAP 0,Fseek,253; JMP 7F
+            TRAP 0,Fseek,254; JMP 7F
+            TRAP 0,Fseek,255; JMP 7F
+SeekJ       AND         arg0,arg0,#FF
+            GET         $2,:rJ
+            SLU         arg0,arg0,3 % *8
+            LDA         $3,SeekTable
+            SET         t,arg1
+            GO          $3,$3,arg0
+7H          SET         ret0,t
+            % check that ret0 >= 0
+            BN          $0,9F
+            PUT         :rJ,$2
+            POP         0,1
+9H          PUT         :rJ,$2
+            POP         0,0
+Seek        SET         $4,arg0
+            SET         $5,arg1
+            GET         $2,:rJ
+            PUSHJ       $3,SeekJ
+            JMP         9F
+            PUT         :rJ,$2
+            POP         0,0
+9H          SET         :MM:__ERROR:__rJ,$2
+            SET         $2,arg0
+            SET         $4,arg1
+            LDA         $1,:MM:__FILE:STRS:Seek1
+            LDA         $3,:MM:__FILE:STRS:Seek2
+            LDA         $5,:MM:__FILE:STRS:Seek3
+            PUSHJ       $0,:MM:__ERROR:Error5RB24
 
 
 %%

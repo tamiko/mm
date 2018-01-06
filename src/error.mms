@@ -198,7 +198,7 @@ IError2     LDA         t,:MM:__ERROR:STRS:InternErro
 % PUSHJ, JMP:
 %   arg0 - address of an error string
 %   arg1 - address of an error string
-%   arg2 - Octa to print between arg0 and arg2
+%   arg2 - Octa to print between arg1 and arg3
 %   arg3 - address of an error string
 %   - routine does not return -
 %
@@ -313,7 +313,7 @@ Error3R2    LDA         t,:MM:__ERROR:STRS:Error1
 %
 % PUSHJ, JMP:
 %   arg0 - address of an error string
-%   arg1 - Octa to print between arg0 and arg2
+%   arg1 - Byte to print between arg0 and arg2
 %   arg2 - address of an error string
 %   - routine does not return -
 %
@@ -356,6 +356,38 @@ Error5R24   LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,arg1
             PUSHJ       t,ErrRegG
+            SET         t,arg2
+            TRAP        0,Fputs,StdErr
+            SET         t,arg3
+            PUSHJ       t,ErrRegG
+            SET         t,arg4
+            TRAP        0,Fputs,StdErr
+            JMP         ErrorHndl
+
+
+%%
+% :MM:__ERROR:Error5RB24
+%   Print an error message and terminate the program.
+%
+% PUSHJ, JMP:
+%   arg0 - address of an error string
+%   arg1 - Octa to print between arg0 and arg2
+%   arg2 - address of an error string
+%   arg3 - Octa to print between argr2 and arg4
+%   arg4 - address of an error string
+%   - routine does not return -
+%
+            .global :MM:__ERROR:Error5RB24
+Error5RB24  LDA         t,:MM:__ERROR:STRS:Error1
+            TRAP        0,Fputs,StdErr
+            SET         t,__rJ
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error2
+            TRAP        0,Fputs,StdErr
+            SET         t,arg0
+            TRAP        0,Fputs,StdErr
+            SET         t,arg1
+            PUSHJ       t,ErrByteG
             SET         t,arg2
             TRAP        0,Fputs,StdErr
             SET         t,arg3
