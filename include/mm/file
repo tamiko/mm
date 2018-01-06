@@ -188,21 +188,6 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 
 
 %%
-% :MM:File:Seek
-%   arg0 - lowest byte defining file handle
-%   arg1 - offset
-%   retm - actual offset (todo)
-%
-% :MM:File:SeekG
-%   Variant of above function that passes arg0 in the general register
-%   $255.
-%
-% :MM:File:SeekJ
-%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
-%
-
-
-%%
 % :MM:File:Tell
 %   arg0 - lowest byte defining file handle
 %   retm - current position in bytes from the beginning
@@ -214,6 +199,9 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 % :MM:File:TellJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
+File:Tell IS            :MM:__FILE:Tell
+File:TellG IS           :MM:__FILE:TellG
+File:TellJ IS           :MM:__FILE:TellJ
 
 
 %%
@@ -228,6 +216,24 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 % :MM:File:SizeJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
+
+
+%%
+% :MM:File:Seek
+%   arg0 - lowest byte defining file handle
+%   arg1 - offset
+%   no return value
+%
+% offset is >=0: The next file operation begins at offset bytes from the
+%                beginning of the file.
+% offset <0:     The next file operation begins at (-offset-1) bytes from
+%                the end of the file
+%
+% :MM:File:SeekJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+File:Seek IS            :MM:__FILE:Seek
+File:SeekJ IS           :MM:__FILE:SeekJ
 
 
 %%
