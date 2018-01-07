@@ -130,7 +130,8 @@ Lock        SET         $3,arg0
             PUT         :rJ,$1
             SET         t,arg0
             POP         0
-9H          SET         :MM:__ERROR:__rJ,$1
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $1,:MM:__FILE:STRS:Lock1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Lock2
@@ -171,7 +172,8 @@ Unlock      SET         $3,arg0
             PUT         :rJ,$1
             SET         t,arg0
             POP         0
-9H          SET         :MM:__ERROR:__rJ,$1
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $1,:MM:__FILE:STRS:Unlock1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Unlock2
@@ -504,15 +506,20 @@ Open        CMPU        t,arg1,4
             SET         $0,$3
             PUT         :rJ,$2
             POP         1,0
-7H          SET         :MM:__ERROR:__rJ,$2
+7H          LDA         t,:MM:__ERROR:__rJ
+            STO         $2,t
             SET         $2,arg1
             LDA         $1,:MM:__FILE:STRS:Open4
             LDA         $3,:MM:__FILE:STRS:Open5
             PUSHJ       $0,:MM:__ERROR:Error3RB2
-8H          GET         :MM:__ERROR:__rJ,:rJ
+8H          GET         $2,:rJ
+            LDA         t,:MM:__ERROR:__rJ
+            STO         $2,t
             LDA         $1,:MM:__FILE:STRS:Open3
             PUSHJ       $0,:MM:__ERROR:Error1
-9H          GET         :MM:__ERROR:__rJ,:rJ
+9H          GET         $4,:rJ
+            LDA         t,:MM:__ERROR:__rJ
+            STO         $4,t
             SET         $2,arg1
             LDA         $1,:MM:__FILE:STRS:Open1
             LDA         $3,:MM:__FILE:STRS:Open2
@@ -832,17 +839,21 @@ Close       AND         $3,arg0,#FF
 7H          AND         $3,arg0,#FF
             SET         $4,0
             STBU        $4,pool,$3
-            SET         :MM:__ERROR:__rJ,$1
+            LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $3,:MM:__FILE:STRS:Close4
             SET         $4,arg0
             LDA         $5,:MM:__FILE:STRS:Close5
             PUSHJ       $2,:MM:__ERROR:Error3RB2
-8H          SET         :MM:__ERROR:__rJ,$1
+8H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Close2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
-9H          GET         :MM:__ERROR:__rJ,:rJ
+9H          GET         $4,:rJ
+            LDA         t,:MM:__ERROR:__rJ
+            STO         $4,t
             LDA         $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Close3
@@ -1263,7 +1274,8 @@ Tell        SET         $3,arg0
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-9H          SET         :MM:__ERROR:__rJ,$1
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $1,:MM:__FILE:STRS:Tell1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Tell2
@@ -1316,7 +1328,8 @@ Size        GET         $1,:rJ
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-9H          SET         :MM:__ERROR:__rJ,$1
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
             LDA         $1,:MM:__FILE:STRS:Size1
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Size2
@@ -1618,7 +1631,8 @@ Seek        SET         $4,arg0
             JMP         9F
             PUT         :rJ,$2
             POP         0,0
-9H          SET         :MM:__ERROR:__rJ,$2
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $2,t
             SET         $2,arg0
             SET         $4,arg1
             LDA         $1,:MM:__FILE:STRS:Seek1
@@ -1930,7 +1944,8 @@ Read        SET         $4,arg2
             PUT         :rJ,$0
             SET         ret0,$1
             POP         1,0
-9H          SET         :MM:__ERROR:__rJ,$0
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $0,t
             LDA         $1,:MM:__FILE:STRS:Read1
             LDA         $3,:MM:__FILE:STRS:Read2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
@@ -2237,7 +2252,8 @@ Write       SET         $4,arg2
             PUT         :rJ,$0
             SET         ret0,$1
             POP         1,0
-9H          SET         :MM:__ERROR:__rJ,$0
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $0,t
             LDA         $1,:MM:__FILE:STRS:Write1
             LDA         $3,:MM:__FILE:STRS:Write2
             PUSHJ       $0,:MM:__ERROR:Error3RB2

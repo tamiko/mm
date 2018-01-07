@@ -139,7 +139,9 @@ AllocG      SET         $3,t
             PUT         :rJ,$1
             SET         t,$2
             POP         0,0
-1H          GET         :MM:__ERROR:__rJ,:rJ
+1H          GET         $4,:rJ
+            LDA         t,:MM:__ERROR:__rJ
+            STO         $4,t
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Alloc1
             LDA         $3,:MM:__HEAP:STRS:Alloc2

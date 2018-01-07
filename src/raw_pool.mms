@@ -28,7 +28,6 @@
 % :MM:__RAW_POOL:
 %
 % A very minimalistic memory pool implementation.
-% Inclusion of this header file will consume one GREG.
 %
 % TODO: Implement a heap structure for efficiently storing the pool.
 %
@@ -49,7 +48,6 @@ Stack_Segment IS        :Stack_Segment
 %%
 % We use a GREG to maintain a pool of memory blocks
 %
-            .global :MM:__RAW_POOL:pool_ptr
 pool_ptr    GREG        0
 
 t           IS          $255
