@@ -49,8 +49,8 @@
 %   arg0 - timer interval in oops
 %   no return value
 %
-Thread:PrEnable IS    :MM:__THREAD:PrEnable
-Thread:PrEnableG IS   :MM:__THREAD:PrEnableG
+Thread:Enable IS      :MM:__THREAD:Enable
+Thread:EnableG IS     :MM:__THREAD:EnableG
 
 
 %%
@@ -62,8 +62,8 @@ Thread:PrEnableG IS   :MM:__THREAD:PrEnableG
 %   no arguments
 %   no return value
 %
-Thread:PrDisable  IS  :MM:__THREAD:PrDisable
-Thread:PrDisableG IS  :MM:__THREAD:PrDisableG
+Thread:Disable  IS    :MM:__THREAD:Disable
+Thread:DisableG IS    :MM:__THREAD:DisableG
 
 
             PREFIX      :

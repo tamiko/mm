@@ -55,8 +55,8 @@ arg0        IS          $0
 %
             .global :MM:__THREAD:Enable
             .global :MM:__THREAD:EnableG
-PrEnableG   SET         arg0,t
-PrEnable    LDA         $1,:MM:__THREAD:interval
+EnableG     SET         arg0,t
+Enable      LDA         $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
             SET         t,arg0
@@ -76,8 +76,8 @@ PrEnable    LDA         $1,:MM:__THREAD:interval
 %
             .global :MM:__THREAD:Disable
             .global :MM:__THREAD:DisableG
-PrDisableG  SET         arg0,t
-PrDisable   NEG         $2,0,1
+DisableG    SET         arg0,t
+Disable     NEG         $2,0,1
             LDA         $1,:MM:__THREAD:interval
             STO         $2,$1
             PUT         :rI,$2

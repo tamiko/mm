@@ -61,6 +61,8 @@ ExcHandler  SWYM
             .section .data,"wa",@progbits
             PREFIX      :MM:__INTERNAL:STRS:
 Unhandled   BYTE        "Unhandled TRIP.\n",0
+DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
+Tripped     BYTE        "Tripped! :-)\n",0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:Yield
@@ -74,44 +76,41 @@ Yield       IS          #00
 Create      IS          #D0
 Clone       IS          #E0
 Exit        IS          #F0
-TripHandler SET         $0,$255
+TripHandler GET         $2,:rW
             GET         $1,:rJ
+            SET         $0,$255
+            NEG         $3,0,1
+            PUT         :rI,$3 % disable timer
             %
             % Determine whether we got tripped by the timer callback
             % (rX=#8000000000000000), or by an explicit TRIP
             % (rX=#80000000FF00XXXX).
             %
-            GET         $2,:rX
-            ANDNH       $2,#F000
-            BZ          $2,1F % timer interrupt
-            ANDNL       $2,#FFFF
-            ANDNML      $2,#00FF
-            SETML       $3,#FF00
-            CMPU        $2,$2,$3
-            BZ          $2,1F % explicit TRIP
+            GET         $3,:rX
+            ANDNH       $3,#F000
+            BZ          $3,1F % timer interrupt
+            ANDNL       $3,#FFFF
+            ANDNML      $3,#00FF
+            SETML       $4,#FF00
+            CMPU        $3,$3,$4
+            BZ          $3,1F % explicit TRIP
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
-            SET         $255,$0
-            PUT         :rJ,$1
-            POP 0
 1H          GET         $3,:rX
+            GET         $255,:rX % DEBUG
+            PUSHJ       $255,:MM:__PRINT:RegLnG % DEBUG
             SRU         $3,$3,8
             AND         $3,$3,#FF
-            SET         $255,$3
-            PUSHJ       $255,:MM:__PRINT:RegLnG
-            CMP         $2,$3,Yield
-            BZ          $2,1F
-            CMP         $2,$3,Create
-            BZ          $2,2F
-            CMP         $2,$3,Clone
-            BZ          $2,3F
-            CMP         $2,$3,Exit
-            BZ          $2,4F
-            LDA         $3,:MM:__INTERNAL:STRS:Unhandled
-            PUSHJ       $2,:MM:__ERROR:IError1
-            SET         $255,$0
-            PUT         :rJ,$1
-            POP 0
+            CMP         $4,$3,Yield
+            BZ          $4,1F
+            CMP         $4,$3,Create
+            BZ          $4,2F
+            CMP         $4,$3,Clone
+            BZ          $4,3F
+            CMP         $4,$3,Exit
+            BZ          $4,4F
+            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            PUSHJ       $0,:MM:__ERROR:IError1
 1H          SWYM % yield
             JMP         9F
 2H          SWYM % create
@@ -120,8 +119,14 @@ TripHandler SET         $0,$255
             JMP         9F
 4H          SWYM % exit
             JMP         9F
+            % check whether we double tripped:
+9H          GET         $3,:rW
+            CMPU        $4,$2,$3
+            BZ          $4,1F
+            LDA         $1,:MM:__INTERNAL:STRS:DoubleTrip
+            PUSHJ       $0,:MM:__ERROR:IError1
             % reenable timer
-9H          LDA         $2,:MM:__THREAD:interval
+1H          LDA         $2,:MM:__THREAD:interval
             LDO         $2,$2
             PUT         :rI,$2
             SET         $255,$0
