@@ -300,7 +300,6 @@ Realloc     GET         $2,:rJ
 ValidJ      SET         $5,0
             JMP         1F
 SizeJ       SET         $5,1
-#ifdef __MMIXWARE
             % A pointer to memory must be inside the pool segment:
 1H          LDA         t,Pool_Segment
             ADDU        t,t,2*OCT
@@ -309,12 +308,6 @@ SizeJ       SET         $5,1
             LDA         t,Stack_Segment
             CMPU        t,arg0,t
             BNN         t,1F
-#else
-            % Do a conservative check:
-1H          CMPU        t,arg0,2*OCT
-            BN          t,1F
-            BN          arg0,1F
-#endif
             SUBU        $1,arg0,2*OCT
             LDO         $2,$1,0 % size
             CMPU        t,$2,3*OCT % size must be at least 3 octas
