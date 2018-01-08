@@ -108,8 +108,6 @@ OCT         IS          #8
 AllocJ      GET         $1,:rJ
             ADDU        $0,arg0,#F % round up to next OCTA
             ANDN        $0,$0,#F
-            SET         t,$0 % DEBUG
-            PUSHJ       t,:MM:__PRINT:RegLnG %DEBUG
             ADDU        $0,$0,3*OCT
             CMPU        t,$0,3*OCT % check for overflow
             BN          t,1F
@@ -127,9 +125,6 @@ AllocJ      GET         $1,:rJ
             STO         $2,$1,$0 % store checksum2
             ADDU        ret0,$1,2*OCT
             GET         $1,:rJ
-            SET         t,$0 % DEBUG
-            PUSHJ       t,:MM:__PRINT:RegLnG %DEBUG
-            PUSHJ       t,:MM:__PRINT:Ln %DEBUG
             PUT         :rJ,$1
             POP         1,1
 1H          PUT         :rJ,$1
