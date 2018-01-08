@@ -239,15 +239,6 @@ DoClone     SAVE        $255,0
             STO         $4,$6,#10
             STO         $3,$4,#20 % stack image
             STO         $0,$4,#28 % UNSAVE address
-
-            SET         $255,$4
-            PUSHJ       $255,:MM:__PRINT:RegLnG
-            PUSHJ       $255,:MM:__PRINT:Ln
-            SET         $10,$4
-            SET         $11,#30
-            PUSHJ       $9,:MM:__PRINT:MemLn
-            PUSHJ       $255,:MM:__PRINT:Ln
-
             UNSAVE      0,$0
             JMP         9F
 
