@@ -118,10 +118,6 @@ Clone       SWYM
             SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Clone,0
-            LDA         $0,:MM:__THREAD:interval
-            LDO         $0,$0
-            BN          $0,1F
-            PUT         :rI,$0
 1H          POP         0
 
 
@@ -142,9 +138,4 @@ Yield       SWYM
             SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Yield,0
-            LDA         $0,:MM:__THREAD:interval
-            LDO         $0,$0
-            BN          $0,1F
-            PUT         :rI,$0
-1H          POP         0
-
+            POP         0
