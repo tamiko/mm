@@ -105,8 +105,6 @@ Exit        IS          #F0
 TripHandler GET         $2,:rW
             GET         $1,:rJ
             SET         $0,$255
-            NEG         $3,0,1
-            PUT         :rI,$3 % disable timer
             %
             % Determine whether we got tripped by the timer callback
             % (rX=#8000000000000000), or by an explicit TRIP
@@ -254,11 +252,7 @@ DoExit      JMP         9B
             BZ          $4,1F
             LDA         $1,:MM:__INTERNAL:STRS:DoubleTrip
             PUSHJ       $0,:MM:__ERROR:IError1
-            % reenable timer
-1H          LDA         $2,:MM:__THREAD:interval
-            LDO         $2,$2
-            PUT         :rI,$2
-            SET         $255,$0
+1H          SET         $255,$0
             PUT         :rJ,$1
             POP 0
 

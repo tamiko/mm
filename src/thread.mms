@@ -43,7 +43,7 @@ arg0        IS          $0
 
 
 %%
-% :MM:__THREAD:PrEnable
+% :MM:__THREAD:Enable
 %
 % PUSHJ
 %   arg0 - interval in oops
@@ -67,32 +67,25 @@ Enable      LDA         $1,:MM:__THREAD:interval
 % :MM:__THREAD:Disable
 %
 % PUSHJ
-%   arg0 - interval in oops
+%   no arguments
 %   no return values
 %
-% :MM:__THREAD:PrDisableG
-%
-% PUSHJ %255
-%
             .global :MM:__THREAD:Disable
-            .global :MM:__THREAD:DisableG
-DisableG    SET         arg0,t
-Disable     NEG         $2,0,1
-            LDA         $1,:MM:__THREAD:interval
-            STO         $2,$1
-            PUT         :rI,$2
-            SET         t,arg0
+Disable     NEG         $1,0,1
+            LDA         $0,:MM:__THREAD:interval
+            STO         $1,$0
+            PUT         :rI,$1
             POP         0
 
 
 %%
-% :MM:__THREAD:PrDisable
+% :MM:__THREAD:ThreadID
 %
 % PUSHJ
-%   arg0 - interval in oops
-%   no return values
+%   no arguments
+%   retm - ThreadID
 %
-% :MM:__THREAD:PrDisableG
+% :MM:__THREAD:ThreadIDG
 %
 % PUSHJ %255
 %
@@ -106,3 +99,52 @@ ThreadIDG   LDA         t,:MM:__INTERNAL:ThreadRing
             LDO         t,t
             LDO         t,t
             POP         0
+
+
+%%
+% :MM:__THREAD:Clone
+%
+% PUSHJ
+%   no arguments
+%   no return values
+%
+            .global :MM:__THREAD:Clone
+Clone       SWYM
+            % Disable timer and TRIP:
+            GET         $0,:rI
+            BN          $0,1F
+            NEG         $0,0,1
+            PUT         :rI,$0
+            SWYM
+            % We should be safe now™
+1H          TRIP        0,:MM:__INTERNAL:Clone,0
+            LDA         $0,:MM:__THREAD:interval
+            LDO         $0,$0
+            BN          $0,1F
+            PUT         :rI,$0
+1H          POP         0
+
+
+%%
+% :MM:__THREAD:Yield
+%
+% PUSHJ
+%   no arguments
+%   no return values
+%
+            .global :MM:__THREAD:Yield
+Yield       SWYM
+            % Disable timer and TRIP:
+            GET         $0,:rI
+            BN          $0,1F
+            NEG         $0,0,1
+            PUT         :rI,$0
+            SWYM
+            % We should be safe now™
+1H          TRIP        0,:MM:__INTERNAL:Yield,0
+            LDA         $0,:MM:__THREAD:interval
+            LDO         $0,$0
+            BN          $0,1F
+            PUT         :rI,$0
+1H          POP         0
+

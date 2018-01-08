@@ -36,15 +36,17 @@
 %
 % This header file defines:
 %   :MM:Thread:Enable (EnableG)
-%   :MM:Thread:Disable (DisableG)
+%   :MM:Thread:Disable
 %   :MM:Thread:ThreadID (ThreadIDG)
+%   :MM:Thread:Clone
+%   :MM:Thread:Yield
 %
 
 
 %%
-% :MM:Thread:EnablePreempt
+% :MM:Thread:Enable
 %
-%   Enable preemptive threaded multitasking.
+%   Enable preemptive scheduling.
 %
 %   PUSHJ:
 %   arg0 - timer interval in oops
@@ -57,20 +59,19 @@ Thread:EnableG IS     :MM:__THREAD:EnableG
 %%
 % :MM:Thread:Disable
 %
-%   Disable preemptive threaded multitasking.
+%   Disable preemptive scheduling
 %
 %   PUSHJ:
 %   no arguments
 %   no return value
 %
 Thread:Disable  IS    :MM:__THREAD:Disable
-Thread:DisableG IS    :MM:__THREAD:DisableG
 
 
 %%
 % :MM:Thread:ThreadID
 %
-%   Returns the Thread ID
+%   Return the Thread ID.
 %
 %   PUSHJ:
 %   no arguments
@@ -78,6 +79,32 @@ Thread:DisableG IS    :MM:__THREAD:DisableG
 %
 Thread:ThreadID  IS   :MM:__THREAD:ThreadID
 Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
+
+
+%%
+% :MM:Thread:Clone
+%
+%   Create a new thread by cloning the execution context of the calling
+%   thread.
+%
+%   PUSHJ:
+%   no arguments
+%   no return value
+%
+Thread:Clone  IS    :MM:__THREAD:Clone
+
+
+%%
+% :MM:Thread:Yield
+%
+%   Voluntarily relinguish the CPU and let the scheduler run another
+%   thread.
+%
+%   PUSHJ:
+%   no arguments
+%   no return value
+%
+Thread:Yield  IS    :MM:__THREAD:Yield
 
 
             PREFIX      :
