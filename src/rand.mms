@@ -42,6 +42,8 @@ Range2      BYTE        "] and [arg1=",0
 Range3      BYTE        "] do not define a valid interval.",10,0
 Range4      BYTE        "Heap:Range failed. Could not read from "
             BYTE        "filehandler [",0
+ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
+            BYTE        "(ExcNotImpl).",10,0
 
 
             .section .data,"wa",@progbits
@@ -105,6 +107,7 @@ Init        GET         $0,:rJ
 %   retm - a random octabyte
 %
             % Arguments for Fread:
+            .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
             LDO         $4,:MM:__RAND:FileHandle
             BNN         $4,1F
@@ -126,6 +129,7 @@ Octa        GET         $0,:rJ
 %
 % PUSHJ $255
 %
+            .global :MM:__RAND:OctaG
 OctaG       GET         $0,:rJ
             PUSHJ       $1,Octa
             PUT         :rJ,$0
@@ -142,9 +146,11 @@ OctaG       GET         $0,:rJ
 %   arg1 - maximal value
 %   retm - a random octabyte within [arg0,arg1]
 %
+            .global :MM:__RAND:Range
+            .global :MM:__RAND:RangeJ
 Range       SWYM
 RangeU      SWYM
-            LDA         $1,:MM:__STRS:ExcNotImpl
+            LDA         $1,:MM:__RAND:STRS:ExcNotImpl
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -156,6 +162,7 @@ RangeU      SWYM
 %   arg1 - size (in bytes)
 %   no return value
 %
+            .global :MM:__RAND:SetJ
 SetJ        GET         $3,:rJ
             LDO         $7,:MM:__RAND:FileHandle
             BNN         $7,1F

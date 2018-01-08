@@ -94,7 +94,7 @@ Grow        SLU         $0,arg0,1
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__POOL:STRS:Grow1
+1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
@@ -133,7 +133,7 @@ Dealloc     CSZ         arg1,arg1,#10
             PUSHJ       t,Recompact
             PUT         :rJ,$0
             POP         0
-1H          LDA         $1,:MM:__POOL:STRS:Deallo1
+1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
