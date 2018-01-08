@@ -69,9 +69,9 @@ ExcHandler  SWYM
             .global     :MM:__INTERNAL:ThreadRing
             .global     :MM:__INTERNAL:ThreadTmpl
             PREFIX      :MM:__INTERNAL:
-ThreadRing  OCTA        #0000000000000000
-ThreadTmpl  OCTA        #0000000000000000
-            OCTA        #0000000000000000
+ThreadRing  OCTA        #0000000000000000 % pointer to active thread
+ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
+            OCTA        #0000000000000000 % UNSAVE address
 
 
             %
