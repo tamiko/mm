@@ -39,16 +39,14 @@ Grow1       BYTE        "__RAW_POOL::Grow failed. "
 Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__RAW_POOL:
+Pool        OCTA        #0000000000000000
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__RAW_POOL:
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
-
-%%
-% We use a GREG to maintain a pool of memory blocks
-%
-pool_ptr    GREG        0
 
 t           IS          $255
 arg0        IS          $0
@@ -87,9 +85,12 @@ Grow        SLU         $0,arg0,1
             BNP         t,1F
             SET         t,$3
             STO         $3,$1,0
-            STO         pool_ptr,$2,0
+            LDA         $5,:MM:__RAW_POOL:Pool
+            LDO         $5,$5
+            STO         $5,$2,0
             STO         $0,$2,OCT
-            SET         pool_ptr,$2
+            LDA         $5,:MM:__RAW_POOL:Pool
+            STO         $2,$5
             GET         $0,:rJ
             PUSHJ       t,Recompact
             PUT         :rJ,$0
@@ -126,9 +127,12 @@ Dealloc     CSZ         arg1,arg1,#10
             LDA         $2,Stack_Segment
             CMPU        t,$2,$3
             BNP         t,1F
-            STO         pool_ptr,arg0,0 % pointer
+            LDA         $5,:MM:__RAW_POOL:Pool
+            LDO         $5,$5
+            STO         $5,arg0,0 % pointer
             STO         arg1,arg0,OCT % size
-            SET         pool_ptr,arg0 % update pointer
+            LDA         $5,:MM:__RAW_POOL:Pool
+            STO         arg0,$5 % update pointer
             GET         $0,:rJ
             PUSHJ       t,Recompact
             PUT         :rJ,$0
@@ -146,14 +150,15 @@ Dealloc     CSZ         arg1,arg1,#10
 %   no arguments
 %   no return value
 %
-Recompact   BZ          pool_ptr,2F % nothing to do
+Recompact   LDA         $1,:MM:__RAW_POOL:Pool
+            LDO         ptrC,$1 % current ptr
+            BZ          $0,2F % nothing to do
 ptrB        IS          $0
 ptrC        IS          $1
 sizeC       IS          $2
 ptrN        IS          $3
 sizeN       IS          $4
             SET         ptrB,0
-            SET         ptrC,pool_ptr % current ptr
 9H          LDO         sizeC,ptrC,OCT % current size
             LDO         ptrN,ptrC,0 % next ptr
             CMPU        t,ptrN,0 % nothing more to do
@@ -184,7 +189,8 @@ sizeN       IS          $4
             STO         ptrN,ptrB,0
             SET         ptrC,ptrN
             JMP         9B
-3H          SET         pool_ptr,ptrN
+3H          LDA         $5,:MM:__RAW_POOL:Pool
+            STO         ptrN,$5
             SET         ptrC,ptrN
             JMP         9B
             % Advance pointer
@@ -211,32 +217,44 @@ Alloc       CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
             % Initialize the pool if necessary:
-            PBNZ        pool_ptr,1F
+            LDA         $2,:MM:__RAW_POOL:Pool
+            LDO         $2,$2
+            PBNZ        $2,1F
             GET         $1,:rJ
             SET         $3,0
             PUSHJ       $2,Grow
             PUT         :rJ,$1
-            % 1st case: use chunk pointed to by pool_ptr:
-1H          LDO         t,pool_ptr,OCT
+            % 1st case: use chunk pointed to by pool ptr:
+1H          LDA         $2,:MM:__RAW_POOL:Pool
+            LDO         $2,$2
+            LDO         t,$2,OCT
             CMPU        t,arg0,t
             BN          t,1F % chunk too big
             BP          t,2F % chunk too small
-            SET         arg0,pool_ptr
-            LDO         pool_ptr,pool_ptr,0
+            SET         arg0,$2
+            LDO         $3,$2
+            LDA         $2,:MM:__RAW_POOL:Pool
+            STO         $3,$2
             POP         1,0
-1H          LDO         t,pool_ptr,0
-            STO         t,pool_ptr,arg0
-            LDO         t,pool_ptr,OCT
+1H          LDA         $2,:MM:__RAW_POOL:Pool
+            LDO         $2,$2
+            LDO         t,$2,0
+            STO         t,$2,arg0
+            LDO         t,$2,OCT
             SUBU        t,t,arg0
             ADDU        arg0,arg0,OCT
-            STO         t,pool_ptr,arg0
+            STO         t,$2,arg0
             SUBU        arg0,arg0,OCT
-            ADDU        pool_ptr,pool_ptr,arg0
-            SUBU        arg0,pool_ptr,arg0
+            ADDU        $2,$2,arg0
+            LDA         $3,:MM:__RAW_POOL:Pool
+            STO         $2,$3
+            SUBU        arg0,$2,arg0
             POP         1,0
             % 2nd case: use some later chunk:
-2H          SET         prev_ptr,pool_ptr
-            LDO         ptr,pool_ptr
+2H          LDA         t,:MM:__RAW_POOL:Pool
+            LDO         t,t
+            SET         prev_ptr,t
+            LDO         ptr,t
 3H          CMPU        t,ptr,0
             PBNZ        t,5F
             % Out of pool memory, allocate new memory from the pool:
