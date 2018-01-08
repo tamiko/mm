@@ -106,7 +106,9 @@ OCT         IS          #8
             .global :MM:__HEAP:AllocJ
             .global :MM:__HEAP:AllocG
 AllocJ      GET         $1,:rJ
-            ADDU        $0,arg0,3*OCT
+            ADDU        $0,arg0,#F % round up to next OCTA
+            ANDN        $0,$0,#F
+            ADDU        $0,$0,3*OCT
             CMPU        t,$0,3*OCT % check for overflow
             BN          t,1F
             SET         $3,$0
