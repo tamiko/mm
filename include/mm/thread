@@ -37,6 +37,7 @@
 % This header file defines:
 %   :MM:Thread:Enable (EnableG)
 %   :MM:Thread:Disable (DisableG)
+%   :MM:Thread:ThreadID (ThreadIDG)
 %
 
 
@@ -64,6 +65,19 @@ Thread:EnableG IS     :MM:__THREAD:EnableG
 %
 Thread:Disable  IS    :MM:__THREAD:Disable
 Thread:DisableG IS    :MM:__THREAD:DisableG
+
+
+%%
+% :MM:Thread:ThreadID
+%
+%   Returns the Thread ID
+%
+%   PUSHJ:
+%   no arguments
+%   retm - ThreadID
+%
+Thread:ThreadID  IS   :MM:__THREAD:ThreadID
+Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 
 
             PREFIX      :
