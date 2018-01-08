@@ -69,6 +69,7 @@ ExcHandler  SWYM
             .global     :MM:__INTERNAL:ThreadRing
             .global     :MM:__INTERNAL:ThreadTmpl
             PREFIX      :MM:__INTERNAL:
+NextID      OCTA        #0000000000000001
 ThreadRing  OCTA        #0000000000000000 % pointer to active thread
 ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
             OCTA        #0000000000000000 % UNSAVE address
@@ -82,6 +83,7 @@ ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
             PREFIX      :MM:__INTERNAL:STRS:
 Unhandled   BYTE        "Unhandled TRIP.\n",0
 DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
+SwitchError BYTE        "Fatal error during context switch.",10,0
 Tripped     BYTE        "Tripped! :-)\n",0
 
             .section .text,"ax",@progbits
@@ -92,10 +94,14 @@ Tripped     BYTE        "Tripped! :-)\n",0
             .global :MM:__INTERNAL:TripHandler
             PREFIX      :MM:__INTERNAL:
 
+Stack_Segment IS        :Stack_Segment
 Yield       IS          #00
 Create      IS          #D0
 Clone       IS          #E0
 Exit        IS          #F0
+
+9H          LDA         $1,:MM:__INTERNAL:STRS:SwitchError
+            PUSHJ       $0,:MM:__ERROR:IError1
 TripHandler GET         $2,:rW
             GET         $1,:rJ
             SET         $0,$255
@@ -117,28 +123,140 @@ TripHandler GET         $2,:rW
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
 1H          GET         $3,:rX
-            GET         $255,:rX % DEBUG
-            PUSHJ       $255,:MM:__PRINT:RegLnG % DEBUG
             SRU         $3,$3,8
             AND         $3,$3,#FF
             CMP         $4,$3,Yield
-            BZ          $4,1F
+            BZ          $4,DoYield
             CMP         $4,$3,Create
-            BZ          $4,2F
+            BZ          $4,DoCreate
             CMP         $4,$3,Clone
-            BZ          $4,3F
+            BZ          $4,DoClone
             CMP         $4,$3,Exit
-            BZ          $4,4F
+            BZ          $4,DoExit
             LDA         $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
-1H          SWYM % yield
+
+            %
+            % Yield:
+            %
+
+DoYield     SAVE        $255,0
+            SET         $0,$255
+            LDA         $1,Stack_Segment
+            SUBU        $2,$0,$1
+            ADDU        $2,$2,#8
+            SET         $4,$2
+            PUSHJ       $3,:MM:__HEAP:AllocJ
+            JMP         9B
+            SET         $5,$1
+            SET         $6,$3
+            SET         $7,$2
+            PUSHJ       $4,:MM:__MEM:CopyJ
+            JMP         9B
+            LDA         $4,:MM:__INTERNAL:ThreadRing
+            LDO         $4,$4
+            LDO         $5,$4,#08
+            SET         $6,#0000
+            CMP         $5,$5,$6 % make sure we are in running state
+            BNZ         $5,9B
+            SET         $5,#00FF
+            STO         $5,$4,#08 % state
+            STO         $3,$4,#20 % stack image
+            STO         $0,$4,#28 % UNSAVE address
+            LDO         $4,$4,#18
+            LDA         $5,:MM:__INTERNAL:ThreadRing
+            STO         $4,$5
+            LDO         $5,$4,#08
+            SET         $6,#00FF
+            CMP         $5,$5,$6
+            BNZ         $5,9B
+            STO         $5,$4,#08 % state
+            LDO         $0,$4,#28
+            NEG         $5,0,1
+            STO         $5,$4,#28
+            % Overwrite stack:
+            LDO         $3,$4,#20
+            SUBU        $2,$0,$1
+1H          LDO         $255,$3,$2
+            STO         $255,$1,$2
+            SUBU        $2,$2,#8
+            BNN         $2,1B
+            % We have to UNSAVE in order to get :rO and :rS into a valid
+            % state (matching the new register stack)
+            UNSAVE      0,$0
+            LDA         $3,:MM:__INTERNAL:ThreadRing
+            LDO         $3,$3
+            LDO         $5,$3,#20
+            PUSHJ       $4,:MM:__HEAP:DeallocJ
+            JMP         9B
+            NEG         $4,0,1
+            STO         $4,$3,#20
             JMP         9F
-2H          SWYM % create
+
+            %
+            % Create:
+            %
+
+DoCreate    JMP         9B
+
+            %
+            % Clone:
+            %
+
+DoClone     SAVE        $255,0
+            SET         $0,$255
+            LDA         $1,Stack_Segment
+            SUBU        $2,$0,$1
+            ADDU        $2,$2,#8
+            SET         $4,$2
+            PUSHJ       $3,:MM:__HEAP:AllocJ
+            JMP         9B
+            SET         $5,$1
+            SET         $6,$3
+            SET         $7,$2
+            PUSHJ       $4,:MM:__MEM:CopyJ
+            JMP         9B
+            % Create new list entry:
+            SET         $5,#30
+            PUSHJ       $4,:MM:__HEAP:AllocJ
+            JMP         9B
+            % Thread ID:
+            LDA         $5,:MM:__INTERNAL:NextID
+            LDO         $6,$5
+            STO         $6,$4,#00
+            ADDU        $6,$6,1
+            STO         $6,$5
+            % State:
+            SET         $5,#FF % sleep
+            STO         $5,$4,#08
+            % Update pointers:
+            LDA         $5,:MM:__INTERNAL:ThreadRing
+            LDO         $5,$5
+            LDO         $6,$5,#18
+            STO         $5,$4,#10
+            STO         $6,$4,#18
+            STO         $4,$5,#18
+            STO         $4,$6,#10
+            STO         $3,$4,#20 % stack image
+            STO         $0,$4,#28 % UNSAVE address
+
+            SET         $255,$4
+            PUSHJ       $255,:MM:__PRINT:RegLnG
+            PUSHJ       $255,:MM:__PRINT:Ln
+            SET         $10,$4
+            SET         $11,#30
+            PUSHJ       $9,:MM:__PRINT:MemLn
+            PUSHJ       $255,:MM:__PRINT:Ln
+
+            UNSAVE      0,$0
             JMP         9F
-3H          SWYM % clone
-            JMP         9F
-4H          SWYM % exit
-            JMP         9F
+
+            %
+            % Exit:
+            %
+
+DoExit      JMP         9B
+
             % check whether we double tripped:
 9H          GET         $3,:rW
             CMPU        $4,$2,$3

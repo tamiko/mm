@@ -83,7 +83,7 @@ InitError   BYTE        "Fatal initialization error.",10,0
             .section .init,"ax",@progbits
             .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
-Stack_Segment IS         :Stack_Segment
+Stack_Segment IS        :Stack_Segment
 1H          LDA         $1,:MM:__INIT:STRS:InitError
             PUSHJ       $0,:MM:__ERROR:IError1
             %
@@ -121,21 +121,13 @@ __init      PUT         :rW,$255      % RESUME at Main
             SET         $4,$2
             PUSHJ       $3,:MM:__HEAP:AllocJ
             JMP         1B
-            SET         $5,$2
-            PUSHJ       $4,:MM:__HEAP:AllocJ
-            JMP         1B
-            SET         $6,$1
-            SET         $7,$3
-            SET         $8,$2
-            PUSHJ       $5,:MM:__MEM:CopyJ
-            JMP         1B
-            SET         $6,$1
-            SET         $7,$4
-            SET         $8,$2
-            PUSHJ       $5,:MM:__MEM:CopyJ
+            SET         $5,$1
+            SET         $6,$3
+            SET         $7,$2
+            PUSHJ       $4,:MM:__MEM:CopyJ
             JMP         1B
             LDA         $255,:MM:__INTERNAL:ThreadTmpl
-            STO         $4,$255,#0
+            STO         $3,$255,#0
             STO         $0,$255,#8
             SET         $5,#30
             PUSHJ       $4,:MM:__HEAP:AllocJ
@@ -145,8 +137,9 @@ __init      PUT         :rW,$255      % RESUME at Main
             STO         $5,$4,#08 % State: running
             STO         $4,$4,#10
             STO         $4,$4,#18
-            STO         $3,$4,#20
-            STO         $0,$4,#28
+            NEG         $5,0,1
+            STO         $5,$4,#20
+            STO         $5,$4,#28
             LDA         $6,:MM:__INTERNAL:ThreadRing
             STO         $4,$6
             %
