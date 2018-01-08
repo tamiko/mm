@@ -55,6 +55,26 @@ ExcHandler  SWYM
 
 
             %
+            % Thread entry data structure (double-linked list):
+            %
+            %    ptr -> OCTA  Thread ID
+            %           OCTA  State (#0..00 run, #0..FF sleep)
+            %           OCTA  pointer to previous
+            %           OCTA  pointer to next
+            %           OCTA  pointer to stack image
+            %           OCTA  UNSAVE address
+            %
+
+            .section .data,"wa",@progbits
+            .global     :MM:__INTERNAL:ThreadRing
+            .global     :MM:__INTERNAL:ThreadTmpl
+            PREFIX      :MM:__INTERNAL:
+ThreadRing  OCTA        #0000000000000000
+ThreadTmpl  OCTA        #0000000000000000
+            OCTA        #0000000000000000
+
+
+            %
             % The glorious trip handler
             %
 
@@ -132,3 +152,4 @@ TripHandler GET         $2,:rW
             SET         $255,$0
             PUT         :rJ,$1
             POP 0
+

@@ -33,9 +33,6 @@
             PUT         :rJ,$0
             POP         0
 1H          UNSAVE      0,$0
-            PUT         :rW,$255      % RESUME at Main
-            SETML       $255,#F700
-            PUT         :rX,$255
-            PUT         :rJ,#0
-            GET         $255,:rW
+            PUT         :rJ,$255
+            GET         $255,:rB
             RESUME

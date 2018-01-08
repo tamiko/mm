@@ -71,7 +71,7 @@ __entry     JMP         :MM:__INIT:__init
 
             %
             % Startup code: hide argc, argv and address of Main.
-            % Compilations units can assemble initialization code into the
+            % Compilation units can assemble initialization code into the
             % .init section that gets run at program startup before Main is
             % called.
             %
@@ -81,11 +81,40 @@ __entry     JMP         :MM:__INIT:__init
             PREFIX      :MM:__INIT:
 __init      SWYM
             %
-            % Save initial state, store stack address in $0, and hide $0
-            % with a PUSHJ:
+            % Prepare RESUME. Eventually we will entry into Main with the
+            % resume sequence
+            %   PUT :rJ,$255
+            %   GET $255,:rW
+            %   RESUME
+            %
+            PUT         :rW,$255      % RESUME at Main
+            PUT         :rB,$255      % keep address of Main in $255
+            SETML       $255,#F700
+            PUT         :rX,$255
+            SET         $255,#0
+            %
+            % Save initial state, store stack address in $0
             %
             SAVE        $255,0
             SET         $0,$255
+            %
+            % Initialize the ThreadRing and create a single entry for the
+            % main thread that will eventually start executing at the Main
+            % label. Further, save a pristine thread image at ThreadTmpl
+            % for the Thread:Create call. Layout:
+            %    ptr -> OCTA  Thread ID
+            %           OCTA  State (#0..00 run, #0..FF sleep)
+            %           OCTA  pointer to previous
+            %           OCTA  pointer to next
+            %           OCTA  pointer to stack image
+            %           OCTA  UNSAVE address
+            %SET         
+            %PUSHJ       $1,
+
+
+            %
+            % Now, hide $0 with a PUSHJ
+            %
             SET         $255,#0
             PUSHJ       $1,1F
 1H          SWYM

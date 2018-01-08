@@ -195,7 +195,8 @@ Dealloc     SET         $3,arg0
             JMP         1F
             PUT         :rJ,$1
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$1
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $1,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Free1
             LDA         $3,:MM:__HEAP:STRS:Free2
@@ -263,12 +264,14 @@ Realloc     GET         $2,:rJ
             SET         ret0,$3
             PUT         :rJ,$2
             POP         1,0
-1H          SET         :MM:__ERROR:__rJ,$2
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $2,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Reallo1
             LDA         $3,:MM:__HEAP:STRS:Reallo2
             PUSHJ       $0,:MM:__ERROR:Error3R2
-2H          SET         :MM:__ERROR:__rJ,$2
+2H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $2,$4
             SET         $2,arg1
             LDA         $1,:MM:__HEAP:STRS:Reallo3
             LDA         $3,:MM:__HEAP:STRS:Reallo4
@@ -353,7 +356,8 @@ Size        SET         $3,arg0
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-1H          SET         :MM:__ERROR:__rJ,$1
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $1,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Size1
             LDA         $3,:MM:__HEAP:STRS:Size2
@@ -365,7 +369,8 @@ SizeG       SET         $3,t
             PUT         :rJ,$1
             SET         t,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$1
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $1,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Size1
             LDA         $3,:MM:__HEAP:STRS:Size2
@@ -461,12 +466,14 @@ Copy        GET         $2,:rJ
             JMP         3F
             PUT         :rJ,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$2
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $2,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Move1
             LDA         $3,:MM:__HEAP:STRS:Move3
             PUSHJ       $0,:MM:__ERROR:Error3R2
-2H          SET         :MM:__ERROR:__rJ,$2
+2H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $2,$4
             SET         $2,arg1
             LDA         $1,:MM:__HEAP:STRS:Move2
             LDA         $3,:MM:__HEAP:STRS:Move3
@@ -526,7 +533,8 @@ Set         GET         $2,:rJ
             JMP         1F
             PUT         :rJ,$2
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$2
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $2,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Set1
             LDA         $3,:MM:__HEAP:STRS:Set2
@@ -555,7 +563,8 @@ Zero        GET         $1,:rJ
             PUT         :rJ,$1
             SET         t,arg0
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$1
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $1,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Zero1
             LDA         $3,:MM:__HEAP:STRS:Zero2
@@ -608,8 +617,10 @@ Rand        GET         $1,:rJ
             PUT         :rJ,$1
             SET         t,arg0
             POP         0,0
-1H          SET         :MM:__ERROR:__rJ,$1
+1H          LDA         $4,:MM:__ERROR:__rJ
+            STO         $1,$4
             SET         $2,arg0
             LDA         $1,:MM:__HEAP:STRS:Rand1
             LDA         $3,:MM:__HEAP:STRS:Rand2
             PUSHJ       $0,:MM:__ERROR:Error3R2
+
