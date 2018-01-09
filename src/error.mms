@@ -82,6 +82,7 @@ arg4        IS          $4
 %%
 % ErrByteG - internally used
 %
+            .global     :MM:__ERROR:ErrByteG
 buffer      IS          $1
 ErrByteG    SET         arg0,t
             LDA         buffer,:MM:__INTERNAL:Buffer
@@ -111,6 +112,7 @@ ErrByteG    SET         arg0,t
 %%
 % ErrRegG - internally used
 %
+            .global     :MM:__ERROR:ErrRegG
 buffer      IS          $1
 ptr         IS          $2
 ErrRegG     SET         $0,t

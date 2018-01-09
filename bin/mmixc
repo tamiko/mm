@@ -34,7 +34,8 @@ cpp_args=( "-D__GNU_AS" "-D__MMIXWARE" "-I$include_dir" )
 as=mmix-as
 as_args=( "-g" "-x" "-linker-allocated-gregs" )
 ld=mmix-ld
-ld_args_pre=( "-g" "$lib_dir/mmi.o" )
+ld_args=( "-g" )
+ld_args_pre=( "$lib_dir/mmi.o" )
 ld_args_post=( "-L$lib_dir" "-lmm" "$lib_dir/mmo.o" )
 out_file=
 
@@ -69,7 +70,11 @@ print_help() {
 }
 
 until [[ "$@" == "" ]]; do
-  if [[ "$1" == -I* ]]; then
+  if  [[ "$1" == -Wa,* ]]; then
+    as_args+=( "${1##-Wa,}" )
+  elif  [[ "$1" == -Wl,* ]]; then
+    ld_args+=( "${1##-Wl,}" )
+  elif [[ "$1" == -I* ]]; then
     cpp_args+=( "$1" )
   elif [[ "$1" == -L* || "$1" == -l* ]]; then
     ld_args+=( "$1" )
@@ -126,10 +131,10 @@ done
 
 
 if ! $compile_only && ! $preprocess_only; then
-  $verbose && echo "$ld" -o "$out_file" "${ld_args_pre[@]}" \
+  $verbose && echo "$ld" -o "$out_file" "${ld_args[@]}" "${ld_args_pre[@]}" \
     "${obj_files[@]:+${obj_files[@]}}" "${ld_args_post[@]}"
 
-  if "$ld" -o "$out_file" "${ld_args_pre[@]}" "${obj_files[@]:+${obj_files[@]}}" \
+  if "$ld" -o "$out_file" "${ld_args[@]}" "${ld_args_pre[@]}" "${obj_files[@]:+${obj_files[@]}}" \
     "${ld_args_post[@]}" ; then
     $keep_tmp || rm -rf "$tmpdir"
   else

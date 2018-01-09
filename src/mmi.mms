@@ -67,7 +67,6 @@ __trip      PUSHJ       $255,:MM:__INTERNAL:TripHandler
             RESUME
             .org #F0    % entry point
 __entry     JMP         :MM:__INIT:__init
-            .org #108
 
             %
             % Startup code: hide argc, argv and address of Main.
@@ -84,8 +83,6 @@ InitError   BYTE        "Fatal initialization error.",10,0
             .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
 Stack_Segment IS        :Stack_Segment
-1H          LDA         $1,:MM:__INIT:STRS:InitError
-            PUSHJ       $0,:MM:__ERROR:IError1
             %
             % Prepare RESUME. Eventually we will entry into Main with the
             % resume sequence
@@ -120,18 +117,18 @@ __init      PUT         :rW,$255      % RESUME at Main
             ADDU        $2,$2,#8
             SET         $4,$2
             PUSHJ       $3,:MM:__HEAP:AllocJ
-            JMP         1B
+            JMP         2F
             SET         $5,$1
             SET         $6,$3
             SET         $7,$2
             PUSHJ       $4,:MM:__MEM:CopyJ
-            JMP         1B
+            JMP         2F
             LDA         $255,:MM:__INTERNAL:ThreadTmpl
             STO         $3,$255,#0
             STO         $0,$255,#8
             SET         $5,#30
             PUSHJ       $4,:MM:__HEAP:AllocJ
-            JMP         1B
+            JMP         2F
             XOR         $5,$5,$5
             STO         $5,$4,#00 % Thread ID: 0
             STO         $5,$4,#08 % State: running
@@ -147,3 +144,7 @@ __init      PUT         :rW,$255      % RESUME at Main
             %
             PUSHJ       $1,1F
 1H          SET         $255,#0
+            JMP         3F
+2H          LDA         $1,:MM:__INIT:STRS:InitError
+            PUSHJ       $0,:MM:__ERROR:IError1
+3H          SWYM
