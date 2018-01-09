@@ -136,6 +136,27 @@ TripHandler GET         $2,:rW
             PUSHJ       $0,:MM:__ERROR:IError1
 
             %
+            % Exit:
+            %
+
+DoExit      LDA         $1,Stack_Segment
+            LDA         $4,:MM:__INTERNAL:ThreadRing
+            LDO         $4,$4
+            LDO         $5,$4,#10 % previous
+            LDO         $6,$4,#18 % next
+            % if this is the last thread context, call exit:
+            CMP         $7,$4,$5
+            BNZ         $7,1F
+            PUSHJ       $255,:MM:__SYS:Exit
+1H          SET         $8,$4
+            PUSHJ       $7,:MM:__HEAP:DeallocJ
+            JMP         9B
+            STO         $5,$6,#10
+            STO         $6,$5,#18
+            SET         $4,$6
+1H          JMP         DoUnsave
+
+            %
             % Yield:
             %
 
@@ -163,7 +184,8 @@ DoYield     SAVE        $255,0
             STO         $3,$4,#20 % stack image
             STO         $0,$4,#28 % UNSAVE address
             LDO         $4,$4,#18
-            LDA         $5,:MM:__INTERNAL:ThreadRing
+
+DoUnsave    LDA         $5,:MM:__INTERNAL:ThreadRing
             STO         $4,$5
             LDO         $5,$4,#08
             SET         $6,#00FF
@@ -199,9 +221,54 @@ DoYield     SAVE        $255,0
             % Create:
             %
 
-DoCreate    JMP         9B
-            % make sure :rY is set to zero
-            SET         $255,#0000
+DoCreate    GET         $3,:rZ
+            LDA         $4,ThreadTmpl
+            LDO         $5,$4,#8
+            LDO         $4,$4,#0
+            SET         $7,$4
+            PUSHJ       $6,:MM:__HEAP:SizeJ
+            JMP         9B
+            SET         $8,$6
+            PUSHJ       $7,:MM:__HEAP:AllocJ
+            JMP         9B
+            SET         $9,$4
+            SET         $10,$7
+            SET         $11,$6
+            PUSHJ       $8,:MM:__MEM:CopyJ
+            JMP         9B
+            % inject new start address
+            SUBU        $6,$6,#28
+            STO         $3,$7,$6
+            SET         $4,$7
+            % Create new list entry:
+            SET         $7,#30
+            PUSHJ       $6,:MM:__HEAP:AllocJ
+            JMP         9B
+            % Thread ID:
+            LDA         $7,:MM:__INTERNAL:NextID
+            LDO         $8,$7
+            STO         $8,$6,#00
+            ADDU        $8,$8,1
+            STO         $8,$7
+            % State:
+            SET         $7,#FF
+            STO         $7,$6,#08
+            % Stack image:
+            STO         $4,$6,#20
+            STO         $0,$6,#28
+            % Update pointers:
+            LDA         $7,:MM:__INTERNAL:ThreadRing
+            LDO         $7,$7
+            LDO         $8,$7,#18
+            STO         $7,$6,#10
+            STO         $8,$6,#18
+            STO         $6,$7,#18
+            STO         $6,$8,#10
+            % store the thread ID of the new process in :rY
+            LDA         $255,:MM:__INTERNAL:ThreadRing
+            LDO         $255,$255
+            LDO         $255,$255,#18
+            LDO         $255,$255
             PUT         :rY,$255
             JMP         9F
 
@@ -251,54 +318,6 @@ DoClone     SAVE        $255,0
             LDO         $255,$255
             LDO         $255,$255,#18
             LDO         $255,$255
-            PUT         :rY,$255
-            JMP         9F
-
-            %
-            % Exit:
-            %
-
-DoExit      LDA         $4,:MM:__INTERNAL:ThreadRing
-            LDO         $5,$4,#10 % previous
-            LDO         $6,$4,#18 % next
-            % if this is the last thread context, call exit:
-            CMP         $7,$4,$5
-            BNZ         $7,1F
-            PUSHJ       $255,:MM:__SYS:Exit
-
-
-1H          SWYM
-
-
-
-            STO         $4,$5
-            LDO         $5,$4,#08
-            SET         $6,#00FF
-            CMP         $5,$5,$6
-            BNZ         $5,9B
-            STO         $5,$4,#08 % state
-            LDO         $0,$4,#28
-            NEG         $5,0,1
-            STO         $5,$4,#28
-            % Overwrite stack:
-            LDO         $3,$4,#20
-            SUBU        $2,$0,$1
-1H          LDO         $255,$3,$2
-            STO         $255,$1,$2
-            SUBU        $2,$2,#8
-            BNN         $2,1B
-            % We have to UNSAVE in order to get :rO and :rS into a valid
-            % state (matching the new register stack)
-            UNSAVE      0,$0
-            LDA         $3,:MM:__INTERNAL:ThreadRing
-            LDO         $3,$3
-            LDO         $5,$3,#20
-            PUSHJ       $4,:MM:__HEAP:DeallocJ
-            JMP         9B
-            NEG         $4,0,1
-            STO         $4,$3,#20
-            % make sure :rY is set to zero
-            SET         $255,#0000
             PUT         :rY,$255
             JMP         9F
 
