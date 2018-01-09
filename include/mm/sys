@@ -41,8 +41,6 @@
 % This header file defines:
 %   :MM:Sys:Exit
 %   :MM:Sys:Abort
-%   :MM:Sys:AtExit (AtExitG)
-%   :MM:Sys:AtAbort (AtAbortG)
 %   :MM:Sys:AtError (AtErrorG)
 %
 
@@ -78,42 +76,17 @@ Sys:Abort   IS         :MM:__SYS:Abort
 
 
 %%
-% :MM:Sys:AtExit
-% :MM:Sys:AtAbort
 % :MM:Sys:AtError
 %
-% A subroutine can be registered via a call to one of the above
-% routines that will be executed at the appropriate event:
-%   AtExit  - After invocation of :MM:Sys:Exit
-%   AtAbort - After invocation of :MM:Sys:Abort
-%   AtError - As an event handler that is invoked if a non fatal (non
-%             internal) error condition arises in one of the :MM:
-%             subroutines.
+% Register As an event handler that is invoked if a non fatal (non
+% internal) error condition arises in one of the :MM: subroutines.
 %
 % The subroutine is called via GO linkage. A return address to the
-% corresponding internal library routine is stored in register $0. In
-% case of the AtError handler an additional return address is stored
-% in $255 pointing to the caller of the library routine.
+% corresponding internal library routine is stored in register $0. An
+% additional return address is stored in $255 pointing to the caller of the
+% library routine.
 % Registered subroutines should not make any assumptions on register
-% and memory state (except for $0 - and $255 in case of AtError -
-% holding a valid return address).
-%
-% Upon returning, :MM:Sys:Exit and :MM:Sys:Abort will terminate
-% the program.
-%
-% Handler can be reregistered arbitrarily; by specifying #0 the
-% current event handler will be removed, in detail:
-%
-% :MM:Sys:AtExit
-% :MM:Sys:AtAbort
-%
-%   #0000000000000000 - no handler is invoked, program will be
-%                       terminated
-%   any other address - jump to the specified address via GO linkage
-%                       and register $0; after returning, terminate
-%                       the program.
-%
-% :MM:Sys:AtError
+% and memory state (except for $0 and $255 holding a valid return address).
 %
 %   #0000000000000000 - no handler is invoked, program will be
 %                       terminated
@@ -124,22 +97,16 @@ Sys:Abort   IS         :MM:__SYS:Abort
 %
 % PUSHJ
 %   arg0 - address of a subroutine that is registered to be executed
-%          at one of the given events
+%          if an error condition is encountered.
 %   no return value
 %
-% :MM:Sys:AtExitG
-% :MM:Sys:AtAbortG
 % :MM:Sys:AtErrorG
-%   variant of above functions that passes arg0 through general
+%   variant of above function that passes arg0 through general
 %   register $255. The value of $255 is preserved.
 %
 % PUSHJ $255
 %
-Sys:AtExit  IS          :MM:__SYS:AtExit
-Sys:AtAbort IS          :MM:__SYS:AtAbort
 Sys:AtError IS          :MM:__SYS:AtError
-Sys:AtExitG IS          :MM:__SYS:AtExitG
-Sys:AtAbortG IS         :MM:__SYS:AtAbortG
 Sys:AtErrorG IS         :MM:__SYS:AtErrorG
 
             PREFIX      :

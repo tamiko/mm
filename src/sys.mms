@@ -33,12 +33,8 @@
             .section .data,"wa",@progbits
             .balign 8
             PREFIX      :MM:__SYS:
-AtExitAddr  OCTA        #0000000000000000
-AtAbortAddr OCTA        #0000000000000000
-AtErrorAddr OCTA        #0000000000000000
-            .global :MM:__SYS:AtExitAddr
-            .global :MM:__SYS:AtAbortAddr
             .global :MM:__SYS:AtErrorAddr
+AtErrorAddr OCTA        #0000000000000000
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__SYS:
@@ -58,10 +54,7 @@ arg0        IS          $0
 %
 
             .global :MM:__SYS:Exit
-Exit        LDO         $0,:MM:__SYS:AtExitAddr
-            BZ          $0,1F
-            GO          $0,$0
-1H          SET         t,0
+Exit        SET         t,0
             % Good bye so long and thanks for all the fish.
             TRAP        0,Halt,0
 
@@ -75,56 +68,10 @@ Exit        LDO         $0,:MM:__SYS:AtExitAddr
 %
 
             .global :MM:__SYS:Abort
-Abort       LDO         $0,:MM:__SYS:AtAbortAddr
-            BZ          $0,1F
-            GO          $0,$0
-1H          SET         t,1
+Abort       SET         t,1
             % Good bye so long and thanks for all the fish.
             TRAP        0,Halt,0
 
-
-%%
-% :MM:__SYS:AtExit
-%
-% PUSHJ
-%   arg0 - address of a subroutine that is called upon successful exit
-%          of the program
-%   no return values
-%
-% :MM:__SYS:AtExitG
-%
-% PUSHJ %255
-%
-
-            .global :MM:__SYS:AtExit
-            .global :MM:__SYS:AtExitG
-AtExitG     SET         arg0,t
-AtExit      LDA         $1,:MM:__SYS:AtExitAddr
-            STO         arg0,$1
-            SET         t,arg0
-            POP         0
-
-
-%%
-% :MM:__SYS:AtAbort
-%
-% PUSHJ
-%   arg0 - address of a subroutine that is called upon abortion of the
-%          program
-%   no return values
-%
-% :MM:__SYS:AtAbortG
-%
-% PUSHJ %255
-%
-
-            .global :MM:__SYS:AtAbort
-            .global :MM:__SYS:AtAbortG
-AtAbortG    SET         arg0,t
-AtAbort     LDA         $1,:MM:__SYS:AtAbortAddr
-            STO         arg0,$1
-            SET         t,arg0
-            POP         0
 
 
 %%

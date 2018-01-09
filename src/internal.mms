@@ -258,7 +258,45 @@ DoClone     SAVE        $255,0
             % Exit:
             %
 
-DoExit      JMP         9B
+DoExit      LDA         $4,:MM:__INTERNAL:ThreadRing
+            LDO         $5,$4,#10 % previous
+            LDO         $6,$4,#18 % next
+            % if this is the last thread context, call exit:
+            CMP         $7,$4,$5
+            BNZ         $7,1F
+            PUSHJ       $255,:MM:__SYS:Exit
+
+
+1H          SWYM
+
+
+
+            STO         $4,$5
+            LDO         $5,$4,#08
+            SET         $6,#00FF
+            CMP         $5,$5,$6
+            BNZ         $5,9B
+            STO         $5,$4,#08 % state
+            LDO         $0,$4,#28
+            NEG         $5,0,1
+            STO         $5,$4,#28
+            % Overwrite stack:
+            LDO         $3,$4,#20
+            SUBU        $2,$0,$1
+1H          LDO         $255,$3,$2
+            STO         $255,$1,$2
+            SUBU        $2,$2,#8
+            BNN         $2,1B
+            % We have to UNSAVE in order to get :rO and :rS into a valid
+            % state (matching the new register stack)
+            UNSAVE      0,$0
+            LDA         $3,:MM:__INTERNAL:ThreadRing
+            LDO         $3,$3
+            LDO         $5,$3,#20
+            PUSHJ       $4,:MM:__HEAP:DeallocJ
+            JMP         9B
+            NEG         $4,0,1
+            STO         $4,$3,#20
             % make sure :rY is set to zero
             SET         $255,#0000
             PUT         :rY,$255

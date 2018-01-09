@@ -19,8 +19,6 @@ str_entry1  BYTE        "    :MM:__Init:__entry         [ ",0
 str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
 str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
 str_hndl3   BYTE        "    :MM:__INTERNAL:ExcHandler  [ ",0
-str_atexit  BYTE        "    :MM:__SYS:AtExitAddr       [ ",0
-str_atabort BYTE        "    :MM:__SYS:AtAbortAddr      [ ",0
 str_aterror BYTE        "    :MM:__SYS:AtErrorAddr      [ ",0
 str_fpool   BYTE        "    :MM:__FILE:Pool            [ ",0
 str_buffer  BYTE        "    :MM:__INTERNAL:Buffer      [ ",0
@@ -111,12 +109,6 @@ Main        SET         $2,t
             PUSHJ       $3,AddressOf
             PUSHJ       t,MM:Print:Ln
 
-            LDA         $5,:MM:__SYS:AtExitAddr
-            LDA         $4,str_atexit
-            PUSHJ       $3,AddressOf2
-            LDA         $5,:MM:__SYS:AtAbortAddr
-            LDA         $4,str_atabort
-            PUSHJ       $3,AddressOf2
             LDA         $5,:MM:__SYS:AtErrorAddr
             LDA         $4,str_aterror
             PUSHJ       $3,AddressOf2
