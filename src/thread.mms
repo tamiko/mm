@@ -120,7 +120,9 @@ Clone       SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Clone,0
             GET         $0,:rY
-            POP         1,0
+            BP          $0,1F
+            NEG         $0,0,1
+1H          POP         1,0
 CloneG      GET         $0,:rJ
             PUSHJ       $1,Clone
             PUT         :rJ,$0

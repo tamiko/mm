@@ -190,6 +190,9 @@ DoYield     SAVE        $255,0
             JMP         9B
             NEG         $4,0,1
             STO         $4,$3,#20
+            % make sure :rY is set to zero
+            SET         $255,#0000
+            PUT         :rY,$255
             JMP         9F
 
             %
@@ -197,6 +200,10 @@ DoYield     SAVE        $255,0
             %
 
 DoCreate    JMP         9B
+            % make sure :rY is set to zero
+            SET         $255,#0000
+            PUT         :rY,$255
+            JMP         9F
 
             %
             % Clone:
@@ -252,6 +259,10 @@ DoClone     SAVE        $255,0
             %
 
 DoExit      JMP         9B
+            % make sure :rY is set to zero
+            SET         $255,#0000
+            PUT         :rY,$255
+            JMP         9F
 
             % check whether we double tripped:
 9H          GET         $3,:rW
@@ -259,11 +270,17 @@ DoExit      JMP         9B
             BZ          $4,1F
             LDA         $1,:MM:__INTERNAL:STRS:DoubleTrip
             PUSHJ       $0,:MM:__ERROR:IError1
-1H          LDA         $2,:MM:__THREAD:interval
-            LDO         $2,$2
-            SET         $255,$0
+1H          SET         $255,$0
             PUT         :rJ,$1
-            % reenable timer
-            PUT         :rI,$2
+            %
+            % reenable timer - we have to take into account that leaving
+            % the context (POP, SET, PUT, RESUME) will advance the clock by
+            % #000B. So increase the timer by that value.
+            %
+            LDA         $2,:MM:__THREAD:interval
+            LDO         $2,$2
+            BN          $2,1F
+            ADDU        $2,$2,#000B
+1H          PUT         :rI,$2
             POP 0
 
