@@ -94,7 +94,11 @@ until [[ "$@" == "" ]]; do
     keep_tmp=true
     verbose=true
   else
-    src_files+=( "$1" )
+    if  [[ "$1" == *.o ]]; then
+      ld_args_pre+=( "$1" )
+    else
+      src_files+=( "$1" )
+    fi
   fi
   shift
 done
