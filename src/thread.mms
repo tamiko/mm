@@ -56,7 +56,12 @@ arg0        IS          $0
             .global :MM:__THREAD:Enable
             .global :MM:__THREAD:EnableG
 EnableG     SET         arg0,t
-Enable      LDA         $1,:MM:__THREAD:interval
+Enable      BN          arg0,Disable
+            SET         $1,#2
+            CMP         $1,$0,$1
+            BNN         $1,1F
+            SET         $0,#2
+1H          LDA         $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
             SET         t,arg0
