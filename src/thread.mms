@@ -27,6 +27,12 @@
 %
 % :MM:__THREAD:
 %
+            .section .data,"wa",@progbits
+            .balign 8
+            .global :MM:__THREAD:interval
+            PREFIX      :MM:__THREAD:STRS:
+NegInterval BYTE        "Thread:Enable failed. Negative timer interval "
+            BYTE        "specified.",10,0
 
             .section .data,"wa",@progbits
             .balign 8
@@ -49,14 +55,15 @@ arg0        IS          $0
 %   arg0 - interval in oops
 %   no return values
 %
+% :MM:__THREAD:EnableJ
 % :MM:__THREAD:EnableG
 %
 % PUSHJ %255
 %
             .global :MM:__THREAD:Enable
+            .global :MM:__THREAD:EnableJ
             .global :MM:__THREAD:EnableG
-EnableG     SET         arg0,t
-Enable      BN          arg0,Disable
+EnableJ     BN          arg0,2F
             SET         $1,#2
             CMP         $1,$0,$1
             BNN         $1,1F
@@ -64,8 +71,19 @@ Enable      BN          arg0,Disable
 1H          LDA         $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
-            SET         t,arg0
-            POP         0
+            POP         0,1
+2H          POP         0,0
+EnableG     SET         arg0,t
+Enable      SET         $2,arg0
+            GET         $0,:rJ
+            PUSHJ       $1,EnableJ
+            JMP         9F
+            PUT         :rJ,$0
+            POP         0,0
+9H          LDA         t,:MM:__ERROR:__rJ
+            STO         $0,t
+            LDA         $1,:MM:__THREAD:STRS:NegInterval
+            PUSHJ       $0,:MM:__ERROR:Error1
 
 
 %%
@@ -113,7 +131,11 @@ ThreadIDG   LDA         t,:MM:__INTERNAL:ThreadRing
 %   no arguments
 %   retm - ThreadID of new thread
 %
+% :MM:__THREAD:CloneJ
+% :MM:__THREAD:CloneG
+%
             .global :MM:__THREAD:Clone
+            .global :MM:__THREAD:CloneJ
             .global :MM:__THREAD:CloneG
 Clone       SWYM
             % Disable timer and TRIP:
@@ -128,6 +150,12 @@ Clone       SWYM
             BP          $0,1F
             NEG         $0,0,1
 1H          POP         1,0
+CloneJ      GET         $0,:rJ
+            PUSHJ       $1,Clone
+            PUT         :rJ,$0
+            BN          $1,1F
+            POP         1,1
+1H          POP         0,0
 CloneG      GET         $0,:rJ
             PUSHJ       $1,Clone
             PUT         :rJ,$0
@@ -152,4 +180,24 @@ Yield       SWYM
             SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Yield,0
+            POP         0
+
+
+%%
+% :MM:__THREAD:Exit
+%
+% PUSHJ
+%   no arguments
+%   no return values
+%
+            .global :MM:__THREAD:Exit
+Exit       SWYM
+            % Disable timer and TRIP:
+            GET         $0,:rI
+            BN          $0,1F
+            NEG         $0,0,1
+            PUT         :rI,$0
+            SWYM
+            % We should be safe now™
+1H          TRIP        0,:MM:__INTERNAL:Exit,0
             POP         0

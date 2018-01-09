@@ -35,11 +35,12 @@
 % Routines for cooperative and preemptive (threaded) multitasking.
 %
 % This header file defines:
-%   :MM:Thread:Enable (EnableG)
+%   :MM:Thread:Enable (EnableJ, EnableG)
 %   :MM:Thread:Disable
 %   :MM:Thread:ThreadID (ThreadIDG)
-%   :MM:Thread:Clone
+%   :MM:Thread:Clone (CloneJ, CLoneG)
 %   :MM:Thread:Yield
+%   :MM:Thread:Exit
 %
 
 
@@ -52,7 +53,16 @@
 %   arg0 - timer interval in oops
 %   no return value
 %
+% :MM:Thread:EnableJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 (with no
+%   return value) on failure instead of throwing an error message.
+%   Same calling sequence as above.
+%
+% :MM:Thread:EnableG
+%   This variant passes retm through the general register $255.
+%
 Thread:Enable IS      :MM:__THREAD:Enable
+Thread:EnableJ IS     :MM:__THREAD:EnableJ
 Thread:EnableG IS     :MM:__THREAD:EnableG
 
 
@@ -89,9 +99,16 @@ Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 %
 %   PUSHJ:
 %   no arguments
-%   retm - ThreadID of clone
+%   retm - In context of calling thread the ThreadID of the clone, in
+%          context of the cloned thread -1.
+%
+% :MM:Thread:CloneJ
+%
+% :MM:Thread:CloneG
+%   This variant passes retm through the general register $255.
 %
 Thread:Clone  IS    :MM:__THREAD:Clone
+Thread:CloneJ IS    :MM:__THREAD:CloneJ
 Thread:CloneG IS    :MM:__THREAD:CloneG
 
 
@@ -106,6 +123,21 @@ Thread:CloneG IS    :MM:__THREAD:CloneG
 %   no return value
 %
 Thread:Yield  IS    :MM:__THREAD:Yield
+
+
+%%
+% :MM:Thread:Exit
+%
+%   Exit thread.
+%
+%   PUSHJ:
+%   no arguments
+%   no return value
+%
+Thread:Exit  IS    :MM:__THREAD:Exit
+
+
+            PREFIX      :
 
 
             PREFIX      :

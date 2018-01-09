@@ -65,7 +65,7 @@
 %   the library, nor locked by the user.
 %
 % :MM:File:LockG
-%   Variant of above function that passes arg0 in the general register
+%   Variant of above function that passes arg0 in the global register
 %   $255. The value of $255 is preserved.
 %
 % :MM:File:LockJ
@@ -89,7 +89,7 @@ File:LockJ  IS          :MM:__FILE:LockJ
 %   arg0 must be a file handle previously locked with :MM:File:Lock.
 %
 % :MM:File:UnlockG
-%   Variant of above function that passes arg0 in the general register
+%   Variant of above function that passes arg0 in the global register
 %   $255.
 %
 % :MM:File:UnlockJ
@@ -144,7 +144,7 @@ File:OpenJ  IS          :MM:__FILE:OpenJ
 %   no return value
 %
 % :MM:File:CloseG
-%   Variant of above function that passes arg0 in the general register
+%   Variant of above function that passes arg0 in the global register
 %   $255.
 %
 % :MM:File:CloseJ
@@ -169,7 +169,7 @@ File:CloseJ IS          :MM:__FILE:CloseJ
 % :MM:File:IsOpenG
 % :MM:File:IsReadableG
 % :MM:File:IsWritableG
-%   Variants that pass arg0 and retm in the general register $255
+%   Variants that pass arg0 and retm in the global register $255
 %
 % :MM:File:IsOpenJ
 % :MM:File:IsReadableJ
@@ -193,7 +193,7 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 %   retm - current position in bytes from the beginning
 %
 % :MM:File:TellG
-%   Variant of above function that passes arg0 in the general register
+%   Variant of above function that passes arg0 in the global register
 %   $255.
 %
 % :MM:File:TellJ
@@ -210,7 +210,7 @@ File:TellJ IS           :MM:__FILE:TellJ
 %   retm - file size in bytes
 %
 % :MM:File:SizeG
-%   Variant of above function that passes arg0 in the general register
+%   Variant of above function that passes arg0 in the global register
 %   $255.
 %
 % :MM:File:SizeJ

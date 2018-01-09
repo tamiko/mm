@@ -65,7 +65,7 @@
 %   Same calling sequence as above.
 %
 % :MM:Heap:AllocG
-%   This variant passes arg0 and retm through the general register $255.
+%   This variant passes arg0 and retm through the global register $255.
 %
 Heap:Alloc  IS          :MM:__HEAP:Alloc
 Heap:AllocJ IS          :MM:__HEAP:AllocJ
@@ -92,7 +92,7 @@ Heap:AllocG IS          :MM:__HEAP:AllocG
 %   above.
 %
 % :MM:Heap:AllocG
-%   This variant passes arg0 through the general register $255. $255 will
+%   This variant passes arg0 through the global register $255. $255 will
 %   be set to #0 on return
 %
 Heap:Dealloc  IS        :MM:__HEAP:Dealloc
@@ -142,7 +142,7 @@ Heap:ReallocJ IS        :MM:__HEAP:ReallocJ
 %   no return value
 %
 % :MM:Heap:ValidG
-%   This variant passes retm through the general register $255.
+%   This variant passes retm through the global register $255.
 %
 Heap:Valid  IS          :MM:__HEAP:Valid
 Heap:ValidJ IS          :MM:__HEAP:ValidJ
@@ -168,7 +168,7 @@ Heap:ValidG IS          :MM:__HEAP:ValidG
 %   above.
 %
 % :MM:Heap:SizeG
-%   This variant passes arg0 and retm through the general register $255.
+%   This variant passes arg0 and retm through the global register $255.
 %
 Heap:Size   IS          :MM:__HEAP:Size
 Heap:SizeJ  IS          :MM:__HEAP:SizeJ
@@ -247,7 +247,7 @@ Heap:SetJ   IS          :MM:__HEAP:SetJ
 %   above.
 %
 % :MM:Heap:ZeroG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the global register $255.
 %
 Heap:Zero   IS          :MM:__HEAP:Zero
 Heap:ZeroJ  IS          :MM:__HEAP:ZeroJ
@@ -279,7 +279,7 @@ Heap:ZeroG  IS          :MM:__HEAP:ZeroG
 %   above.
 %
 % :MM:Heap:RandG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the global register $255.
 %
 Heap:Rand   IS          :MM:__HEAP:Rand
 Heap:RandJ  IS          :MM:__HEAP:RandJ
