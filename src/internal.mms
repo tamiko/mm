@@ -84,7 +84,8 @@ ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
 Unhandled   BYTE        "Unhandled TRIP.\n",0
 DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
 SwitchError BYTE        "Fatal error during context switch.",10,0
-Tripped     BYTE        "Tripped! :-)\n",0
+Tripped1    BYTE        "[[",0
+Tripped2    BYTE        "]] <-- Tripped! :-)\n",0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:Yield
@@ -238,6 +239,12 @@ DoClone     SAVE        $255,0
             STO         $3,$4,#20 % stack image
             STO         $0,$4,#28 % UNSAVE address
             UNSAVE      0,$0
+            % store the thread ID of the clone in :rY
+            LDA         $255,:MM:__INTERNAL:ThreadRing
+            LDO         $255,$255
+            LDO         $255,$255,#18
+            LDO         $255,$255
+            PUT         :rY,$255
             JMP         9F
 
             %

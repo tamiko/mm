@@ -106,9 +106,10 @@ ThreadIDG   LDA         t,:MM:__INTERNAL:ThreadRing
 %
 % PUSHJ
 %   no arguments
-%   no return values
+%   retm - ThreadID of new thread
 %
             .global :MM:__THREAD:Clone
+            .global :MM:__THREAD:CloneG
 Clone       SWYM
             % Disable timer and TRIP:
             GET         $0,:rI
@@ -118,7 +119,13 @@ Clone       SWYM
             SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Clone,0
-1H          POP         0
+            GET         $0,:rY
+            POP         1,0
+CloneG      GET         $0,:rJ
+            PUSHJ       $1,Clone
+            PUT         :rJ,$0
+            SET         t,$1
+            POP         0,0
 
 
 %%

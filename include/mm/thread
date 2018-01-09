@@ -89,9 +89,10 @@ Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 %
 %   PUSHJ:
 %   no arguments
-%   no return value
+%   retm - ThreadID of clone
 %
 Thread:Clone  IS    :MM:__THREAD:Clone
+Thread:CloneG IS    :MM:__THREAD:CloneG
 
 
 %%
