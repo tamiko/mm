@@ -47,7 +47,7 @@ Continued2  BYTE        "[MM library]   Special handler value #FFFFFFFFFFFFFFFF.
 Continued3  BYTE        "].",10,0
 InternErro  BYTE        "[MM library] Internal error: ",10
             BYTE        "[MM library]   ",0
-Error1      BYTE        "[MM library] Called from [rJ=",0
+Error1      BYTE        "[MM library] Called from [:rJ-4 = ",0
 Error2      BYTE        "]:",10,"[MM library]   ",0
 ErrorHndlC1 BYTE        "[MM library]   Calling error handler [",0
 ErrorHndlC2 BYTE        "].",10,0
@@ -237,6 +237,7 @@ Error0      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -256,6 +257,7 @@ Error1      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -278,6 +280,7 @@ Error2      LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -303,6 +306,7 @@ Error3R2    LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -330,6 +334,7 @@ Error3RB2   LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -359,6 +364,7 @@ Error5R24   LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -392,6 +398,7 @@ Error5RB24  LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             LDA         t,__rJ
             LDO         t,t
+            SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
@@ -409,6 +416,7 @@ Error5RB24  LDA         t,:MM:__ERROR:STRS:Error1
 
 
             % Respect a possible error handler:
+            .global     :MM:__ERROR:ErrorHndl
 ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             BZ          $0,1F
             % Check for special value #-1
