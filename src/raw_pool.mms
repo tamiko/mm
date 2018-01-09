@@ -40,6 +40,7 @@ Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
             .section .data,"wa",@progbits
+            .global     :MM:__RAW_POOL:Pool
             PREFIX      :MM:__RAW_POOL:
 Pool        OCTA        #0000000000000000
 
@@ -150,14 +151,14 @@ Dealloc     CSZ         arg1,arg1,#10
 %   no arguments
 %   no return value
 %
-Recompact   LDA         $1,:MM:__RAW_POOL:Pool
-            LDO         ptrC,$1 % current ptr
-            BZ          $0,2F % nothing to do
 ptrB        IS          $0
 ptrC        IS          $1
 sizeC       IS          $2
 ptrN        IS          $3
 sizeN       IS          $4
+Recompact   LDA         $1,:MM:__RAW_POOL:Pool
+            LDO         ptrC,$1 % current ptr
+            BZ          $1,2F % nothing to do
             SET         ptrB,0
 9H          LDO         sizeC,ptrC,OCT % current size
             LDO         ptrN,ptrC,0 % next ptr
@@ -172,7 +173,6 @@ sizeN       IS          $4
             STO         t,ptrC,0
             STCO        0,ptrN,0 % clear data
             STCO        0,ptrN,OCT
-            PREST       #10,ptrN
             ADDU        t,sizeC,sizeN % update size
             STO         t,ptrC,OCT
             JMP         9B
@@ -182,7 +182,6 @@ sizeN       IS          $4
             BNZ         t,1F
             STCO        0,ptrC,0 % clear data
             STCO        0,ptrC,OCT
-            PREST       #10,ptrC
             ADDU        sizeN,sizeN,sizeC % update size
             STO         sizeN,ptrN,OCT
             BZ          ptrB,3F
