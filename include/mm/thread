@@ -156,7 +156,43 @@ Thread:Yield  IS    :MM:__THREAD:Yield
 Thread:Exit  IS    :MM:__THREAD:Exit
 
 
-            PREFIX      :
+%%
+% :MM:Thread:IsRunning
+%
+%   Returns whether a thread with a ThreadID is in the thread ring.
+%
+%   PUSHJ
+%   arg0 - ThreadID
+%   retm - 0 if thread is running, -1 otherwise.
+%
+% :MM:Thread:IsRunningJ
+%   This variant returns to :rJ+#4 if thread is running and to :rJ+#0
+%   otherwise.
+%
+% :MM:Thread:IsRunningG
+%   This variant passes arg0 through the general register $255.
+%
+Thread:IsRunning IS :MM:__THREAD:IsRunning
+Thread:IsRunningJ IS :MM:__THREAD:IsRunningJ
+Thread:IsRunningG IS :MM:__THREAD:IsRunningG
+
+
+%%
+% :MM:Thread:Wait
+%
+%   Wait for the thread with ThreadID arg0 to exit. This routine stalls
+%   execution on the current thread by yielding repeatedly until the thread
+%   with ThreadID exits.
+%
+%   PUSHJ
+%   arg0 - ThreadID
+%   no return values
+%
+% :MM:Thread:WaitG
+%   This variant passes arg0 through the general register $255.
+%
+Thread:Wait  IS    :MM:__THREAD:Wait
+Thread:WaitG IS    :MM:__THREAD:WaitG
 
 
             PREFIX      :
