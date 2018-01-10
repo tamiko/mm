@@ -232,17 +232,20 @@ Exit       SWYM
 1H          TRIP        0,:MM:__INTERNAL:Exit,0
             POP         0
 
-
 %%
-% :MM:__THREAD:Wait
+% :MM:__THREAD:IsRunning
 %
 % PUSHJ
 %   arg0 - ThreadID
-%   no return values
+%   retm - 0 if thread is running, -1 otherwise.
 %
-            .global :MM:__THREAD:Wait
-            .global :MM:__THREAD:WaitG
-Wait        SWYM
+% :MM:__THREAD:IsRunningJ
+% :MM:__THREAD:IsRunningG
+%
+            .global :MM:__THREAD:IsRunning
+            .global :MM:__THREAD:IsRunningJ
+            .global :MM:__THREAD:IsRunningG
+IsRunningJ  SWYM
             % Disable timer:
 9H          GET         $1,:rI
             BN          $1,1F
@@ -254,19 +257,52 @@ Wait        SWYM
 1H          LDO         $4,$3,#00
             CMP         $4,$4,$0
             BNZ         $4,2F
-            % found thread ID, we have to wait.
+            % found thread ID arg0
             BN          $1,3F
             PUT         :rI,$1
-3H          GET         $3,:rJ
-            PUSHJ       $4,:MM:__THREAD:Yield
-            PUT         :rJ,$3
-            JMP         9B
+3H          POP         0,1
+            % advance to next entry
 2H          LDO         $3,$3,#18
             CMP         $4,$3,$2
             BNZ         $4,1B
+            % did not find thread ID arg0 in any thread ring entry:
             BN          $1,3F
             PUT         :rI,$1
 3H          POP         0,0
+IsRunning   SET         $2,$0
+            GET         $0,:rJ
+            PUSHJ       $1,IsRunningJ
+            NEG         $1,0,1
+            SET         $1,#0000
+            PUT         :rJ,$0
+            SET         $0,$1
+            POP         1,0
+IsRunningG  SET         $2,t
+            GET         $0,:rJ
+            PUSHJ       $1,IsRunningJ
+            NEG         t,0,1
+            SET         t,#0000
+            PUT         :rJ,$0
+            POP         0,0
+
+
+%%
+% :MM:__THREAD:Wait
+%
+% PUSHJ
+%   arg0 - ThreadID
+%   no return values
+%
+            .global :MM:__THREAD:Wait
+            .global :MM:__THREAD:WaitG
+Wait        GET         $1,:rJ
+1H          SET         $3,arg0
+            PUSHJ       $2,IsRunningJ
+            JMP         9F
+            PUSHJ       $2,Yield
+            JMP         1B
+9H          PUT         :rJ,$1
+            POP         0,0
 WaitG       GET         $0,:rJ
             SET         $2,t
             PUSHJ       $1,Wait
