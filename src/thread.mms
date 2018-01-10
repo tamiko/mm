@@ -164,6 +164,37 @@ CloneG      GET         $0,:rJ
 
 
 %%
+% :MM:__THREAD:Create
+%
+% PUSHJ
+%   arg0 - Entry address of new thread
+%   retm - The ThreadID of the new thread
+%
+% :MM:__THREAD:CreateG
+%
+            .global :MM:__THREAD:Create
+            .global :MM:__THREAD:CreateG
+Create      SWYM
+            % Disable timer and TRIP:
+            GET         $1,:rI
+            BN          $1,1F
+            NEG         $1,0,1
+            PUT         :rI,$1
+            SWYM
+            % We should be safe now™
+1H          TRIP        0,:MM:__INTERNAL:Create,0
+            POP         0
+            GET         $0,:rY
+            POP         1,0
+CreateG     GET         $0,:rJ
+            SET         $2,t
+            PUSHJ       $1,Create
+            PUT         :rJ,$0
+            SET         t,$1
+            POP         0,0
+
+
+%%
 % :MM:__THREAD:Yield
 %
 % PUSHJ

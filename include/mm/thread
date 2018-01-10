@@ -103,6 +103,8 @@ Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 %          context of the cloned thread -1.
 %
 % :MM:Thread:CloneJ
+%   This variant returns to :rJ+#4 in the calling thread (returning the
+%   ThreadID of the clone) and to :rJ+#0 in the clone (no return value).
 %
 % :MM:Thread:CloneG
 %   This variant passes retm through the general register $255.
@@ -110,6 +112,23 @@ Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 Thread:Clone  IS    :MM:__THREAD:Clone
 Thread:CloneJ IS    :MM:__THREAD:CloneJ
 Thread:CloneG IS    :MM:__THREAD:CloneG
+
+
+%%
+% :MM:Thread:Create
+%
+%   Create a new thread by creating a ne execution context with main
+%   address arg0.
+%
+%   PUSHJ:
+%   arg0 - Entry address of new thread
+%   retm - The ThreadID of the new thread
+%
+% :MM:Thread:CreateG
+%   This variant passes retm through the general register $255.
+%
+Thread:Create  IS   :MM:__THREAD:Create
+Thread:CreateG IS   :MM:__THREAD:CreateG
 
 
 %%

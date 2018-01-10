@@ -255,7 +255,6 @@ DoUnsave    LDA         $5,:MM:__INTERNAL:ThreadRing
             PUT         :rW,$255
             RESUME
 
-
             %
             % Create:
             %
