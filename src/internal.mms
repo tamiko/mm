@@ -255,7 +255,7 @@ DoCreate    GET         $3,:rZ
             STO         $7,$6,#08
             % Stack image:
             STO         $4,$6,#20
-            STO         $0,$6,#28
+            STO         $5,$6,#28
             % Update pointers:
             LDA         $7,:MM:__INTERNAL:ThreadRing
             LDO         $7,$7
