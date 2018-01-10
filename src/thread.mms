@@ -183,7 +183,6 @@ Create      SWYM
             SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Create,0
-            POP         0
             GET         $0,:rY
             POP         1,0
 CreateG     GET         $0,:rJ
@@ -232,3 +231,44 @@ Exit       SWYM
             % We should be safe now™
 1H          TRIP        0,:MM:__INTERNAL:Exit,0
             POP         0
+
+
+%%
+% :MM:__THREAD:Wait
+%
+% PUSHJ
+%   arg0 - ThreadID
+%   no return values
+%
+            .global :MM:__THREAD:Wait
+            .global :MM:__THREAD:WaitG
+Wait        SWYM
+            % Disable timer:
+9H          GET         $1,:rI
+            BN          $1,1F
+            NEG         $2,0,1
+            PUT         :rI,$2
+1H          LDA         $3,:MM:__INTERNAL:ThreadRing
+            LDO         $3,$3
+            SET         $2,$3
+1H          LDO         $4,$3,#00
+            CMP         $4,$4,$0
+            BNZ         $4,2F
+            % found thread ID, we have to wait.
+            BN          $1,3F
+            PUT         :rI,$1
+3H          GET         $3,:rJ
+            PUSHJ       $4,:MM:__THREAD:Yield
+            PUT         :rJ,$3
+            JMP         9B
+2H          LDO         $3,$3,#18
+            CMP         $4,$3,$2
+            BNZ         $4,1B
+            BN          $1,3F
+            PUT         :rI,$1
+3H          POP         0,0
+WaitG       GET         $0,:rJ
+            SET         $2,t
+            PUSHJ       $1,Wait
+            PUT         :rJ,$0
+            POP         0,0

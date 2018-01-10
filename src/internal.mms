@@ -253,7 +253,18 @@ DoUnsave    LDA         $5,:MM:__INTERNAL:ThreadRing
             LDA         $255,:MM:__INTERNAL:__buffer
             LDO         $255,$255
             PUT         :rW,$255
-            RESUME
+            %
+            % reenable timer - we have to take into account that leaving
+            % the context (PUT, GET, RESUME) will advance the clock by
+            % #0005. So increase the timer by that value.
+            %
+            LDA         $255,:MM:__THREAD:interval
+            LDO         $255,$255
+            BN          $255,1F
+            ADDU        $255,$255,#0005
+            PUT         :rI,$255
+            GET         $255,:rW
+1H          RESUME
 
             %
             % Create:
@@ -360,6 +371,6 @@ DoClone     SAVE        $255,0
             LDO         $2,$2
             BN          $2,1F
             ADDU        $2,$2,#000B
-1H          PUT         :rI,$2
-            POP 0
+            PUT         :rI,$2
+1H          POP 0
 
