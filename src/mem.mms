@@ -203,18 +203,14 @@ Copy        GET         $3,:rJ
             JMP         9F
 3H          PUT         :rJ,$3
             POP         0,0
-1H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__MEM:STRS:Copy1
             LDA         $3,:MM:__MEM:STRS:Copy3
             LDA         $5,:MM:__MEM:STRS:Copy4
             PUSHJ       $0,:MM:__ERROR:Error5R24
-2H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+2H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg1
             LDA         $1,:MM:__MEM:STRS:Copy2
@@ -343,9 +339,7 @@ Set         GET         $3,:rJ
             JMP         9F
 3H          PUT         :rJ,$3
             POP         0,0
-1H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__MEM:STRS:Set1
@@ -377,9 +371,7 @@ Zero        GET         $2,:rJ
             JMP         9F
 3H          PUT         :rJ,$2
             POP         0,0
-1H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__MEM:STRS:Zero1
@@ -420,9 +412,7 @@ Rand        GET         $2,:rJ
             JMP         9F
 3H          PUT         :rJ,$2
             POP         0,0
-1H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__MEM:STRS:Rand1
@@ -545,18 +535,14 @@ Cmp         GET         $3,:rJ
             SET         ret0,0
             SUB         ret0,ret0,1
             POP         1,0
-1H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
             LDA         $1,:MM:__MEM:STRS:Cmp1
             LDA         $3,:MM:__MEM:STRS:Cmp3
             LDA         $5,:MM:__MEM:STRS:Cmp4
             PUSHJ       $0,:MM:__ERROR:Error5R24
-2H          GET         $6,:rJ
-            LDA         t,:MM:__ERROR:__rJ
-            STO         $6,t
+2H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg1
             LDA         $1,:MM:__MEM:STRS:Cmp2

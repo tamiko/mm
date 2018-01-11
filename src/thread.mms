@@ -82,8 +82,7 @@ Enable      SET         $2,arg0
             JMP         9F
             PUT         :rJ,$0
             POP         0,0
-9H          LDA         t,:MM:__ERROR:__rJ
-            STO         $0,t
+9H          SET         t,$0 % :rJ
             LDA         $1,:MM:__THREAD:STRS:NegInterval
             PUSHJ       $0,:MM:__ERROR:Error1
 
@@ -379,7 +378,6 @@ UnlockMutex GET         $1,:rJ
             JMP         2F
             PUT         :rJ,$1
             POP         0,0
-2H          LDA         t,:MM:__ERROR:__rJ
-            STO         $1,t
+2H          SET         t,$1 % :rJ
             LDA         $1,:MM:__THREAD:STRS:UnlockMFail
             PUSHJ       $0,:MM:__ERROR:Error1
