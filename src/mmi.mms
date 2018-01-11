@@ -148,3 +148,4 @@ __init      PUT         :rW,$255      % RESUME at Main
 2H          LDA         $1,:MM:__INIT:STRS:InitError
             PUSHJ       $0,:MM:__ERROR:IError1
 3H          SWYM
+
