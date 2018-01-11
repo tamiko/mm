@@ -113,6 +113,9 @@ RegLn       SET         $1,0
             SET         $2,8
 RegLnP      ADD         $5,$1,$1
             ADD         $6,$2,$2
+            GET         $10,:rJ
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $3,10 % newline
             STB         $3,buffer,17
@@ -124,6 +127,9 @@ Reg         SET         $1,0
             SET         $2,8
 RegP        ADD         $5,$1,$1
             ADD         $6,$2,$2
+            GET         $10,:rJ
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $3,0
             STB         $3,buffer,17
@@ -146,6 +152,9 @@ RegP        ADD         $5,$1,$1
             STB         $3,buffer,0
             SET         t,buffer
             TRAP        0,Fputs,StdOut
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$10
             SET         t,$4 % restore original value
             POP         0,0
 
@@ -167,7 +176,10 @@ RegP        ADD         $5,$1,$1
             .global :MM:__PRINT:ByteG
 buffer      IS          $1
 ByteG       SET         arg0,t
-Byte        LDA         buffer,:MM:__INTERNAL:Buffer
+Byte        GET         $10,:rJ
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -188,6 +200,9 @@ Byte        LDA         buffer,:MM:__INTERNAL:Buffer
             STB         $2,buffer,1
             SET         t,buffer
             TRAP        0,Fputs,StdOut
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$10
             SET         t,$0 % restore original value
             POP         0,0
 
@@ -211,7 +226,10 @@ buffer      IS          $1
 ptr         IS          $2
 carry       IS          $3
 UnsignedG   SET         arg0,t
-Unsigned    LDA         buffer,:MM:__INTERNAL:Buffer
+Unsigned    GET         $10,:rJ
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            LDA         buffer,:MM:__INTERNAL:Buffer
             SET         ptr,128*8-1
             SET         t,0
             STB         t,buffer,ptr
@@ -229,6 +247,9 @@ Unsigned    LDA         buffer,:MM:__INTERNAL:Buffer
 2H          ADDU        t,buffer,ptr
             ADDU        t,t,1
             TRAP        0,Fputs,StdOut
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            PUT         :rJ,$10
             SET         t,$0 % restore original value
             POP         0,0
 
@@ -253,12 +274,16 @@ Signed      GET         $2,:rJ
             BN          arg0,1F
             PUSHJ       t,UnsignedG
             JMP         2F
-1H          LDA         buffer,:MM:__INTERNAL:Buffer
+1H          LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            LDA         buffer,:MM:__INTERNAL:Buffer
             STCO        0,buffer,0
             SET         t,'-'
             STB         t,buffer,0
             SET         t,buffer
             TRAP        0,Fputs,StdOut
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
             NEG         t,$0
             PUSHJ       t,UnsignedG
 2H          PUT         :rJ,$2

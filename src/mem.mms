@@ -397,7 +397,6 @@ Zero        GET         $2,:rJ
 %   arg1 - size (in bytes)
 %   no return value
 %
-
             .global :MM:__MEM:RandJ
             .global :MM:__MEM:Rand
 RandJ       IS          :MM:__RAND:SetJ
@@ -431,7 +430,6 @@ Rand        GET         $2,:rJ
 %   arg2 - size (in bytes)
 %   no return value
 %
-
             .global :MM:__MEM:CmpJ
             % Check preconditions:
 CmpJ        ADDU        t,arg0,arg2
@@ -510,7 +508,6 @@ CmpInternJ  SWYM
 %   arg2 - size (in bytes)
 %   retm - 0 indicating two equal memory regions, -1 otherwise
 %
-
             .global :MM:__MEM:Cmp
             % Check preconditions:
 Cmp         GET         $3,:rJ
