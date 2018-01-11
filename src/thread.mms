@@ -33,6 +33,8 @@
             PREFIX      :MM:__THREAD:STRS:
 NegInterval BYTE        "Thread:Enable failed. Negative timer interval "
             BYTE        "specified.",10,0
+UnlockMFail BYTE        "Thread:UnlockMutex failed. Mutex is not locked by "
+            BYTE        "the current thread.",10,0
 
             .section .data,"wa",@progbits
             .balign 8
@@ -308,3 +310,76 @@ WaitG       GET         $0,:rJ
             PUSHJ       $1,Wait
             PUT         :rJ,$0
             POP         0,0
+
+
+%%
+% :MM:__THREAD:LockMutex
+%
+% PUSHJ
+%   arg0 - address of OCTA used as mutex
+%   no return values
+%
+% :MM:__THREAD:LockMutexJ
+% :MM:__THREAD:LockMutexG
+%
+            .global :MM:__THREAD:LockMutex
+            .global :MM:__THREAD:LockMutexJ
+            .global :MM:__THREAD:LockMutexG
+            % use CSWAP for atomic update of Mutex: We assume the mutex to
+            % be unlocked (:rP == #0..0) and try to store $1 (Thread ID |
+            % 1<<64).
+LockMutexJ  LDA         $1,:MM:__INTERNAL:ThreadRing
+            LDO         $1,$1
+            LDO         $1,$1
+            ORH         $1,#8000
+            SET         $2,#0000
+            PUT         :rP,$2
+            CSWAP       $1,arg0
+            BZ          $1,1F
+            POP         0,1
+1H          POP         0,0
+LockMutexG  SET         $0,t
+LockMutex   GET         $1,:rJ
+1H          SET         $3,$0
+            PUSHJ       $2,LockMutexJ
+            JMP         2F
+            PUT         :rJ,$1
+            POP         0,0
+2H          PUSHJ       $2,Yield
+            JMP         1B
+
+
+%%
+% :MM:__THREAD:UnlockMutex
+%
+% PUSHJ
+%   arg0 - address of OCTA used as mutex
+%   no return values
+%
+% :MM:__THREAD:UnlockMutexJ
+% :MM:__THREAD:UnlockMutexG
+%
+            .global :MM:__THREAD:UnlockMutex
+            .global :MM:__THREAD:UnlockMutexJ
+            .global :MM:__THREAD:UnlockMutexG
+UnlockMutexJ LDA         $1,:MM:__INTERNAL:ThreadRing
+            LDO         $1,$1
+            LDO         $1,$1
+            ORH         $1,#8000
+            SET         $2,#0000
+            PUT         :rP,$1
+            CSWAP       $2,arg0
+            BZ          $2,1F
+            POP         0,1
+1H          POP         0,0
+UnlockMutexG SET        $0,t
+UnlockMutex GET         $1,:rJ
+1H          SET         $3,$0
+            PUSHJ       $2,UnlockMutexJ
+            JMP         2F
+            PUT         :rJ,$1
+            POP         0,0
+2H          LDA         t,:MM:__ERROR:__rJ
+            STO         $1,t
+            LDA         $1,:MM:__THREAD:STRS:UnlockMFail
+            PUSHJ       $0,:MM:__ERROR:Error1
