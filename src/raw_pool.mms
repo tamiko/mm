@@ -66,7 +66,8 @@ OCT         IS          #8
 %
             % Allocate at least 128MiB (#0800 0000 bytes) and at least
             % twice the size as requested:
-Grow        SLU         $0,arg0,1
+Grow        GET         $10,:rJ
+            SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
             CSN         $0,t,$1
@@ -92,9 +93,8 @@ Grow        SLU         $0,arg0,1
             STO         $0,$2,OCT
             LDA         $5,:MM:__RAW_POOL:Pool
             STO         $2,$5
-            GET         $0,:rJ
             PUSHJ       t,Recompact
-            PUT         :rJ,$0
+            PUT         :rJ,$10
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
@@ -115,7 +115,9 @@ Grow        SLU         $0,arg0,1
 %
             .global :MM:__RAW_POOL:Dealloc
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
-Dealloc     CSZ         arg1,arg1,#10
+Dealloc     GET         $10,:rJ
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            CSZ         arg1,arg1,#10
             ADDU        arg1,arg1,#F
             ANDN        arg1,arg1,#F
             % A bunch of rudimentary checks:
@@ -134,9 +136,9 @@ Dealloc     CSZ         arg1,arg1,#10
             STO         arg1,arg0,OCT % size
             LDA         $5,:MM:__RAW_POOL:Pool
             STO         arg0,$5 % update pointer
-            GET         $0,:rJ
             PUSHJ       t,Recompact
-            PUT         :rJ,$0
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$10
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
@@ -212,17 +214,17 @@ ptr         IS          $1
 prev_ptr    IS          $2
             % Align arg1 to 2 * 8 and make sure to request at least
             % 2*OCT:
-Alloc       CSZ         arg0,arg0,#10
+Alloc       GET         $5,:rJ
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
             % Initialize the pool if necessary:
             LDA         $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
             PBNZ        $2,1F
-            GET         $1,:rJ
-            SET         $3,0
-            PUSHJ       $2,Grow
-            PUT         :rJ,$1
+            SET         $7,arg0
+            PUSHJ       $6,Grow
             % 1st case: use chunk pointed to by pool ptr:
 1H          LDA         $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
@@ -234,6 +236,8 @@ Alloc       CSZ         arg0,arg0,#10
             LDO         $3,$2
             LDA         $2,:MM:__RAW_POOL:Pool
             STO         $3,$2
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$5
             POP         1,0
 1H          LDA         $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
@@ -248,6 +252,8 @@ Alloc       CSZ         arg0,arg0,#10
             LDA         $3,:MM:__RAW_POOL:Pool
             STO         $2,$3
             SUBU        arg0,$2,arg0
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$5
             POP         1,0
             % 2nd case: use some later chunk:
 2H          LDA         t,:MM:__RAW_POOL:Pool
@@ -258,10 +264,8 @@ Alloc       CSZ         arg0,arg0,#10
             PBNZ        t,5F
             % Out of pool memory, allocate new memory from the pool:
             GET         $1,:rJ
-            SET         $3,arg0
-            GET         $1,:rJ
-            PUSHJ       $2,Grow
-            PUT         :rJ,$1
+            SET         $7,arg0
+            PUSHJ       $6,Grow
             JMP         Alloc % ... and restart
 5H          LDO         t,ptr,OCT
             CMPU        t,arg0,t
@@ -270,6 +274,8 @@ Alloc       CSZ         arg0,arg0,#10
             SET         arg0,ptr
             LDO         t,ptr,0
             STO         t,prev_ptr,0
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$5
             POP         1,0
 4H          LDO         t,ptr,0
             STO         t,ptr,arg0
@@ -281,6 +287,8 @@ Alloc       CSZ         arg0,arg0,#10
             ADDU        ptr,ptr,arg0
             STO         ptr,prev_ptr,0
             SUBU        arg0,ptr,arg0
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$5
             POP         1,0
 5H          SET         prev_ptr,ptr
             LDO         ptr,ptr,0
