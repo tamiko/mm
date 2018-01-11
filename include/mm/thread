@@ -195,6 +195,48 @@ Thread:Wait  IS    :MM:__THREAD:Wait
 Thread:WaitG IS    :MM:__THREAD:WaitG
 
 
+%%
+% :MM:Thread:LockMutex
+%
+%   Lock Mutex M8(arg0). The method waits (and yields) until a mutex is
+%   acquired.
+%
+%   PUSHJ
+%   arg0 - address of memory used as mutex
+%   no return values
+%
+% :MM:Thread:LockMutexJ
+%   This variant does not wait (or yield) but returns to :rJ+#4 if the
+%   mutex could be locked successfully, otherwise :rJ+#0.
+%
+% :MM:Thread:LockMutexG
+%   This variant passes arg0 through the general register $255.
+%
+Thread:LockMutex IS :MM:__THREAD:LockMutex
+Thread:LockMutexJ IS :MM:__THREAD:LockMutexJ
+Thread:LockMutexG IS :MM:__THREAD:LockMutexG
+
+
+%%
+% :MM:Thread:UnlockMutex
+%
+%   Unlocks a previously acquired mutex (M8(arg0)).
+%
+%   PUSHJ
+%   arg0 - address of memory used as mutex
+%   no return values
+%
+% :MM:Thread:UnlockMutexJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
+%   instead of throwing an error message. Same calling sequence as above.
+%
+% :MM:Thread:UnlockMutexG
+%   This variant passes arg0 through the general register $255.
+%
+Thread:UnlockMutex IS :MM:__THREAD:UnlockMutex
+Thread:UnlockMutexG IS :MM:__THREAD:UnlockMutexG
+
+
             PREFIX      :
 
 #endif /* MM_THREAD */
