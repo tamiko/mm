@@ -248,7 +248,7 @@ Unsigned    GET         $10,:rJ
             ADDU        t,t,1
             TRAP        0,Fputs,StdOut
             LDA         t,:MM:__INTERNAL:BufferMutex
-            PUSHJ       t,:MM:__THREAD:LockMutexG
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$10
             SET         t,$0 % restore original value
             POP         0,0
