@@ -1677,6 +1677,10 @@ Seek        SET         $4,arg0
 % :MM:__FILE:Read
 %
 
+            .section .data,"wa",@progbits
+ReadBuffer  OCTA        #0,#0,#0
+
+            .section .text,"ax",@progbits
             .global :MM:__FILE:ReadJ
             .global :MM:__FILE:Read
 ReadTable   TRAP 0,Fread,0; JMP 7F
@@ -1935,7 +1939,6 @@ ReadTable   TRAP 0,Fread,0; JMP 7F
             TRAP 0,Fread,253; JMP 7F
             TRAP 0,Fread,254; JMP 7F
             TRAP 0,Fread,255; JMP 7F
-            OCTA        #0,#0
 ReadJ       BN          arg2,9F % invalid size
             AND         arg0,arg0,#FF
             GET         $3,:rJ
@@ -1944,12 +1947,15 @@ ReadJ       BN          arg2,9F % invalid size
             JMP         9F % not readable
             SLU         arg0,arg0,3 % *8
             LDA         $4,ReadTable
-            LDA         t,ReadJ
-            SUBU        t,t,#10
+            LDA         t,ReadBuffer
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            ADDU        t,t,#8
             STO         arg1,t,#0
             STO         arg2,t,#8
             GO          $4,$4,arg0
 7H          SET         ret0,t
+            LDA         t,ReadBuffer
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1
             NEG         $1,0,$1
             SUB         $1,$1,1
@@ -1984,6 +1990,10 @@ Read        SET         $4,arg2
 % :MM:__FILE:Write
 %
 
+            .section .data,"wa",@progbits
+WriteBuffer OCTA        #0,#0,#0
+
+            .section .text,"ax",@progbits
             .global :MM:__FILE:WriteJ
             .global :MM:__FILE:Write
 WriteTable  TRAP 0,Fwrite,0; JMP 7F
@@ -2242,7 +2252,6 @@ WriteTable  TRAP 0,Fwrite,0; JMP 7F
             TRAP 0,Fwrite,253; JMP 7F
             TRAP 0,Fwrite,254; JMP 7F
             TRAP 0,Fwrite,255; JMP 7F
-            OCTA        #0,#0
 WriteJ      BN          arg2,9F % invalid size
             AND         arg0,arg0,#FF
             GET         $3,:rJ
@@ -2251,12 +2260,15 @@ WriteJ      BN          arg2,9F % invalid size
             JMP         9F % not writable
             SLU         arg0,arg0,3 % *8
             LDA         $4,WriteTable
-            LDA         t,WriteJ
-            SUBU        t,t,#10
+            LDA         t,WriteBuffer
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            ADDU        t,t,#8
             STO         arg1,t,#0
             STO         arg2,t,#8
             GO          $4,$4,arg0
 7H          SET         ret0,t
+            LDA         t,WriteBuffer
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1
             NEG         $1,0,$1
             SUB         $1,$1,1
