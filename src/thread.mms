@@ -41,35 +41,6 @@ UnlockMFail BYTE        "Thread:UnlockMutex failed. Mutex is not locked by "
             .global :MM:__THREAD:interval
             PREFIX      :MM:__THREAD:
 interval    OCTA        #FFFFFFFFFFFFFFFF
-stored_int  OCTA        #FFFFFFFFFFFFFFFF
-
-
-%%
-% :MM:__INTERNAL:EnterCritical
-% :MM:__INTERNAL:LeaveCritical
-%
-%   Enter and leave a critical section. Internally used.
-%
-            .section .text,"ax",@progbits
-            PREFIX      :MM:__INTERNAL:
-            .global :MM:__INTERNAL:EnterCritical
-            .global :MM:__INTERNAL:LeaveCritical
-EnterCritical GET       $0,:rI
-            BN          $0,1F
-            NEG         $1,0,1
-            PUT         :rI,$1
-            LDA         $2,stored_int
-            STO         $0,$2
-            POP         0,0
-1H          NEG         $0,0,1
-            LDA         $2,stored_int
-            STO         $0,$2
-            POP         0,0
-LeaveCritical LDA       $0,stored_int
-            LDO         $0,$0
-            BN          $0,1F
-            PUT         :rI,$0
-1H          POP         0,0
 
 
             .section .text,"ax",@progbits
