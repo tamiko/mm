@@ -72,6 +72,7 @@ Write2      BYTE        "].",10,0
             .balign 8
             .global :MM:__FILE:Pool
             PREFIX      :MM:__FILE:
+PoolMutex   OCTA        #0000000000000000
 Pool        BYTE        #EE,#EE,#EE
             .fill 253*1
 
@@ -112,16 +113,25 @@ BinaryReadWrite IS      :BinaryReadWrite
             .global :MM:__FILE:LockJ
             .global :MM:__FILE:LockG
             .global :MM:__FILE:Lock
+pool        IS          $2
             % Select lowest byte:
 LockJ       AND         arg0,arg0,#FF
-pool        IS          $2
+            GET         $5,:rJ
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             LDA         pool,:MM:__FILE:Pool
 2H          LDBU        $4,pool,arg0
             BNZ         $4,9F % already in use
             SET         $4,#FF
 2H          STB         $4,pool,arg0
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
             POP         0,1
-9H          POP         0,0
+9H          LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
+            POP         0,0
 LockG       SET         $0,t
 Lock        SET         $3,arg0
             GET         $1,:rJ
@@ -135,7 +145,6 @@ Lock        SET         $3,arg0
             SET         $2,arg0
             LDA         $3,:MM:__FILE:STRS:Lock2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
-
 
 %%
 % :MM:__FILE:UnlockJ
@@ -153,16 +162,25 @@ Lock        SET         $3,arg0
             .global :MM:__FILE:UnlockG
             .global :MM:__FILE:Unlock
             % Select lowest byte:
-UnlockJ     CMPU        arg0,arg0,#FF
 pool        IS          $2
+UnlockJ     CMPU        arg0,arg0,#FF
+            GET         $5,:rJ
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             LDA         pool,:MM:__FILE:Pool
 2H          LDBU        $4,pool,arg0
             XOR         $4,$4,#FF
             BNZ         $4,9F % not locked
             SET         $4,#00
 2H          STB         $4,pool,arg0
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
             POP         1,1
-9H          POP         0,0
+9H          LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
+            POP         0,0
 UnlockG     SET         $0,t
 Unlock      SET         $3,arg0
             GET         $1,:rJ
@@ -443,10 +461,13 @@ OpenTable   TRAP 0,Fopen,0; JMP 7F
             TRAP 0,Fopen,253; JMP 7F
             TRAP 0,Fopen,254; JMP 7F
             TRAP 0,Fopen,255; JMP 7F
-OpenJ       CMPU        t,arg1,4
-            BP          t,9F
 pool        IS          $2
 fh          IS          $3
+OpenJ       GET         $6,:rJ
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            CMPU        t,arg1,4
+            BP          t,9F
             % Find an unused fh:
             LDA         pool,:MM:__FILE:Pool
             SET         fh,0
@@ -470,11 +491,17 @@ fh          IS          $3
 7H          BN          t,1F
             SRU         $3,fh,3 % /8
             SET         $0,fh
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$6
             POP         1,1
 1H          SRU         fh,$3,3 % fh
             SET         $0,0
             STB         $0,pool,fh
-9H          POP         0,0
+9H          LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$6
+            POP         0,0
 
 
 %%
@@ -488,6 +515,7 @@ fh          IS          $3
 Open        CMPU        t,arg1,4
             BP          t,9F
             % Are any file handles available?
+            % TODO: This check is a bit racy...
             LDA         pool,:MM:__FILE:Pool
             SET         fh,0
 2H          LDBU        $4,pool,fh
@@ -787,6 +815,9 @@ CloseTable  TRAP 0,Fclose,0; JMP 7F
 pool        IS          $2
             % sanitize arg0:
 CloseJ      AND         arg0,arg0,#FF
+            GET         $5,:rJ
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             LDA         pool,:MM:__FILE:Pool
             LDBU        $3,pool,arg0
             BZ          $3,9F
@@ -801,8 +832,14 @@ CloseJ      AND         arg0,arg0,#FF
             BN          t,9F
             SET         $3,0
             STBU        $3,pool,arg0
+            LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
             POP         0,1
-9H          POP         0,0
+9H          LDA         t,:MM:__FILE:PoolMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            PUT         :rJ,$5
+            POP         0,0
 
 
 %%
@@ -815,6 +852,7 @@ CloseJ      AND         arg0,arg0,#FF
             .global :MM:__FILE:Close
 CloseG      SET         arg0,t
 Close       AND         $3,arg0,#FF
+            % TODO: This check is a bit racy...
             LDA         pool,:MM:__FILE:Pool
             LDBU        $3,pool,$3
             BZ          $3,9F
