@@ -219,78 +219,59 @@ Alloc       GET         $5,:rJ
             CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
+            %
             % Initialize the pool if necessary:
+            %
             LDA         $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
             PBNZ        $2,1F
-            SET         $7,arg0
+__retry     SET         $7,arg0
             PUSHJ       $6,Grow
-            % 1st case: use chunk pointed to by pool ptr:
+            %
+            % 1st pass: Try to find a chunk with requested size:
+            %
 1H          LDA         $2,:MM:__RAW_POOL:Pool
-            LDO         $2,$2
-            LDO         t,$2,OCT
+            LDO         ptr,$2
+            SET         prev_ptr,#0
+3H          LDO         t,ptr,OCT
             CMPU        t,arg0,t
-            BN          t,1F % chunk too big
-            BP          t,2F % chunk too small
-            SET         arg0,$2
-            LDO         $3,$2
-            LDA         $2,:MM:__RAW_POOL:Pool
-            STO         $3,$2
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
-            PUT         :rJ,$5
-            POP         1,0
+            BZ          t,2F % matching size?
+            SET         prev_ptr,ptr
+            LDO         ptr,ptr
+            CMPU        t,ptr,0
+            BNZ         t,3B
+            JMP         1F % no luck
+2H          LDO         $3,ptr
+            JMP         __out
+            %
+            % 2nd pass: Use any chunk that is sufficiently large:
+            %
 1H          LDA         $2,:MM:__RAW_POOL:Pool
-            LDO         $2,$2
-            LDO         t,$2,0
-            STO         t,$2,arg0
-            LDO         t,$2,OCT
-            SUBU        t,t,arg0
-            ADDU        arg0,arg0,OCT
-            STO         t,$2,arg0
-            SUBU        arg0,arg0,OCT
-            ADDU        $2,$2,arg0
-            LDA         $3,:MM:__RAW_POOL:Pool
-            STO         $2,$3
-            SUBU        arg0,$2,arg0
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
-            PUT         :rJ,$5
-            POP         1,0
-            % 2nd case: use some later chunk:
-2H          LDA         t,:MM:__RAW_POOL:Pool
-            LDO         t,t
-            SET         prev_ptr,t
-            LDO         ptr,t
-3H          CMPU        t,ptr,0
-            PBNZ        t,5F
-            % Out of pool memory, allocate new memory from the pool:
-            GET         $1,:rJ
-            SET         $7,arg0
-            PUSHJ       $6,Grow
-            JMP         Alloc % ... and restart
-5H          LDO         t,ptr,OCT
+            LDO         ptr,$2
+            SET         prev_ptr,#0
+3H          LDO         t,ptr,OCT
             CMPU        t,arg0,t
-            BN          t,4F % chunk too big
-            BP          t,5F % chunk too small
-            SET         arg0,ptr
-            LDO         t,ptr,0
-            STO         t,prev_ptr,0
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
-            PUT         :rJ,$5
-            POP         1,0
-4H          LDO         t,ptr,0
+            BN          t,2F % sufficiently large?
+            SET         prev_ptr,ptr
+            LDO         ptr,ptr
+            CMPU        t,ptr,0
+            BNZ         t,3B
+            JMP         __retry % no luck
+            % chop off the rest:
+2H          LDO         t,ptr,0
             STO         t,ptr,arg0
             LDO         t,ptr,OCT
             SUBU        t,t,arg0
             ADDU        arg0,arg0,OCT
             STO         t,ptr,arg0
             SUBU        arg0,arg0,OCT
-            ADDU        ptr,ptr,arg0
-            STO         ptr,prev_ptr,0
-            SUBU        arg0,ptr,arg0
+            ADDU        $3,ptr,arg0
+__out       BNZ         prev_ptr,9F
+            LDA         $3,:MM:__RAW_POOL:Pool
+            STO         $2,$3
+            JMP         8F
+9H          STO         $2,prev_ptr
+8H          SET         arg0,ptr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$5
             POP         1,0
-5H          SET         prev_ptr,ptr
-            LDO         ptr,ptr,0
-            JMP         3B % loop
-
