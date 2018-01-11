@@ -29,8 +29,11 @@
             %
 
             .section .data,"wa",@progbits
+            .global :MM:__INTERNAL:BufferMutex
             .global :MM:__INTERNAL:Buffer
+            .balign 8
             PREFIX      :MM:__INTERNAL:
+BufferMutex OCTA        #0000000000000000
 Buffer      IS          @
             .fill 128*8
 

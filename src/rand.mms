@@ -33,9 +33,7 @@
             PREFIX      :MM:__RAND:STRS:
 Urandom     BYTE        "/dev/urandom",0
 Init1       BYTE        "__RAND:Init failed. Unable to open '/dev/urandom'",0
-Init2       BYTE        ". Internal error. File handle [",0
-Init3       BYTE        "] invalid.",10,0
-Init4       BYTE        ".",10,0
+Init2       BYTE        ".",10,0
 Octa1       BYTE        "Rand:Octa failed. Could not read random data.",10,0
 Range1      BYTE        "Rand:Range failed. Invalid range specified, [arg0=",0
 Range2      BYTE        "] and [arg1=",0
@@ -54,49 +52,29 @@ FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .balign 8
 
 
+            .section .init,"ax",@progbits
+            PREFIX      :MM:__RAND:
+BinaryRead  IS          :BinaryRead
+            LDA         $3,:MM:__RAND:STRS:Urandom
+            SET         $4,BinaryRead
+            PUSHJ       $2,:MM:__FILE:OpenJ
+            JMP         4F
+            LDA         $1,:MM:__RAND:FileHandle
+            STO         $2,$1
+            JMP         2F
+4H          LDA         $2,:MM:__RAND:STRS:Init1
+            LDA         $3,:MM:__RAND:STRS:Init2
+            PUSHJ       $1,:MM:__ERROR:IError2 % does not return
+2H          SWYM
+
+
             .section .text,"ax",@progbits
             PREFIX      :MM:__RAND:
-Ftell       IS          :Ftell
-Fopen       IS          :Fopen
-Fread       IS          :Fread
-BinaryRead  IS          :BinaryRead
 
 t           IS          $255
 arg0        IS          $0
 arg1        IS          $1
 OCT         IS          #8
-
-
-%%
-%
-% :MM:__RAND:Init
-%
-% PUSHJ
-%   no arguments
-%   no return value
-%
-Init        GET         $0,:rJ
-            LDO         $1,:MM:__RAND:FileHandle
-            BN          $1,1F
-            % is the filehandle valid?
-            SET         $3,$1
-            PUSHJ       $2,:MM:__FILE:IsReadableJ
-            JMP         3F
-            JMP         2F
-1H          LDA         $3,:MM:__RAND:STRS:Urandom
-            SET         $4,BinaryRead
-            PUSHJ       $2,:MM:__FILE:Open
-            STO         $2,:MM:__RAND:FileHandle
-2H          PUT         :rJ,$0
-            POP         0,0
-3H          LDA         $2,:MM:__RAND:STRS:Init1
-            LDA         $3,:MM:__RAND:STRS:Init2
-            LDO         $4,:MM:__RAND:FileHandle
-            LDA         $5,:MM:__RAND:STRS:Init3
-            PUSHJ       $1,:MM:__ERROR:IError4R3 % does not return
-4H          LDA         $2,:MM:__RAND:STRS:Init1
-            LDA         $3,:MM:__RAND:STRS:Init4
-            PUSHJ       $1,:MM:__ERROR:IError2 % does not return
 
 
 %%
@@ -109,19 +87,18 @@ Init        GET         $0,:rJ
             % Arguments for Fread:
             .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
-            PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:LockMutexG
             PUT         :rJ,$5
             LDO         $4,:MM:__RAND:FileHandle
-            BNN         $4,1F
-            PUSHJ       t,Init
-            LDO         $4,:MM:__RAND:FileHandle
-1H          LDA         $2,:MM:__INTERNAL:Buffer
+            LDA         $2,:MM:__INTERNAL:Buffer
             SET         $3,#8
             PUSHJ       $1,:MM:__FILE:ReadJ
             JMP         9F
             PUT         :rJ,$0
             LDO         $0,:MM:__INTERNAL:Buffer
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            LDA         t,:MM:__INTERNAL:BufferMutex
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
             POP         1,0
 9H          LDA         $2,:MM:__RAND:STRS:Octa1
             PUSHJ       $1,:MM:__ERROR:IError1
@@ -167,18 +144,13 @@ RangeU      SWYM
 %
             .global :MM:__RAND:SetJ
 SetJ        GET         $3,:rJ
-            LDO         $7,:MM:__RAND:FileHandle
-            BNN         $7,1F
-            PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            PUSHJ       t,Init
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
-            LDO         $7,:MM:__RAND:FileHandle
-1H          ADDU        t,arg0,arg1
+            LDO         $5,:MM:__RAND:FileHandle
+            ADDU        t,arg0,arg1
             CMPU        t,t,arg0
             BN          t,9F
             BZ          arg1,1F % Nothing to do.
-            SET         $5,arg0
-            SET         $6,arg1
+            SET         $6,arg0
+            SET         $7,arg1
             PUSHJ       $4,:MM:__FILE:ReadJ
             JMP         9F
 1H          PUT         :rJ,$3
