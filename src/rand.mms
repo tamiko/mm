@@ -109,6 +109,8 @@ Init        GET         $0,:rJ
             % Arguments for Fread:
             .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            PUT         :rJ,$5
             LDO         $4,:MM:__RAND:FileHandle
             BNN         $4,1F
             PUSHJ       t,Init
@@ -119,6 +121,7 @@ Octa        GET         $0,:rJ
             JMP         9F
             PUT         :rJ,$0
             LDO         $0,:MM:__INTERNAL:Buffer
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             POP         1,0
 9H          LDA         $2,:MM:__RAND:STRS:Octa1
             PUSHJ       $1,:MM:__ERROR:IError1
@@ -166,7 +169,9 @@ RangeU      SWYM
 SetJ        GET         $3,:rJ
             LDO         $7,:MM:__RAND:FileHandle
             BNN         $7,1F
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,Init
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             LDO         $7,:MM:__RAND:FileHandle
 1H          ADDU        t,arg0,arg1
             CMPU        t,t,arg0
