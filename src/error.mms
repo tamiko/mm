@@ -48,7 +48,8 @@ Continued3  BYTE        "].",10,0
 InternErro  BYTE        "[MM library] Internal error: ",10
             BYTE        "[MM library]   ",0
 Error1      BYTE        "[MM library] Called from [:rJ-4 = ",0
-Error2      BYTE        "]:",10,"[MM library]   ",0
+Error2      BYTE        "] on thread [ThreadID = ",0
+Error3      BYTE        "]:",10,"[MM library]   ",0
 ErrorHndlC1 BYTE        "[MM library]   Calling error handler [",0
 ErrorHndlC2 BYTE        "].",10,0
 ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
@@ -235,6 +236,10 @@ Error0      SET         $10,t
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
+            TRAP        0,Fputs,StdErr
             JMP         ErrorHndl
 
 
@@ -254,6 +259,10 @@ Error1      SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -277,6 +286,10 @@ Error2      SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -303,6 +316,10 @@ Error3R2    SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -331,6 +348,10 @@ Error3RB2   SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -361,6 +382,10 @@ Error5R24   SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
+            TRAP        0,Fputs,StdErr
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -395,6 +420,10 @@ Error5RB24  SET         $10,t
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
+            PUSHJ       t,:MM:__THREAD:ThreadIDG
+            PUSHJ       t,ErrRegG
+            LDA         t,:MM:__ERROR:STRS:Error3
+            TRAP        0,Fputs,StdErr
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
