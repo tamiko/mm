@@ -66,8 +66,7 @@ OCT         IS          #8
 %
             % Allocate at least 128MiB (#0800 0000 bytes) and at least
             % twice the size as requested:
-Grow        GET         $10,:rJ
-            SLU         $0,arg0,1
+Grow        SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
             CSN         $0,t,$1
@@ -93,8 +92,8 @@ Grow        GET         $10,:rJ
             STO         $0,$2,OCT
             LDA         $5,:MM:__RAW_POOL:Pool
             STO         $2,$5
-            PUSHJ       t,Recompact
-            PUT         :rJ,$10
+            % Recompact:
+            SWYM
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
@@ -114,9 +113,11 @@ Grow        GET         $10,:rJ
 %     allocated via :MM:__RAW_POOL:Alloc
 %
             .global :MM:__RAW_POOL:Dealloc
-            % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
+ptr         IS          $2
+prev_ptr    IS          $3
 Dealloc     GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
             CSZ         arg1,arg1,#10
             ADDU        arg1,arg1,#F
             ANDN        arg1,arg1,#F
@@ -130,75 +131,56 @@ Dealloc     GET         $10,:rJ
             LDA         $2,Stack_Segment
             CMPU        t,$2,$3
             BNP         t,1F
-            LDA         $5,:MM:__RAW_POOL:Pool
-            LDO         $5,$5
-            STO         $5,arg0,0 % pointer
-            STO         arg1,arg0,OCT % size
-            LDA         $5,:MM:__RAW_POOL:Pool
-            STO         arg0,$5 % update pointer
-            PUSHJ       t,Recompact
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            %
+            % We must keep the linked list of free memory regions sorted!
+            %
+            LDA         $4,:MM:__RAW_POOL:Pool
+            LDO         ptr,$4
+            SET         prev_ptr,#0
+3H          CMPU        t,arg0,ptr
+            BN          t,2F
+            SET         prev_ptr,ptr
+            LDO         ptr,ptr
+            CMPU        t,ptr,#0
+            BNZ         t,3B
+            % We have prev_ptr < arg0 < ptr:
+2H          STO         ptr,arg0,#0
+            STO         arg1,arg0,#8
+            BNZ         prev_ptr,9F
+            STO         arg0,$4
+            JMP         8F
+9H          STO         arg0,prev_ptr
+            % Recompact:
+8H          BZ          prev_ptr,4F
+            LDO         $4,prev_ptr,#8
+            ADDU        $4,$4,prev_ptr
+            CMP         $4,$4,arg0
+            BNZ         $4,4F
+            % Merge prev_ptr and arg0:
+            LDO         $4,arg0,#0
+            STO         $4,prev_ptr,#0
+            LDO         $4,arg0,#8
+            LDO         $5,prev_ptr,#8
+            ADDU        $4,$5,$4
+            STO         $4,prev_ptr,#8
+            SET         arg0,prev_ptr
+4H          BZ          ptr,4F
+            LDO         $4,arg0,#8
+            ADDU        $4,$4,arg0
+            CMP         $4,$4,ptr
+            BNZ         $4,4F
+            % Merge arg0 and ptr:
+            LDO         $4,ptr,#0
+            STO         $4,arg0,#0
+            LDO         $4,ptr,#8
+            LDO         $5,arg0,#8
+            ADDU        $4,$5,$4
+            STO         $4,arg0,#8
+4H          PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$10
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
-
-%%
-% :MM:__RAW_POOL:Recompact
-%
-% A rudimentary reduction strategy: Merge adjacents blocks of memory
-% that can be easily spotted by a linear search
-%
-% PUSHJ:
-%   no arguments
-%   no return value
-%
-ptrB        IS          $0
-ptrC        IS          $1
-sizeC       IS          $2
-ptrN        IS          $3
-sizeN       IS          $4
-Recompact   LDA         $1,:MM:__RAW_POOL:Pool
-            LDO         ptrC,$1 % current ptr
-            BZ          $1,2F % nothing to do
-            SET         ptrB,0
-9H          LDO         sizeC,ptrC,OCT % current size
-            LDO         ptrN,ptrC,0 % next ptr
-            CMPU        t,ptrN,0 % nothing more to do
-            BZ          t,2F
-            LDO         sizeN,ptrN,OCT % next size
-            % First case, merge if ptrC + sizeC = ptrN:
-            ADDU        t,ptrC,sizeC
-            CMPU        t,t,ptrN
-            BNZ         t,1F
-            LDO         t,ptrN,0 % update ptr
-            STO         t,ptrC,0
-            STCO        0,ptrN,0 % clear data
-            STCO        0,ptrN,OCT
-            ADDU        t,sizeC,sizeN % update size
-            STO         t,ptrC,OCT
-            JMP         9B
-            % Second case, merge if ptrN + sizeN = ptrC:
-1H          ADDU        t,ptrN,sizeN
-            CMPU        t,t,ptrC
-            BNZ         t,1F
-            STCO        0,ptrC,0 % clear data
-            STCO        0,ptrC,OCT
-            ADDU        sizeN,sizeN,sizeC % update size
-            STO         sizeN,ptrN,OCT
-            BZ          ptrB,3F
-            STO         ptrN,ptrB,0
-            SET         ptrC,ptrN
-            JMP         9B
-3H          LDA         $5,:MM:__RAW_POOL:Pool
-            STO         ptrN,$5
-            SET         ptrC,ptrN
-            JMP         9B
-            % Advance pointer
-1H          SET         ptrB,ptrC
-            SET         ptrC,ptrN
-            JMP         9B
-2H          POP         0
 
 %%
 % :MM:__RAW_POOL:Alloc
@@ -212,8 +194,7 @@ Recompact   LDA         $1,:MM:__RAW_POOL:Pool
             .global :MM:__RAW_POOL:Alloc
 ptr         IS          $1
 prev_ptr    IS          $2
-            % Align arg1 to 2 * 8 and make sure to request at least
-            % 2*OCT:
+            % Align arg0 to 2 * 8 and make sure to request at least 2*OCT:
 Alloc       GET         $5,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             CSZ         arg0,arg0,#10
