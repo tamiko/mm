@@ -255,7 +255,7 @@ Error0      SET         $10,t
 Error1      SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
@@ -282,7 +282,7 @@ Error1      SET         $10,t
 Error2      SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
@@ -312,7 +312,7 @@ Error2      SET         $10,t
 Error3R2    SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
@@ -344,7 +344,7 @@ Error3R2    SET         $10,t
 Error3RB2   SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
@@ -378,7 +378,7 @@ Error3RB2   SET         $10,t
 Error5R24   SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2
@@ -416,7 +416,7 @@ Error5R24   SET         $10,t
 Error5RB24  SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
-            SET         t,$0
+            SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Error2

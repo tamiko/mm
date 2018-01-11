@@ -20,8 +20,6 @@ str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
 str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
 str_hndl3   BYTE        "    :MM:__INTERNAL:ExcHandler  [ ",0
 str_aterror BYTE        "    :MM:__SYS:AtErrorAddr      [ ",0
-str_fpool   BYTE        "    :MM:__FILE:Pool            [ ",0
-str_buffer  BYTE        "    :MM:__INTERNAL:Buffer      [ ",0
 str_between BYTE        " ]    -->    [ ",0
 str_argc    BYTE        "    argc:                      [ ",0
 str_argv    BYTE        "    argv:                      [ ",0
@@ -113,11 +111,6 @@ Main        SET         $2,t
             LDA         $4,str_aterror
             PUSHJ       $3,AddressOf2
             LDA         $5,:MM:__FILE:Pool
-            LDA         $4,str_fpool
-            PUSHJ       $3,AddressOf
-            LDA         $5,:MM:__INTERNAL:Buffer
-            LDA         $4,str_buffer
-            PUSHJ       $3,AddressOf
             PUSHJ       t,:MM:Print:Ln
 
             LDA         t,str_header3
