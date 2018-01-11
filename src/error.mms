@@ -227,7 +227,7 @@ IError4R3   LDA         t,:MM:__ERROR:STRS:InternErro
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error0
-Error0      SET         $0,t
+Error0      SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -247,7 +247,7 @@ Error0      SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error1
-Error1      SET         $0,t
+Error1      SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -270,7 +270,7 @@ Error1      SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error2
-Error2      SET         $0,t
+Error2      SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -296,7 +296,7 @@ Error2      SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error3R2
-Error3R2    SET         $0,t
+Error3R2    SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -324,7 +324,7 @@ Error3R2    SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error3RB2
-Error3RB2   SET         $0,t
+Error3RB2   SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -354,7 +354,7 @@ Error3RB2   SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error5R24
-Error5R24   SET         $0,t
+Error5R24   SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -388,7 +388,7 @@ Error5R24   SET         $0,t
 %   - routine does not return -
 %
             .global :MM:__ERROR:Error5RB24
-Error5RB24  SET         $0,t
+Error5RB24  SET         $10,t
             LDA         t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$0
@@ -411,8 +411,7 @@ Error5RB24  SET         $0,t
 
             % Respect a possible error handler:
             .global     :MM:__ERROR:ErrorHndl
-ErrorHndl   SET         $3,$0
-            LDO         $0,:MM:__SYS:AtErrorAddr
+ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             BZ          $0,1F
             % Check for special value #-1
             SET         $1,1
@@ -429,15 +428,15 @@ ErrorHndl   SET         $3,$0
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
-            SET         t,$3
+            SET         t,$10
             GO          $0,$0 % call error handler
             LDA         t,:MM:__ERROR:STRS:Continued1
             TRAP        0,Fputs,StdErr
-2H          SET         t,$3
+2H          SET         t,$10
             PUSHJ       t,ErrRegG
             LDA         t,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
-            PUT         :rJ,$3
+            PUT         :rJ,$10
             POP         0,0 % continue execution
 1H          LDA         t,:MM:__ERROR:STRS:Terminated
             TRAP        0,Fputs,StdErr
