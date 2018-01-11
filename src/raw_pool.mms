@@ -267,8 +267,8 @@ __retry     SET         $7,arg0
             SUBU        arg0,arg0,OCT
             ADDU        $3,ptr,arg0
 __out       BNZ         prev_ptr,9F
-            LDA         $3,:MM:__RAW_POOL:Pool
-            STO         $2,$3
+            LDA         $2,:MM:__RAW_POOL:Pool
+            STO         $3,$2
             JMP         8F
 9H          STO         $2,prev_ptr
 8H          SET         arg0,ptr
