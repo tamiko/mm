@@ -90,10 +90,6 @@ DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
 SwitchError BYTE        "Fatal error during context switch.",10,0
 
             .section .text,"ax",@progbits
-            .global :MM:__INTERNAL:Yield
-            .global :MM:__INTERNAL:Create
-            .global :MM:__INTERNAL:Clone
-            .global :MM:__INTERNAL:Exit
             .global :MM:__INTERNAL:TripHandler
             PREFIX      :MM:__INTERNAL:
 

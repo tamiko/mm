@@ -42,6 +42,11 @@ UnlockMFail BYTE        "Thread:UnlockMutex failed. Mutex is not locked by "
             PREFIX      :MM:__THREAD:
 interval    OCTA        #FFFFFFFFFFFFFFFF
 
+            PREFIX      :MM:__INTERNAL:
+Yield       IS          #00
+Create      IS          #D0
+Clone       IS          #E0
+Exit        IS          #F0
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__THREAD:
