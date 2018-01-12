@@ -203,6 +203,7 @@ Unlock      SET         $3,arg0
 %   retm - file handle on success / 0 on error
 %
 
+            .global :MM:__FILE:OpenTable
             .global :MM:__FILE:OpenJ
             % A lot of table...
 OpenTable   TRAP 0,Fopen,0; JMP 7F
@@ -555,6 +556,7 @@ Open        CMPU        t,arg1,4
 %   no return value
 %
 
+            .global :MM:__FILE:CloseTable
             .global :MM:__FILE:CloseJ
 CloseTable  TRAP 0,Fclose,0; JMP 7F
             TRAP 0,Fclose,1; JMP 7F
@@ -1023,6 +1025,7 @@ IsWritable  GET         $1,:rJ
 % :MM:__FILE:TellG
 %
 
+            .global :MM:__FILE:TellTable
             .global :MM:__FILE:TellJ
             .global :MM:__FILE:TellG
             .global :MM:__FILE:Tell
@@ -1378,6 +1381,7 @@ SizeG       GET         $0,:rJ
 % :MM:__FILE:Seek
 %
 
+            .global :MM:__FILE:SeekTable
             .global :MM:__FILE:SeekJ
             .global :MM:__FILE:Seek
 SeekTable   TRAP 0,Fseek,0; JMP 7F
@@ -1681,6 +1685,7 @@ Seek        SET         $4,arg0
 ReadBuffer  OCTA        #0,#0,#0
 
             .section .text,"ax",@progbits
+            .global :MM:__FILE:ReadTable
             .global :MM:__FILE:ReadJ
             .global :MM:__FILE:Read
 ReadTable   TRAP 0,Fread,0; JMP 7F
@@ -1994,6 +1999,7 @@ Read        SET         $4,arg2
 WriteBuffer OCTA        #0,#0,#0
 
             .section .text,"ax",@progbits
+            .global :MM:__FILE:WriteTable
             .global :MM:__FILE:WriteJ
             .global :MM:__FILE:Write
 WriteTable  TRAP 0,Fwrite,0; JMP 7F
