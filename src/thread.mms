@@ -311,6 +311,26 @@ WaitG       GET         $0,:rJ
 
 
 %%
+% :MM:__THREAD:WaitAll
+%
+% PUSHJ
+%   no arguments
+%   no return values
+%
+            .global :MM:__THREAD:WaitAll
+WaitAll     GET         $2,:rJ
+            LDA         $0,:MM:__INTERNAL:ThreadRing
+            LDO         $0,$0
+2H          LDO         $1,$0,#10
+            CMP         $1,$0,$1
+            BZ          $1,1F
+            PUSHJ       t,:MM:__THREAD:Yield
+            JMP         2B
+1H          PUT         :rJ,$2
+            POP         0,0
+
+
+%%
 % :MM:__THREAD:LockMutex
 %
 % PUSHJ

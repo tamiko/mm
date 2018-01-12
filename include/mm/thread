@@ -196,6 +196,19 @@ Thread:WaitG IS    :MM:__THREAD:WaitG
 
 
 %%
+% :MM:Thread:WaitAll
+%
+%   Wait for all other threads to exit. This routine stalls execution on
+%   the current thread by yielding repeatedly until all other threads exit.
+%
+%   PUSHJ
+%   no arguments
+%   no return values
+%
+Thread:WaitAll IS  :MM:__THREAD:WaitAll
+
+
+%%
 % :MM:Thread:LockMutex
 %
 %   Lock Mutex M8(arg0). The method waits (and yields) until a mutex is
