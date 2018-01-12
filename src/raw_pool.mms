@@ -54,49 +54,6 @@ arg0        IS          $0
 arg1        IS          $1
 OCT         IS          #8
 
-%%
-% :MM:__RAW_POOL:Grow
-%   Increase available memory by allocating memory from the pool
-%   segment. Ensure that at least a continuous block of arg0 bytes is
-%   available for allocation
-%
-% PUSHJ:
-%   arg0 - minimal size of a continous block available
-%   no return value
-%
-            % Allocate at least 128MiB (#0800 0000 bytes) and at least
-            % twice the size as requested:
-Grow        SLU         $0,arg0,1
-            SETML       $1,#0800
-            CMPU        t,$0,$1
-            CSN         $0,t,$1
-            ADDU        $0,$0,#F
-            ANDN        $0,$0,#F
-            LDA         $1,Pool_Segment
-            LDO         $2,$1
-            ADDU        $2,$2,#F
-            ANDN        $2,$2,#F % align
-            ADDU        $3,$2,$0
-            CMPU        t,$1,$2 % valid pointer in M_8[:Pool_Segment]?
-            BNN         t,1F
-            CMPU        t,$1,$3
-            BNN         t,1F % check for overflow
-            LDA         $4,Stack_Segment
-            CMPU        t,$4,$3 % check for valid range
-            BNP         t,1F
-            SET         t,$3
-            STO         $3,$1,0
-            LDA         $5,:MM:__RAW_POOL:Pool
-            LDO         $5,$5
-            STO         $5,$2,0
-            STO         $0,$2,OCT
-            LDA         $5,:MM:__RAW_POOL:Pool
-            STO         $2,$5
-            % Recompact:
-            SWYM
-            POP         0
-1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
 % :MM:__RAW_POOL:Dealloc
@@ -180,6 +137,76 @@ Dealloc     GET         $10,:rJ
             PUT         :rJ,$10
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+
+
+%%
+% :MM:__RAW_POOL:Grow
+%   Increase available memory by allocating memory from the pool
+%   segment. Ensure that at least a continuous block of arg0 bytes is
+%   available for allocation
+%
+% PUSHJ:
+%   arg0 - minimal size of a continous block available
+%   no return value
+%
+            % Allocate
+            %   - at least 128MiB (#0800 0000 bytes)
+            %   - at least twice the size as requested
+            %   - align to 2OCTA
+            .global :MM:__RAW_POOL:Grow
+ptr         IS          $2
+prev_ptr    IS          $3
+Grow        SLU         $0,arg0,1
+            SETML       $1,#0800
+            CMPU        t,$0,$1
+            CSN         $0,t,$1
+            ADDU        $0,$0,#F
+            ANDN        $0,$0,#F
+            % Sanity checks:
+            LDA         $1,Pool_Segment
+            LDO         $2,$1
+            ADDU        $2,$2,#F
+            ANDN        $2,$2,#F % align
+            ADDU        $3,$2,$0
+            CMPU        t,$1,$2 % valid pointer in M_8[:Pool_Segment]?
+            BNN         t,1F
+            CMPU        t,$1,$3
+            BNN         t,1F % check for overflow
+            LDA         $4,Stack_Segment
+            CMPU        t,$4,$3 % check for valid range
+            BNP         t,1F
+            STO         $3,$1,0
+            SET         $1,$2
+            SET         t,#0000
+            STO         t,$1,#0
+            STO         $0,$1,#8
+            % Get to last entry:
+            LDA         $4,:MM:__RAW_POOL:Pool
+            LDO         ptr,$4
+            SET         prev_ptr,#0
+2H          CMPU        t,ptr,#0
+            BZ          t,3F
+            SET         prev_ptr,ptr
+            LDO         ptr,ptr
+            JMP         2B
+3H          BNZ         prev_ptr,9F
+            STO         $1,$4
+            JMP         8F
+9H          STO         $1,prev_ptr
+            % Recompact:
+            LDO         $4,prev_ptr,#8
+            ADDU        $4,$4,prev_ptr
+            CMP         $4,$4,$1
+            BNZ         $4,8F
+            % Merge prev_ptr and arg0:
+            SET         t,#0000
+            STO         t,prev_ptr,#0
+            LDO         $4,prev_ptr,#8
+            ADDU        $4,$4,$0
+            STO         $4,prev_ptr,#8
+8H          POP         0
+1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
