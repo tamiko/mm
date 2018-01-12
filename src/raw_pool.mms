@@ -264,7 +264,7 @@ __retry     SET         $7,arg0
             LDO         ptr,ptr
             CMPU        t,ptr,0
             BNZ         t,3B
-            JMP         __retry % no luck
+            JMP         __retry % no luck, increase pool memory and retry.
             % chop off the rest:
 2H          LDO         t,ptr,0
             STO         t,ptr,arg0
