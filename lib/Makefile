@@ -10,9 +10,9 @@ ranlib=mmix-ranlib
 
 sources:=$(wildcard ../src/*.mms)
 objects:=$(patsubst ../src/%.mms,%.o,$(sources))
-objects:=$(filter-out mmi.o mmo.o,$(objects))
+objects:=$(filter-out mmi.o mmo.o guard.o,$(objects))
 
-all: libmm.a mmi.o mmo.o $(objects)
+all: libmm.a mmi.o mmo.o guard.o $(objects)
 
 %.i: ../src/%.mms
 	$(cpp) $(cpp_args) -I../include $< -o $@
