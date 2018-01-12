@@ -15,8 +15,9 @@ str_pool    BYTE        "    Pool segment:              [ ",0
 str_stack   BYTE        "    Stack segment:             [ ",0
 str_main    BYTE        "    Main:                      [ ",0
 str_hndl1   BYTE        "    :MM:__Init:__trip          [ ",0
-str_entry1  BYTE        "    :MM:__Init:__entry         [ ",0
-str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
+str_entry   BYTE        "    :MM:__Init:__entry         [ ",0
+str_guard   BYTE        "    :MM:__Init:__guard         [ ",0
+str_init    BYTE        "    :MM:__Init:__init          [ ",0
 str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
 str_hndl3   BYTE        "    :MM:__INTERNAL:ExcHandler  [ ",0
 str_aterror BYTE        "    :MM:__SYS:AtErrorAddr      [ ",0
@@ -92,10 +93,13 @@ Main        SET         $2,t
             LDA         $4,str_hndl1
             PUSHJ       $3,AddressOf
             LDA         $5,:MM:__INIT:__entry
-            LDA         $4,str_entry1
+            LDA         $4,str_entry
+            PUSHJ       $3,AddressOf
+            LDA         $5,:MM:__INIT:__guard
+            LDA         $4,str_guard
             PUSHJ       $3,AddressOf
             LDA         $5,:MM:__INIT:__init
-            LDA         $4,str_entry2
+            LDA         $4,str_init
             PUSHJ       $3,AddressOf
             PUSHJ       t,MM:Print:Ln
 
