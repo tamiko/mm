@@ -32,6 +32,8 @@
             .global     :MM:__STATISTICS:HeapGrow
             .global     :MM:__STATISTICS:HeapAlloc
             .global     :MM:__STATISTICS:HeapDealloc
+            .global     :MM:__STATISTICS:HeapMaxNonC
+            .global     :MM:__STATISTICS:HeapSizes
             PREFIX      :MM:__STATISTICS:
 HeapAlloc   OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
@@ -44,10 +46,10 @@ __debug     OCTA        #DEADBEEFDEADBEEF
             .section .data,"wa",@progbits
             PREFIX      :MM:__STATISTICS:STRS:
 heap_header BYTE        "Heap statistics:",10,0
-heap_alloc  BYTE        "    Number of allocations:          ",0
-heap_deallo BYTE        "    Number of deallocations:        ",0
-heap_grow   BYTE        "    Number of heap grow operations: ",0
-heap_nonc   BYTE        "    Maximal non contiguous:         ",0
+heap_alloc  BYTE        "    Number of allocations:            ",0
+heap_deallo BYTE        "    Number of deallocations:          ",0
+heap_grow   BYTE        "    Number of heap grow operations:   ",0
+heap_nonc   BYTE        "    Maximal free space fragmentation: ",0
 
 
 

@@ -14,7 +14,7 @@ objects:=$(filter-out mmi.o mmo.o guard.o,$(objects))
 
 all: libmm.a mmi.o mmo.o guard.o $(objects)
 
-%.i: ../src/%.mms ../src/statistics.mmh
+%.i: ../src/%.mms ../src/statistics.mmh Makefile
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
 %.o: %.i

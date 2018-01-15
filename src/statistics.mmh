@@ -28,14 +28,29 @@
 #define MM_INTERNAL_STATISTICS
 
 #ifdef STATISTICS
-#define INCREASE_COUNTER(label)        \
+
+#define INCREMENT_COUNTER(label)       \
             LDA         $30,label     ;\
             LDO         $31,$30       ;\
             ADDU        $31,$31,1     ;\
             STO         $31,$30
+
+#define STORE_MAX(register, label)        \
+            LDA         $30,label        ;\
+            LDO         $31,$30          ;\
+            ODIF        $30,register,$31 ;\
+            ADDU        $31,$31,$30      ;\
+            LDA         $30,label        ;\
+            STO         $31,$30
+
 #else
-#define INCREASE_COUNTER(label)        \
+
+#define INCREMENT_COUNTER(label)       \
             SWYM
+
+#define STORE_MAX(register, label)        \
+            SWYM
+
 #endif
 
 

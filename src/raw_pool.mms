@@ -74,7 +74,7 @@ OCT         IS          #8
             .global :MM:__RAW_POOL:Dealloc
 ptr         IS          $2
 prev_ptr    IS          $3
-Dealloc     INCREASE_COUNTER(:MM:__STATISTICS:HeapDealloc)
+Dealloc     INCREMENT_COUNTER(:MM:__STATISTICS:HeapDealloc)
             GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
@@ -136,7 +136,17 @@ Dealloc     INCREASE_COUNTER(:MM:__STATISTICS:HeapDealloc)
             LDO         $5,arg0,#8
             ADDU        $4,$5,$4
             STO         $4,arg0,#8
-4H          PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+4H          SWYM
+#ifdef STATISTICS
+            SET         $0,0
+            LDA         $1,:MM:__RAW_POOL:Pool
+7H          LDO         $1,$1
+            BZ          $1,8F
+            ADDU        $0,$0,1
+            JMP         7B
+8H          STORE_MAX($0, :MM:__STATISTICS:HeapMaxNonC)
+#endif
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$10
             POP         0
 1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
@@ -160,7 +170,7 @@ Dealloc     INCREASE_COUNTER(:MM:__STATISTICS:HeapDealloc)
             .global :MM:__RAW_POOL:Grow
 ptr         IS          $2
 prev_ptr    IS          $3
-Grow        INCREASE_COUNTER(:MM:__STATISTICS:HeapGrow)
+Grow        INCREMENT_COUNTER(:MM:__STATISTICS:HeapGrow)
             SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
@@ -226,7 +236,7 @@ Grow        INCREASE_COUNTER(:MM:__STATISTICS:HeapGrow)
 ptr         IS          $1
 prev_ptr    IS          $2
             % Align arg0 to 2 * 8 and make sure to request at least 2*OCT:
-Alloc       INCREASE_COUNTER(:MM:__STATISTICS:HeapAlloc)
+Alloc       INCREMENT_COUNTER(:MM:__STATISTICS:HeapAlloc)
             GET         $5,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             CSZ         arg0,arg0,#10
