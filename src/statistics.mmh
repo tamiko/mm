@@ -29,10 +29,10 @@
 
 #ifdef STATISTICS
 
-#define INCREMENT_COUNTER(label)       \
-            LDA         $30,label     ;\
-            LDO         $31,$30       ;\
-            ADDU        $31,$31,1     ;\
+#define INCREMENT_COUNTER(label,offset)   \
+            LDA         $30,label,offset ;\
+            LDO         $31,$30          ;\
+            ADDU        $31,$31,1        ;\
             STO         $31,$30
 
 #define STORE_MAX(register, label)        \
