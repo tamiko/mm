@@ -39,9 +39,7 @@ HeapAlloc   OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
 HeapGrow    OCTA        #0000000000000000
 HeapMaxNonC OCTA        #0000000000000000
-HeapSizes   OCTA        #0000000000000000
-            .fill       0x800
-__debug     OCTA        #DEADBEEFDEADBEEF
+HeapSizes   .fill       0x200
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__STATISTICS:STRS:
@@ -82,6 +80,11 @@ PrintHeap   GET         $0,:rJ
             LDA         $255,:MM:__STATISTICS:HeapMaxNonC
             LDO         $255,$255
             PUSHJ       $255,:MM:__PRINT:UnsignedG
+            PUSHJ       $255,:MM:__PRINT:Ln
+            PUSHJ       $255,:MM:__PRINT:Ln
+            LDA         $2,:MM:__STATISTICS:HeapSizes
+            SET         $3,#208
+            PUSHJ       $1,:MM:__PRINT:MemLn
             PUSHJ       $255,:MM:__PRINT:Ln
             PUT         :rJ,$0
             POP         0

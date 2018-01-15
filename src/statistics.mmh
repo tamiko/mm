@@ -30,7 +30,8 @@
 #ifdef STATISTICS
 
 #define INCREMENT_COUNTER(label,offset)   \
-            LDA         $30,label,offset ;\
+            LDA         $30,label        ;\
+            ADDU        $30,$30,offset   ;\
             LDO         $31,$30          ;\
             ADDU        $31,$31,1        ;\
             STO         $31,$30

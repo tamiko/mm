@@ -74,9 +74,9 @@ OCT         IS          #8
             .global :MM:__RAW_POOL:Dealloc
 ptr         IS          $2
 prev_ptr    IS          $3
-Dealloc     INCREMENT_COUNTER(:MM:__STATISTICS:HeapDealloc)
-            GET         $10,:rJ
+Dealloc     GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            INCREMENT_COUNTER(:MM:__STATISTICS:HeapDealloc, 0)
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
             CSZ         arg1,arg1,#10
             ADDU        arg1,arg1,#F
@@ -170,7 +170,7 @@ Dealloc     INCREMENT_COUNTER(:MM:__STATISTICS:HeapDealloc)
             .global :MM:__RAW_POOL:Grow
 ptr         IS          $2
 prev_ptr    IS          $3
-Grow        INCREMENT_COUNTER(:MM:__STATISTICS:HeapGrow)
+Grow        INCREMENT_COUNTER(:MM:__STATISTICS:HeapGrow, 0)
             SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
@@ -236,12 +236,20 @@ Grow        INCREMENT_COUNTER(:MM:__STATISTICS:HeapGrow)
 ptr         IS          $1
 prev_ptr    IS          $2
             % Align arg0 to 2 * 8 and make sure to request at least 2*OCT:
-Alloc       INCREMENT_COUNTER(:MM:__STATISTICS:HeapAlloc)
-            GET         $5,:rJ
+Alloc       GET         $5,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            INCREMENT_COUNTER(:MM:__STATISTICS:HeapAlloc, 0)
             CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
+#ifdef STATISTICS
+            SRU         t,arg0,3
+            SUBU        t,t,8
+            SET         $1,#01F8
+            ODIF        $1,t,$1
+            SUBU        t,t,$1
+            INCREMENT_COUNTER(:MM:__STATISTICS:HeapSizes, t)
+#endif
             %
             % Initialize the pool if necessary:
             %
