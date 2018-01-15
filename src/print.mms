@@ -235,6 +235,10 @@ Unsigned    GET         $10,:rJ
             STB         t,buffer,ptr
             SUB         ptr,ptr,1
             SET         $4,$0
+            BNZ         $4,9F
+            SET         t,48
+            STB         t,buffer,ptr
+            SUBU        ptr,ptr,1
             % Yes, I know.. it is div...
 9H          DIVU        $4,$4,10
             GET         t,:rR

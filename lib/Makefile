@@ -1,5 +1,5 @@
 cpp=cpp
-cpp_args=-D__GNU_AS -D__MMIXWARE
+cpp_args=-D__GNU_AS -D__MMIXWARE -DSTATISTICS
 as=mmix-as
 as_args=-g -x -linker-allocated-gregs
 ld=mmix-ld
@@ -14,7 +14,7 @@ objects:=$(filter-out mmi.o mmo.o guard.o,$(objects))
 
 all: libmm.a mmi.o mmo.o guard.o $(objects)
 
-%.i: ../src/%.mms
+%.i: ../src/%.mms ../src/statistics.mmh
 	$(cpp) $(cpp_args) -I../include $< -o $@
 
 %.o: %.i

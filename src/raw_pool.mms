@@ -24,6 +24,8 @@
 % SOFTWARE.
 %%
 
+#include "statistics.mmh"
+
 %
 % :MM:__RAW_POOL:
 %
@@ -72,7 +74,8 @@ OCT         IS          #8
             .global :MM:__RAW_POOL:Dealloc
 ptr         IS          $2
 prev_ptr    IS          $3
-Dealloc     GET         $10,:rJ
+Dealloc     INCREASE_COUNTER(:MM:__STATISTICS:HeapDealloc)
+            GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
             CSZ         arg1,arg1,#10
@@ -157,7 +160,8 @@ Dealloc     GET         $10,:rJ
             .global :MM:__RAW_POOL:Grow
 ptr         IS          $2
 prev_ptr    IS          $3
-Grow        SLU         $0,arg0,1
+Grow        INCREASE_COUNTER(:MM:__STATISTICS:HeapGrow)
+            SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
             CSN         $0,t,$1
@@ -222,7 +226,8 @@ Grow        SLU         $0,arg0,1
 ptr         IS          $1
 prev_ptr    IS          $2
             % Align arg0 to 2 * 8 and make sure to request at least 2*OCT:
-Alloc       GET         $5,:rJ
+Alloc       INCREASE_COUNTER(:MM:__STATISTICS:HeapAlloc)
+            GET         $5,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
