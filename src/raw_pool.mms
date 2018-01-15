@@ -245,7 +245,7 @@ Alloc       GET         $5,:rJ
 #ifdef STATISTICS
             SRU         t,arg0,3
             SUBU        t,t,8
-            SET         $1,#01F8
+            SET         $1,#00F8
             ODIF        $1,t,$1
             SUBU        t,t,$1
             INCREMENT_COUNTER(:MM:__STATISTICS:HeapSizes, t)
