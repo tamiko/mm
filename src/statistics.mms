@@ -153,7 +153,3 @@ PrintHeap   GET         $0,:rJ
             JMP         1B
 9H          PUT         :rJ,$0
             POP         0
-
-
-            %LDA         t,:MM:__INTERNAL:BufferMutex
-            %PUSHJ       t,:MM:__THREAD:LockMutexG
