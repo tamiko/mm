@@ -108,15 +108,28 @@ PrintHeap   GET         $0,:rJ
 3H          PUSHJ       $255,:MM:__PRINT:StrG
             ADDU        $5,$1,#8
             SLU         $5,$5,3
-            SET         $6,6
-            SET         $7,8
-            PUSHJ       $4,:MM:__PRINT:RegP
+            SET         $255,10
+            CMP         $255,$5,$255
+            BNN         $255,5F
+            LDA         $255,:MM:__STATISTICS:STRS:heap_hist7
+            PUSHJ       $255,:MM:__PRINT:StrG
+5H          SET         $255,100
+            CMP         $255,$5,$255
+            BNN         $255,5F
+            LDA         $255,:MM:__STATISTICS:STRS:heap_hist7
+            PUSHJ       $255,:MM:__PRINT:StrG
+5H          SET         $255,1000
+            CMP         $255,$5,$255
+            BNN         $255,5F
+            LDA         $255,:MM:__STATISTICS:STRS:heap_hist7
+            PUSHJ       $255,:MM:__PRINT:StrG
+5H          PUSHJ       $4,:MM:__PRINT:Unsigned
             LDA         $255,:MM:__STATISTICS:STRS:heap_hist4
             PUSHJ       $255,:MM:__PRINT:StrG
             SET         $4,#0000
             PUT         :rD,$4
             LDO         $4,$3,$1
-            MULU        $4,$4,#20
+            MULU        $4,$4,#40
             DIVU        $4,$4,$2
             GET         $255,:rR
             BNP         $255,7F
@@ -129,7 +142,7 @@ PrintHeap   GET         $0,:rJ
 5H          LDA         $255,:MM:__STATISTICS:STRS:heap_hist6
 6H          PUSHJ       $255,:MM:__PRINT:StrG
             ADDU        $5,$5,1
-            CMPU        $255,$5,32
+            CMPU        $255,$5,64
             BNZ         $255,4B
             LDA         $255,:MM:__STATISTICS:STRS:heap_hist5
             PUSHJ       $255,:MM:__PRINT:StrG
