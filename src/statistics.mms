@@ -92,12 +92,10 @@ PrintHeap   GET         $0,:rJ
             %
             % Print a histogram:
             %
-
             SET         $1,#0000
             LDA         $2,:MM:__STATISTICS:HeapAlloc
             LDO         $2,$2
             LDA         $3,:MM:__STATISTICS:HeapSizes
-
 1H          SET         $255,#0100
             CMPU        $255,$1,$255
             BNN         $255,9F
@@ -138,13 +136,8 @@ PrintHeap   GET         $0,:rJ
             LDO         $255,$3,$1
             PUSHJ       $255,:MM:__PRINT:UnsignedG
             PUSHJ       $255,:MM:__PRINT:Ln
-
             ADD         $1,$1,#0008
             JMP         1B
-
-            %
-            %
-            %
 9H          PUT         :rJ,$0
             POP         0
 
