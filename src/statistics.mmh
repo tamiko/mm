@@ -29,28 +29,32 @@
 
 #ifdef STATISTICS
 
-#define INCREMENT_COUNTER(label,offset)   \
-            LDA         $30,label        ;\
-            ADDU        $30,$30,offset   ;\
-            LDO         $31,$30          ;\
-            ADDU        $31,$31,1        ;\
+            .macro      INCREMENT_COUNTER label offset=0
+            LDA         $30,\label
+            ADDU        $30,$30,\offset
+            LDO         $31,$30
+            ADDU        $31,$31,1
             STO         $31,$30
+            .endm
 
-#define STORE_MAX(register, label)        \
-            LDA         $30,label        ;\
-            LDO         $31,$30          ;\
-            ODIF        $30,register,$31 ;\
-            ADDU        $31,$31,$30      ;\
-            LDA         $30,label        ;\
+            .macro      STORE_MAX register label
+            LDA         $30,\label
+            LDO         $31,$30
+            ODIF        $30,\register,$31
+            ADDU        $31,$31,$30
+            LDA         $30,\label
             STO         $31,$30
+            .endm
 
 #else
 
-#define INCREMENT_COUNTER(label)       \
+            .macro      INCREMENT_COUNTER label offset=0
             SWYM
+            .endm
 
-#define STORE_MAX(register, label)        \
+            .macro      STORE_MAX register label
             SWYM
+            .endm
 
 #endif
 

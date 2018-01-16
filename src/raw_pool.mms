@@ -76,7 +76,7 @@ ptr         IS          $2
 prev_ptr    IS          $3
 Dealloc     GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            INCREMENT_COUNTER(:MM:__STATISTICS:HeapDealloc, 0)
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapDealloc
             % Align arg1 to 2*OCT and make sure it is at least 2*OCT:
             CSZ         arg1,arg1,#10
             ADDU        arg1,arg1,#F
@@ -144,7 +144,7 @@ Dealloc     GET         $10,:rJ
             BZ          $1,8F
             ADDU        $0,$0,1
             JMP         7B
-8H          STORE_MAX($0, :MM:__STATISTICS:HeapMaxNonC)
+8H          STORE_MAX   $0,:MM:__STATISTICS:HeapMaxNonC
 #endif
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$10
@@ -170,7 +170,8 @@ Dealloc     GET         $10,:rJ
             .global :MM:__RAW_POOL:Grow
 ptr         IS          $2
 prev_ptr    IS          $3
-Grow        INCREMENT_COUNTER(:MM:__STATISTICS:HeapGrow, 0)
+Grow        SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapGrow
             SLU         $0,arg0,1
             SETML       $1,#0800
             CMPU        t,$0,$1
@@ -238,7 +239,7 @@ prev_ptr    IS          $2
             % Align arg0 to 2 * 8 and make sure to request at least 2*OCT:
 Alloc       GET         $5,:rJ
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            INCREMENT_COUNTER(:MM:__STATISTICS:HeapAlloc, 0)
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapAlloc
             CSZ         arg0,arg0,#10
             ADDU        arg0,arg0,#F
             ANDN        arg0,arg0,#F
@@ -248,7 +249,7 @@ Alloc       GET         $5,:rJ
             SET         $1,#00F8
             ODIF        $1,t,$1
             SUBU        t,t,$1
-            INCREMENT_COUNTER(:MM:__STATISTICS:HeapSizes, t)
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapSizes,t
 #endif
             %
             % Initialize the pool if necessary:
