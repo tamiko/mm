@@ -61,6 +61,7 @@ heap_hist7  BYTE        " ",0
             .global     :MM:__STATISTICS:PrintHeap
             PREFIX      :MM:__STATISTICS:
 PrintHeap   GET         $0,:rJ
+            PUSHJ       $255,:MM:__PRINT:Ln
             LDA         $255,:MM:__STATISTICS:STRS:heap_header
             PUSHJ       $255,:MM:__PRINT:StrG
             LDA         $255,:MM:__STATISTICS:STRS:heap_alloc
