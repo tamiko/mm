@@ -144,7 +144,8 @@ Dealloc     GET         $10,:rJ
             BZ          $1,8F
             ADDU        $0,$0,1
             JMP         7B
-8H          STORE_MAX   $0,:MM:__STATISTICS:HeapMaxNonC
+8H          SWYM
+            STORE_MAX   $0,:MM:__STATISTICS:HeapMaxNonC
 #endif
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$10
