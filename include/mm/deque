@@ -28,9 +28,9 @@
 % TODO
 %
 
-#ifndef MM_ADT
-#define MM_ADT
+#ifndef MM_DEQUE
+#define MM_DEQUE
 
-#include "__internal/adt.mms"
+#include "__internal/deque.mms"
 
 #endif
