@@ -55,9 +55,9 @@
 %
 % :MM:Rand:OctaG
 %   Same as above but stores a random octa in the general register
-%   $255 instead of default PUSHJ linkage
+%   :MM:t instead of default PUSHJ linkage
 %
-%   PUSHJ $255
+%   PUSHJ
 %
 Rand:Octa   IS          :MM:__RAND:Octa
 Rand:OctaG  IS          :MM:__RAND:OctaG

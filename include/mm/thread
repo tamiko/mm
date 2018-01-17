@@ -59,7 +59,7 @@
 %   Same calling sequence as above.
 %
 % :MM:Thread:EnableG
-%   This variant passes retm through the general register $255.
+%   This variant passes retm through the general register :MM:t.
 %
 Thread:Enable IS      :MM:__THREAD:Enable
 Thread:EnableJ IS     :MM:__THREAD:EnableJ
@@ -107,7 +107,7 @@ Thread:ThreadIDG IS   :MM:__THREAD:ThreadIDG
 %   ThreadID of the clone) and to :rJ+#0 in the clone (no return value).
 %
 % :MM:Thread:CloneG
-%   This variant passes retm through the general register $255.
+%   This variant passes retm through the general register :MM:t.
 %
 Thread:Clone  IS    :MM:__THREAD:Clone
 Thread:CloneJ IS    :MM:__THREAD:CloneJ
@@ -125,7 +125,7 @@ Thread:CloneG IS    :MM:__THREAD:CloneG
 %   retm - The ThreadID of the new thread
 %
 % :MM:Thread:CreateG
-%   This variant passes retm through the general register $255.
+%   This variant passes retm through the general register :MM:t.
 %
 Thread:Create  IS   :MM:__THREAD:Create
 Thread:CreateG IS   :MM:__THREAD:CreateG
@@ -170,7 +170,7 @@ Thread:Exit  IS    :MM:__THREAD:Exit
 %   otherwise.
 %
 % :MM:Thread:IsRunningG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the general register :MM:t.
 %
 Thread:IsRunning IS :MM:__THREAD:IsRunning
 Thread:IsRunningJ IS :MM:__THREAD:IsRunningJ
@@ -189,7 +189,7 @@ Thread:IsRunningG IS :MM:__THREAD:IsRunningG
 %   no return values
 %
 % :MM:Thread:WaitG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the general register :MM:t.
 %
 Thread:Wait  IS    :MM:__THREAD:Wait
 Thread:WaitG IS    :MM:__THREAD:WaitG
@@ -223,7 +223,7 @@ Thread:WaitAll IS  :MM:__THREAD:WaitAll
 %   mutex could be locked successfully, otherwise :rJ+#0.
 %
 % :MM:Thread:LockMutexG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the general register :MM:t.
 %
 Thread:LockMutex IS :MM:__THREAD:LockMutex
 Thread:LockMutexJ IS :MM:__THREAD:LockMutexJ
@@ -244,7 +244,7 @@ Thread:LockMutexG IS :MM:__THREAD:LockMutexG
 %   instead of throwing an error message. Same calling sequence as above.
 %
 % :MM:Thread:UnlockMutexG
-%   This variant passes arg0 through the general register $255.
+%   This variant passes arg0 through the general register :MM:t.
 %
 Thread:UnlockMutex IS :MM:__THREAD:UnlockMutex
 Thread:UnlockMutexG IS :MM:__THREAD:UnlockMutexG

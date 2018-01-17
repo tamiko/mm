@@ -66,7 +66,7 @@
 %
 % :MM:File:LockG
 %   Variant of above function that passes arg0 in the global register
-%   $255. The value of $255 is preserved.
+%   :MM:t. The value of :MM:t is preserved.
 %
 % :MM:File:LockJ
 %   Variant of File:Lock that returns to :rJ+#4 on success, and
@@ -90,7 +90,7 @@ File:LockJ  IS          :MM:__FILE:LockJ
 %
 % :MM:File:UnlockG
 %   Variant of above function that passes arg0 in the global register
-%   $255.
+%   :MM:t.
 %
 % :MM:File:UnlockJ
 %   Variant of File:Unlock that returns to :rJ+#4 on success, and
@@ -145,7 +145,7 @@ File:OpenJ  IS          :MM:__FILE:OpenJ
 %
 % :MM:File:CloseG
 %   Variant of above function that passes arg0 in the global register
-%   $255.
+%   :MM:t.
 %
 % :MM:File:CloseJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
@@ -169,7 +169,7 @@ File:CloseJ IS          :MM:__FILE:CloseJ
 % :MM:File:IsOpenG
 % :MM:File:IsReadableG
 % :MM:File:IsWritableG
-%   Variants that pass arg0 and retm in the global register $255
+%   Variants that pass arg0 and retm in the global register :MM:t
 %
 % :MM:File:IsOpenJ
 % :MM:File:IsReadableJ
@@ -194,7 +194,7 @@ File:IsWritableJ IS     :MM:__FILE:IsWritableJ
 %
 % :MM:File:TellG
 %   Variant of above function that passes arg0 in the global register
-%   $255.
+%   :MM:t.
 %
 % :MM:File:TellJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
@@ -211,7 +211,7 @@ File:TellJ IS           :MM:__FILE:TellJ
 %
 % :MM:File:SizeG
 %   Variant of above function that passes arg0 in the global register
-%   $255.
+%   :MM:t.
 %
 % :MM:File:SizeJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.

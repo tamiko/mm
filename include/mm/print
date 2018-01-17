@@ -60,11 +60,11 @@
 %
 % :MM:Print:StrG
 % :MM:Print:StrLnG
-%   Print The null terminated string at memory location $255 on stdout
+%   Print The null terminated string at memory location :MM:t on stdout
 %   (StrG), or print and append a newline (StrLnG).
-%   The content of $255 is preserved.
+%   The content of :MM:t is preserved.
 %
-%   PUSHJ (,$255)
+%   PUSHJ
 %   no return value
 %
 Print:Str   IS          :MM:__PRINT:Str
@@ -88,10 +88,10 @@ Print:StrLnG IS         :MM:__PRINT:StrLnG
 %
 % :MM:Print:RegG
 % :MM:Print:RegLnG
-%   Pretty print the content of GREG $255 on std::out. The content of
-%   $255 is preserved.
+%   Pretty print the content of GREG :MM:t on std::out. The content of
+%   :MM:t is preserved.
 %
-%   PUSHJ (,$255)
+%   PUSHJ
 %   no return value
 %
 Print:Reg   IS          :MM:__PRINT:Reg
@@ -108,10 +108,10 @@ Print:RegLnG IS         :MM:__PRINT:RegLnG
 %   no return value
 %
 % :MM:Print:ByteG
-%   Pretty print the least significant byte of GREG $255 on stdout.
-%   The content of $255 is preserved.
+%   Pretty print the least significant byte of GREG :MM:t on stdout.
+%   The content of :MM:t is preserved.
 %
-%   PUSHJ (,$255)
+%   PUSHJ
 %   no return value
 %
 Print:Byte  IS          :MM:__PRINT:Byte
@@ -128,11 +128,11 @@ Print:ByteG IS          :MM:__PRINT:ByteG
 %   no return value
 %
 % :MM:Print:ByteG
-%   Pretty print the content of GREG $255 interpreted as a signed
+%   Pretty print the content of GREG :MM:t interpreted as a signed
 %   (:Signed) or unsigned (:Unsigned) integer in decimal notation on
-%   stdout. The content of GREG $255 is preserved.
+%   stdout. The content of GREG :MM:t is preserved.
 %
-%   PUSHJ (,$255)
+%   PUSHJ
 %   no return value
 %
 Print:Signed IS         :MM:__PRINT:Signed
@@ -154,10 +154,10 @@ Print:MemLn IS         :MM:__PRINT:MemLn
 
 %%
 % :MM:Print:Ln
-%   Print an newline character to stdout. The content of $255 is
+%   Print an newline character to stdout. The content of :MM:t is
 %   preserved.
 %
-%   PUSHJ (,$255)
+%   PUSHJ
 %   no return value
 %
 Print:Ln    IS          :MM:__PRINT:Ln
