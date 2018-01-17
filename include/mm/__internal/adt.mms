@@ -31,38 +31,120 @@
 
             .macro      __RESTORE_REGISTERS
             PUT         :rJ,:MM:__ADT:__t1
+            SET         :MM:__ADT:__t1,$255
             SET         $255,:MM:__ADT:__t2
+            CMP         :MM:__ADT:__t1,:MM:__ADT:__t1,#0
+            BZ          :MM:__ADT:__t1,@+#8
             .endm
 
+            %
+            %         ptr to next
+            %         ptr to previous
+            % ptr --> DATA
+            %
 
-            .macro      Stack:Push register size
+            .macro      Deque:__Push front back size side=0
             __SAVE_REGISTERS
+            BNZ         \front,__1h_dpu\@
+            % sanity check: both registers must be #0:
+            BNZ         \back,__er_dpu\@
+            % initialize:
             SET         $255,\size
-            ADDU        $255,$255,#8
+            ADDU        $255,$255,#10
             PUSHJ       $255,:MM:__HEAP:AllocG
-            STO         \register,$255,#0
-            ADDU        $255,$255,#8
-            SET         \register,$255
-            __RESTORE_REGISTERS
-            JMP         @+#8
-            .endm
-
-
-            .macro      Stack:Pop register
-            __SAVE_REGISTERS
-            SET         $255,\register
-            SUBU        $255,$255,#8
+            STO         $255,$255,#00
+            STO         $255,$255,#08
+            ADDU        $255,$255,#10
+            SET         \front,$255
+            SET         \back,$255
+            SET         $255,#0
+            JMP         __er_dpu\@+#4
+            % sanity check: both registers must hold a valid memory address:
+__1h_dpu\@  SET         $255,\front
+            SUBU        $255,$255,#10
             PUSHJ       $255,:MM:__HEAP:ValidG
-            BZ          $255,@+#10
-            __RESTORE_REGISTERS
-            JMP         @+#24
-            SET         $255,\register
-            SUBU        $255,$255,#8
-            SUBU        \register,\register,#8
-            LDO         \register,\register
-            PUSHJ       $255,:MM:__HEAP:DeallocG
-            __RESTORE_REGISTERS
+            BN          $255,__er_dpu\@
+            SET         $255,\back
+            SUBU        $255,$255,#10
+            PUSHJ       $255,:MM:__HEAP:ValidG
+            BN          $255,__er_dpu\@
+            % TODO: Additional checks?
+            SET         $255,\size
+            ADDU        $255,$255,#10
+            PUSHJ       $255,:MM:__HEAP:AllocG
+            SUBU        \front,\front,#10
+            SUBU        \back,\back,#10
+            STO         \back,$255,#08
+            STO         \front,$255,#00
+            STO         $255,\front,#08
+            STO         $255,\back,#00
+            .if \side
+            SET         \front,$255
+            .else
+            SET         \back,$255
+            .endif
+            ADDU        \front,\front,#10
+            ADDU        \back,\back,#10
+            SET         $255,#0
             JMP         @+#8
+__er_dpu\@  NEG         $255,0,1
+            __RESTORE_REGISTERS
+            .endm
+
+            .macro      Deque:PushFront front back size
+            Deque:__Push \front,\back,\size,1
+            .endm
+
+            .macro      Deque:PushBack front back size
+            Deque:__Push \front,\back,\size,0
             .endm
 
 
+            .macro      Deque:__Pop front back side=0
+            __SAVE_REGISTERS
+            % sanity check: both registers must hold a valid memory address:
+            SET         $255,\front
+            SUBU        $255,$255,#10
+            PUSHJ       $255,:MM:__HEAP:ValidG
+            BN          $255,__er_dpo\@
+            SET         $255,\back
+            SUBU        $255,$255,#10
+            PUSHJ       $255,:MM:__HEAP:ValidG
+            BN          $255,__er_dpo\@
+            % TODO: Additional checks?
+            CMP         $255,\front,\back
+            BNZ         $255,__1h_dpo\@
+            SET         $255,\front
+            SUBU        $255,$255,#10
+            PUSHJ       $255,:MM:__HEAP:DeallocG
+            SET         \front,#0
+            SET         \back,#0
+            SET         $255,#0
+            JMP         __er_dpo\@+#4
+__1h_dpo\@  SUBU        \front,\front,#10
+            SUBU        \back,\back,#10
+            .if \side
+            SET         $255,\front
+            LDO         \front,\front,#00
+            .else
+            SET         $255,\back
+            LDO         \back,\back,#08
+            .endif
+            PUSHJ       $255,:MM:__HEAP:DeallocG
+            STO         \front,\back,#00
+            STO         \back,\front,#08
+            ADDU        \front,\front,#10
+            ADDU        \back,\back,#10
+            SET         $255,#0
+            JMP         @+#8
+__er_dpo\@  NEG         $255,0,1
+            __RESTORE_REGISTERS
+            .endm
+
+            .macro      Deque:PopFront front back
+            Deque:__Pop \front,\back,1
+            .endm
+
+            .macro      Deque:PopBack front back
+            Deque:__Pop \front,\back,0
+            .endm
