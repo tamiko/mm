@@ -34,9 +34,10 @@
             .section .data,"wa",@progbits
             .global :MM:__INTERNAL:BufferMutex
             .global :MM:__INTERNAL:Buffer
-            .balign 8
             PREFIX      :MM:__INTERNAL:
+            .balign 8
 BufferMutex OCTA        #0000000000000000
+            .balign 8
 Buffer      IS          @
             .fill 128*8
 
@@ -47,6 +48,7 @@ Buffer      IS          @
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__INTERNAL:STRS:
+            .balign 4
 NotImplem   BYTE        "Arithmetic exception handler not implemented.\n",0
 
             .section .text,"ax",@progbits
@@ -56,7 +58,7 @@ ExcHandler  SWYM
             SET         $0,$255
             GET         $1,:rJ
             % We do not handle arithmetic exceptions at the moment.
-            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            GETA        $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 
@@ -88,8 +90,11 @@ ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__INTERNAL:STRS:
+            .balign 4
 Unhandled   BYTE        "Unhandled TRIP.\n",0
+            .balign 4
 DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
+            .balign 4
 SwitchError BYTE        "Fatal error during context switch.",10,0
 
             .section .text,"ax",@progbits
@@ -102,7 +107,7 @@ Create      IS          #D0
 Clone       IS          #E0
 Exit        IS          #F0
 
-9H          LDA         $1,:MM:__INTERNAL:STRS:SwitchError
+9H          GETA        $1,:MM:__INTERNAL:STRS:SwitchError
             PUSHJ       $0,:MM:__ERROR:IError1
 TripHandler SWYM
             STORE_SPECIAL :rU,:MM:__STATISTICS:__buffer
@@ -123,7 +128,7 @@ TripHandler SWYM
             SETML       $4,#FF00
             CMPU        $3,$3,$4
             BZ          $3,1F % explicit TRIP
-            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            GETA        $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
 1H          GET         $3,:rX
             SRU         $3,$3,8
@@ -136,15 +141,15 @@ TripHandler SWYM
             BZ          $4,DoClone
             CMP         $4,$3,Exit
             BZ          $4,DoExit
-            LDA         $1,:MM:__INTERNAL:STRS:Unhandled
+            GETA        $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
 
             %
             % Exit:
             %
 
-DoExit      LDA         $1,Stack_Segment
-            LDA         $4,:MM:__INTERNAL:ThreadRing
+DoExit      GETA        $1,Stack_Segment
+            GETA        $4,:MM:__INTERNAL:ThreadRing
             LDO         $4,$4
             LDO         $5,$4,#10 % previous
             LDO         $6,$4,#18 % next
@@ -166,7 +171,7 @@ DoExit      LDA         $1,Stack_Segment
 
 DoYield     SAVE        $255,0
             SET         $0,$255
-            LDA         $1,Stack_Segment
+            GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
@@ -177,7 +182,7 @@ DoYield     SAVE        $255,0
             SET         $7,$2
             PUSHJ       $4,:MM:__MEM:CopyJ
             JMP         9B
-            LDA         $4,:MM:__INTERNAL:ThreadRing
+            GETA        $4,:MM:__INTERNAL:ThreadRing
             LDO         $4,$4
             LDO         $5,$4,#08
             SET         $6,#0000
@@ -191,7 +196,7 @@ DoYield     SAVE        $255,0
 
 DoUnsave    SWYM
             INCREMENT_COUNTER :MM:__STATISTICS:ThreadSwitc
-            LDA         $5,:MM:__INTERNAL:ThreadRing
+            GETA        $5,:MM:__INTERNAL:ThreadRing
             STO         $4,$5
             LDO         $5,$4,#08
             SET         $6,#00EE % new
@@ -214,7 +219,7 @@ DoUnsave    SWYM
             % We have to UNSAVE in order to get :rO and :rS into a valid
             % state (matching the new register stack)
             UNSAVE      0,$0
-            LDA         $3,:MM:__INTERNAL:ThreadRing
+            GETA        $3,:MM:__INTERNAL:ThreadRing
             LDO         $3,$3
             LDO         $5,$3,#20
             PUSHJ       $4,:MM:__HEAP:DeallocJ
@@ -235,12 +240,12 @@ DoUnsave    SWYM
             SET         $6,#0000
             STO         $6,$4,#08
             % Store entry address in internal buffer:
-            LDA         $7,:MM:__INTERNAL:__buffer
+            GETA        $7,:MM:__INTERNAL:__buffer
             LDO         $6,$4,#28
             STO         $6,$7
             NEG         $6,0,1
             STO         $6,$4,#28
-            LDA         $4,:MM:__INTERNAL:ThreadTmpl
+            GETA        $4,:MM:__INTERNAL:ThreadTmpl
             LDO         $3,$4,#0
             LDO         $0,$4,#8
             % Overwrite stack:
@@ -259,7 +264,7 @@ DoUnsave    SWYM
             %
             SET         $255,#0
             PUT         :rJ,$255
-            LDA         $255,:MM:__INTERNAL:__buffer
+            GETA        $255,:MM:__INTERNAL:__buffer
             LDO         $255,$255
             PUT         :rW,$255
             %
@@ -267,7 +272,7 @@ DoUnsave    SWYM
             % the context (PUT, GET, RESUME) will advance the clock by
             % #0005. So increase the timer by that value.
             %
-            LDA         $255,:MM:__THREAD:interval
+            GETA        $255,:MM:__THREAD:interval
             LDO         $255,$255
             BN          $255,1F
             ADDU        $255,$255,#0005
@@ -285,7 +290,7 @@ DoCreate    GET         $3,:rZ
             PUSHJ       $4,:MM:__HEAP:AllocJ
             JMP         9B
             % Thread ID:
-            LDA         $5,:MM:__INTERNAL:NextID
+            GETA        $5,:MM:__INTERNAL:NextID
             LDO         $6,$5
             STO         $6,$4,#00
             ADDU        $6,$6,1
@@ -298,7 +303,7 @@ DoCreate    GET         $3,:rZ
             STO         $5,$4,#20 %
             STO         $3,$4,#28 % entry point for new thread
             % Update pointers:
-            LDA         $5,:MM:__INTERNAL:ThreadRing
+            GETA        $5,:MM:__INTERNAL:ThreadRing
             LDO         $5,$5
             LDO         $6,$5,#18
             STO         $5,$4,#10
@@ -306,7 +311,7 @@ DoCreate    GET         $3,:rZ
             STO         $4,$5,#18
             STO         $4,$6,#10
             % store the thread ID of the new process in :rY
-            LDA         $255,:MM:__INTERNAL:ThreadRing
+            GETA        $255,:MM:__INTERNAL:ThreadRing
             LDO         $255,$255
             LDO         $255,$255,#18
             LDO         $255,$255
@@ -319,7 +324,7 @@ DoCreate    GET         $3,:rZ
 
 DoClone     SAVE        $255,0
             SET         $0,$255
-            LDA         $1,Stack_Segment
+            GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
@@ -335,7 +340,7 @@ DoClone     SAVE        $255,0
             PUSHJ       $4,:MM:__HEAP:AllocJ
             JMP         9B
             % Thread ID:
-            LDA         $5,:MM:__INTERNAL:NextID
+            GETA        $5,:MM:__INTERNAL:NextID
             LDO         $6,$5
             STO         $6,$4,#00
             ADDU        $6,$6,1
@@ -344,7 +349,7 @@ DoClone     SAVE        $255,0
             SET         $5,#FF % sleep
             STO         $5,$4,#08
             % Update pointers:
-            LDA         $5,:MM:__INTERNAL:ThreadRing
+            GETA        $5,:MM:__INTERNAL:ThreadRing
             LDO         $5,$5
             LDO         $6,$5,#18
             STO         $5,$4,#10
@@ -356,7 +361,7 @@ DoClone     SAVE        $255,0
             STO         $0,$4,#28 % UNSAVE address
             UNSAVE      0,$0
             % store the thread ID of the clone in :rY
-            LDA         $255,:MM:__INTERNAL:ThreadRing
+            GETA        $255,:MM:__INTERNAL:ThreadRing
             LDO         $255,$255
             LDO         $255,$255,#18
             LDO         $255,$255
@@ -367,7 +372,7 @@ DoClone     SAVE        $255,0
 9H          GET         $3,:rW
             CMPU        $4,$2,$3
             BZ          $4,1F
-            LDA         $1,:MM:__INTERNAL:STRS:DoubleTrip
+            GETA        $1,:MM:__INTERNAL:STRS:DoubleTrip
             PUSHJ       $0,:MM:__ERROR:IError1
 1H          SET         $255,$0
             PUT         :rJ,$1
@@ -376,7 +381,7 @@ DoClone     SAVE        $255,0
             % the context (POP, SET, PUT, RESUME) will advance the clock by
             % #000B. So increase the timer by that value.
             %
-            LDA         $2,:MM:__THREAD:interval
+            GETA        $2,:MM:__THREAD:interval
             LDO         $2,$2
             BN          $2,1F
             ADDU        $2,$2,#000B
@@ -403,7 +408,7 @@ stored_int  OCTA        #FFFFFFFFFFFFFFFF
 EnterCritical SWYM
             GET         $0,:rI
             NEG         $1,0,1
-            LDA         $2,stored_int
+            GETA        $2,stored_int
             BN          $0,1F
             %
             % If :rI is negative we are either in the TripHandler or
@@ -420,7 +425,7 @@ EnterCritical SWYM
 
 
 LeaveCritical SWYM
-            LDA         $0,stored_int
+            GETA        $0,stored_int
             LDO         $0,$0
             BN          $0,1F
             STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingCriti

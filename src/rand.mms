@@ -31,15 +31,24 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__RAND:STRS:
+            .balign 4
 Urandom     BYTE        "/dev/urandom",0
+            .balign 4
 Init1       BYTE        "__RAND:Init failed. Unable to open '/dev/urandom'",0
+            .balign 4
 Init2       BYTE        ".",10,0
+            .balign 4
 Octa1       BYTE        "Rand:Octa failed. Could not read random data.",10,0
+            .balign 4
 Range1      BYTE        "Rand:Range failed. Invalid range specified, [arg0=",0
+            .balign 4
 Range2      BYTE        "] and [arg1=",0
+            .balign 4
 Range3      BYTE        "] do not define a valid interval.",10,0
+            .balign 4
 Range4      BYTE        "Heap:Range failed. Could not read from "
             BYTE        "filehandler [",0
+            .balign 4
 ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             BYTE        "(ExcNotImpl).",10,0
 
@@ -55,15 +64,15 @@ FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .section .init,"ax",@progbits
             PREFIX      :MM:__RAND:
 BinaryRead  IS          :BinaryRead
-            LDA         $3,:MM:__RAND:STRS:Urandom
+            GETA        $3,:MM:__RAND:STRS:Urandom
             SET         $4,BinaryRead
             PUSHJ       $2,:MM:__FILE:OpenJ
             JMP         4F
-            LDA         $1,:MM:__RAND:FileHandle
+            GETA        $1,:MM:__RAND:FileHandle
             STO         $2,$1
             JMP         2F
-4H          LDA         $2,:MM:__RAND:STRS:Init1
-            LDA         $3,:MM:__RAND:STRS:Init2
+4H          GETA        $2,:MM:__RAND:STRS:Init1
+            GETA        $3,:MM:__RAND:STRS:Init2
             PUSHJ       $1,:MM:__ERROR:IError2 % does not return
 2H          SWYM
 
@@ -87,20 +96,20 @@ OCT         IS          #8
             % Arguments for Fread:
             .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
-            LDA         t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
             PUT         :rJ,$5
             LDO         $4,:MM:__RAND:FileHandle
-            LDA         $2,:MM:__INTERNAL:Buffer
+            GETA        $2,:MM:__INTERNAL:Buffer
             SET         $3,#8
             PUSHJ       $1,:MM:__FILE:ReadJ
             JMP         9F
             PUT         :rJ,$0
             LDO         $0,:MM:__INTERNAL:Buffer
-            LDA         t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             POP         1,0
-9H          LDA         $2,:MM:__RAND:STRS:Octa1
+9H          GETA        $2,:MM:__RAND:STRS:Octa1
             PUSHJ       $1,:MM:__ERROR:IError1
 
 
@@ -130,7 +139,7 @@ OctaG       GET         $0,:rJ
             .global :MM:__RAND:RangeJ
 Range       SWYM
 RangeU      SWYM
-            LDA         $1,:MM:__RAND:STRS:ExcNotImpl
+            GETA        $1,:MM:__RAND:STRS:ExcNotImpl
             PUSHJ       $0,:MM:__ERROR:IError1
 
 

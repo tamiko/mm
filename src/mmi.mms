@@ -112,7 +112,7 @@ __init      PUT         :rW,$255      % RESUME at Main
             %           OCTA  pointer to stack image
             %           OCTA  UNSAVE address
             %
-            LDA         $1,Stack_Segment
+            GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
@@ -123,7 +123,7 @@ __init      PUT         :rW,$255      % RESUME at Main
             SET         $7,$2
             PUSHJ       $4,:MM:__MEM:CopyJ
             JMP         2F
-            LDA         $255,:MM:__INTERNAL:ThreadTmpl
+            GETA        $255,:MM:__INTERNAL:ThreadTmpl
             STO         $3,$255,#0
             STO         $0,$255,#8
             SET         $5,#30
@@ -137,7 +137,7 @@ __init      PUT         :rW,$255      % RESUME at Main
             NEG         $5,0,1
             STO         $5,$4,#20
             STO         $5,$4,#28
-            LDA         $6,:MM:__INTERNAL:ThreadRing
+            GETA        $6,:MM:__INTERNAL:ThreadRing
             STO         $4,$6
             %
             % Now, hide $0 with a PUSHJ
@@ -145,7 +145,7 @@ __init      PUT         :rW,$255      % RESUME at Main
             PUSHJ       $1,1F
 1H          SET         $255,#0
             JMP         3F
-2H          LDA         $1,:MM:__INIT:STRS:InitError
+2H          GETA        $1,:MM:__INIT:STRS:InitError
             PUSHJ       $0,:MM:__ERROR:IError1
 3H          SWYM
 

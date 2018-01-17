@@ -32,14 +32,16 @@
 
             .section .data,"wa",@progbits
             .balign 8
-            .global :MM:__THREAD:interval
             PREFIX      :MM:__THREAD:STRS:
+            .balign 4
 NegInterval BYTE        "Thread:Enable failed. Negative timer interval "
             BYTE        "specified.",10,0
+            .balign 4
 UnlockMFail BYTE        "Thread:UnlockMutex failed. Mutex is not locked by "
             BYTE        "the current thread.",10,0
 
             .section .data,"wa",@progbits
+            .global :MM:__THREAD:interval
             .balign 8
             .global :MM:__THREAD:interval
             PREFIX      :MM:__THREAD:
@@ -78,7 +80,7 @@ EnableJ     BN          arg0,2F
             CMP         $1,$0,$1
             BNN         $1,1F
             SET         $0,#2
-1H          LDA         $1,:MM:__THREAD:interval
+1H          GETA        $1,:MM:__THREAD:interval
             STO         arg0,$1
             PUT         :rI,arg0
             POP         0,1
@@ -91,7 +93,7 @@ Enable      SET         $2,arg0
             PUT         :rJ,$0
             POP         0,0
 9H          SET         t,$0 % :rJ
-            LDA         $1,:MM:__THREAD:STRS:NegInterval
+            GETA        $1,:MM:__THREAD:STRS:NegInterval
             PUSHJ       $0,:MM:__ERROR:Error1
 
 
@@ -104,7 +106,7 @@ Enable      SET         $2,arg0
 %
             .global :MM:__THREAD:Disable
 Disable     NEG         $1,0,1
-            LDA         $0,:MM:__THREAD:interval
+            GETA        $0,:MM:__THREAD:interval
             STO         $1,$0
             PUT         :rI,$1
             POP         0
@@ -123,11 +125,11 @@ Disable     NEG         $1,0,1
 %
             .global :MM:__THREAD:ThreadID
             .global :MM:__THREAD:ThreadIDG
-ThreadID    LDA         $0,:MM:__INTERNAL:ThreadRing
+ThreadID    GETA        $0,:MM:__INTERNAL:ThreadRing
             LDO         $0,$0
             LDO         $0,$0
             POP         1,0
-ThreadIDG   LDA         t,:MM:__INTERNAL:ThreadRing
+ThreadIDG   GETA        t,:MM:__INTERNAL:ThreadRing
             LDO         t,t
             LDO         t,t
             POP         0
@@ -253,7 +255,7 @@ Exit        SWYM
             .global :MM:__THREAD:IsRunningG
 IsRunningJ  SWYM
             DISABLE_TIMER
-1H          LDA         $3,:MM:__INTERNAL:ThreadRing
+1H          GETA        $3,:MM:__INTERNAL:ThreadRing
             LDO         $3,$3
             SET         $2,$3
 1H          LDO         $4,$3,#00
@@ -324,7 +326,7 @@ WaitG       GET         $0,:rJ
 %
             .global :MM:__THREAD:WaitAll
 WaitAll     GET         $2,:rJ
-            LDA         $0,:MM:__INTERNAL:ThreadRing
+            GETA        $0,:MM:__INTERNAL:ThreadRing
             LDO         $0,$0
 2H          LDO         $1,$0,#10
             CMP         $1,$0,$1
@@ -351,7 +353,7 @@ WaitAll     GET         $2,:rJ
             % use CSWAP for atomic update of Mutex: We assume the mutex to
             % be unlocked (:rP == #0..0) and try to store $1 (Thread ID |
             % 1<<64).
-LockMutexJ  LDA         $1,:MM:__INTERNAL:ThreadRing
+LockMutexJ  GETA        $1,:MM:__INTERNAL:ThreadRing
             LDO         $1,$1
             LDO         $1,$1
             ORH         $1,#8000
@@ -385,7 +387,7 @@ LockMutex   GET         $1,:rJ
             .global :MM:__THREAD:UnlockMutex
             .global :MM:__THREAD:UnlockMutexJ
             .global :MM:__THREAD:UnlockMutexG
-UnlockMutexJ LDA         $1,:MM:__INTERNAL:ThreadRing
+UnlockMutexJ GETA        $1,:MM:__INTERNAL:ThreadRing
             LDO         $1,$1
             LDO         $1,$1
             ORH         $1,#8000
@@ -403,6 +405,6 @@ UnlockMutex GET         $1,:rJ
             PUT         :rJ,$1
             POP         0,0
 2H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__THREAD:STRS:UnlockMFail
+            GETA        $1,:MM:__THREAD:STRS:UnlockMFail
             PUSHJ       $0,:MM:__ERROR:Error1
 

@@ -39,21 +39,33 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__ERROR:STRS:
+            .balign 4
 Terminated  BYTE        "[MM library] Program terminated.",10,0
+            .balign 4
 Continued1  BYTE        "Error handler returned.",10
             BYTE        "[MM library]     Continue execution at [",0
+            .balign 4
 Continued2  BYTE        "Special handler value #FFFFFFFFFFFFFFFF.",10
             BYTE        "[MM library]     Continue execution at [",0
+            .balign 4
 Continued3  BYTE        "].",10,0
+            .balign 4
 InternErro  BYTE        "[MM library] Internal error: ",10
             BYTE        "[MM library]     ",0
+            .balign 4
 Error1      BYTE        "[MM library] Called from [:rJ-4 = ",0
+            .balign 4
 Error2      BYTE        "] on thread [ThreadID = ",0
+            .balign 4
 Error3      BYTE        "]:",10,"[MM library]     ",0
+            .balign 4
 ErrorHndlC1 BYTE        "Calling error handler [",0
+            .balign 4
 ErrorHndlC2 BYTE        "].",10,0
+            .balign 4
 ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             BYTE        "(ExcNotImpl).",10,0
+            .balign 4
 Generic     BYTE        "Something went horribly wrong...",10,0
 
             .section .text,"ax",@progbits
@@ -80,7 +92,7 @@ arg4        IS          $4
             .global     :MM:__ERROR:ErrByteG
 buffer      IS          $1
 ErrByteG    SET         arg0,t
-            LDA         buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__INTERNAL:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -115,7 +127,7 @@ ErrRegG     SET         $0,t
             SET         $2,8
             ADD         $5,$1,$1
             ADD         $6,$2,$2
-            LDA         buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__INTERNAL:Buffer
             SET         $3,0
             STB         $3,buffer,17
 1H          SET         $4,$0 % save original value
@@ -147,16 +159,16 @@ ErrRegG     SET         $0,t
             .global     :MM:__ERROR:ErrorBanner
 ErrorBanner GET         $0,:rJ
             SET         $10,t
-            LDA         t,:MM:__ERROR:STRS:Error1
+            GETA        t,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__ERROR:STRS:Error2
+            GETA        t,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__THREAD:ThreadIDG
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__ERROR:STRS:Error3
+            GETA        t,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUT         :rJ,$0
@@ -173,7 +185,7 @@ ErrorBanner GET         $0,:rJ
 %
             .global :MM:__ERROR:IError0
 IError0     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            LDA         t,:MM:__ERROR:STRS:InternErro
+            GETA        t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -188,7 +200,7 @@ IError0     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError1
 IError1     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            LDA         t,:MM:__ERROR:STRS:InternErro
+            GETA        t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -206,7 +218,7 @@ IError1     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError2
 IError2     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            LDA         t,:MM:__ERROR:STRS:InternErro
+            GETA        t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -228,7 +240,7 @@ IError2     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError4R3
 IError4R3   PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            LDA         t,:MM:__ERROR:STRS:InternErro
+            GETA        t,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             SET         t,arg0
             TRAP        0,Fputs,StdErr
@@ -414,7 +426,7 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             BNZ         $0,1F
             % Abort program:
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            LDA         t,:MM:__ERROR:STRS:Terminated
+            GETA        t,:MM:__ERROR:STRS:Terminated
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
             % Continue execution if we encounter the special value -1:
@@ -424,11 +436,11 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            LDA         t,:MM:__ERROR:STRS:Continued2
+            GETA        t,:MM:__ERROR:STRS:Continued2
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__ERROR:STRS:Continued3
+            GETA        t,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10
@@ -438,11 +450,11 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
 1H          PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            LDA         t,:MM:__ERROR:STRS:ErrorHndlC1
+            GETA        t,:MM:__ERROR:STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
             LDO         t,:MM:__SYS:AtErrorAddr
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__ERROR:STRS:ErrorHndlC2
+            GETA        t,:MM:__ERROR:STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10
@@ -450,11 +462,11 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            LDA         t,:MM:__ERROR:STRS:Continued1
+            GETA        t,:MM:__ERROR:STRS:Continued1
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUSHJ       t,ErrRegG
-            LDA         t,:MM:__ERROR:STRS:Continued3
+            GETA        t,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10

@@ -32,6 +32,7 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__INIT:STRS:
+            .balign 4
 GuardMessa  BYTE        "I'm sorry Dave. I'm afraid I can't do that. ",10
             BYTE        "[MM library]     "
             BYTE        "Guard section reached - program did not "
@@ -40,7 +41,7 @@ GuardMessa  BYTE        "I'm sorry Dave. I'm afraid I can't do that. ",10
             .section .text,"ax",@progbits
             .global :MM:__INIT:__guard
             PREFIX      :MM:__INIT:
-__guard     LDA         $255,__guard
+__guard     GETA        $255,__guard
             ADD         $255,$255,4
-            LDA         $1,:MM:__INIT:STRS:GuardMessa
+            GETA        $1,:MM:__INIT:STRS:GuardMessa
             PUSHJ       $0,:MM:__ERROR:Error1

@@ -36,8 +36,10 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__RAW_POOL:STRS:
+            .balign 4
 Grow1       BYTE        "__RAW_POOL::Grow failed. "
             BYTE        "Out of memory.",10,0
+            .balign 4
 Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
@@ -82,19 +84,19 @@ Dealloc     GET         $10,:rJ
             ADDU        arg1,arg1,#F
             ANDN        arg1,arg1,#F
             % A bunch of rudimentary checks:
-            LDA         $2,Pool_Segment
+            GETA        $2,Pool_Segment
             CMPU        t,$2,arg0
             BNN         t,1F
             ADDU        $3,arg0,arg1
             CMPU        t,$2,$3
             BNN         t,1F
-            LDA         $2,Stack_Segment
+            GETA        $2,Stack_Segment
             CMPU        t,$2,$3
             BNP         t,1F
             %
             % We must keep the linked list of free memory regions sorted!
             %
-            LDA         $4,:MM:__RAW_POOL:Pool
+            GETA        $4,:MM:__RAW_POOL:Pool
             LDO         ptr,$4
             SET         prev_ptr,#0
 3H          CMPU        t,arg0,ptr
@@ -139,7 +141,7 @@ Dealloc     GET         $10,:rJ
 4H          SWYM
 #ifdef STATISTICS
             SET         $0,0
-            LDA         $1,:MM:__RAW_POOL:Pool
+            GETA        $1,:MM:__RAW_POOL:Pool
 7H          LDO         $1,$1
             BZ          $1,8F
             ADDU        $0,$0,1
@@ -150,7 +152,7 @@ Dealloc     GET         $10,:rJ
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$10
             POP         0
-1H          LDA         $1,:MM:__RAW_POOL:STRS:Deallo1
+1H          GETA        $1,:MM:__RAW_POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 
@@ -180,7 +182,7 @@ Grow        SWYM
             ADDU        $0,$0,#F
             ANDN        $0,$0,#F
             % Sanity checks:
-            LDA         $1,Pool_Segment
+            GETA        $1,Pool_Segment
             LDO         $2,$1
             ADDU        $2,$2,#F
             ANDN        $2,$2,#F % align
@@ -189,7 +191,7 @@ Grow        SWYM
             BNN         t,1F
             CMPU        t,$1,$3
             BNN         t,1F % check for overflow
-            LDA         $4,Stack_Segment
+            GETA        $4,Stack_Segment
             CMPU        t,$4,$3 % check for valid range
             BNP         t,1F
             STO         $3,$1,0
@@ -198,7 +200,7 @@ Grow        SWYM
             STO         t,$1,#0
             STO         $0,$1,#8
             % Get to last entry:
-            LDA         $4,:MM:__RAW_POOL:Pool
+            GETA        $4,:MM:__RAW_POOL:Pool
             LDO         ptr,$4
             SET         prev_ptr,#0
 2H          CMPU        t,ptr,#0
@@ -222,7 +224,7 @@ Grow        SWYM
             ADDU        $4,$4,$0
             STO         $4,prev_ptr,#8
 8H          POP         0
-1H          LDA         $1,:MM:__RAW_POOL:STRS:Grow1
+1H          GETA        $1,:MM:__RAW_POOL:STRS:Grow1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
@@ -255,7 +257,7 @@ Alloc       GET         $5,:rJ
             %
             % Initialize the pool if necessary:
             %
-            LDA         $2,:MM:__RAW_POOL:Pool
+            GETA        $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
             PBNZ        $2,1F
 __retry     SET         $7,arg0
@@ -263,7 +265,7 @@ __retry     SET         $7,arg0
             %
             % 1st pass: Try to find a chunk with requested size:
             %
-1H          LDA         $2,:MM:__RAW_POOL:Pool
+1H          GETA        $2,:MM:__RAW_POOL:Pool
             LDO         ptr,$2
             SET         prev_ptr,#0
 3H          LDO         t,ptr,OCT
@@ -279,7 +281,7 @@ __retry     SET         $7,arg0
             %
             % 2nd pass: Use any chunk that is sufficiently large:
             %
-1H          LDA         $2,:MM:__RAW_POOL:Pool
+1H          GETA        $2,:MM:__RAW_POOL:Pool
             LDO         ptr,$2
             SET         prev_ptr,#0
 3H          LDO         t,ptr,OCT
@@ -300,7 +302,7 @@ __retry     SET         $7,arg0
             SUBU        arg0,arg0,OCT
             ADDU        $3,ptr,arg0
 __out       BNZ         prev_ptr,9F
-            LDA         $2,:MM:__RAW_POOL:Pool
+            GETA        $2,:MM:__RAW_POOL:Pool
             STO         $3,$2
             JMP         8F
 9H          STO         $3,prev_ptr

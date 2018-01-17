@@ -30,37 +30,58 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__MEM:STRS:
+            .balign 4
 Copy1       BYTE        "Mem:Copy failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+            .balign 4
 Copy2       BYTE        "Mem:Copy failed. Invalid data range specified. "
             BYTE        "Memory region [arg1,arg1+arg2), with [arg1=",0
+            .balign 4
 Copy3       BYTE        "] and [arg2=",0
+            .balign 4
 Copy4       BYTE        "], wraps.",10,0
+            .balign 4
 Copy5       BYTE        "Mem:Copy failed. Something went horribly "
             BYTE        "wrong",10,0
+            .balign 4
 Set1        BYTE        "Mem:Set failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+            .balign 4
 Set2        BYTE        "] and [arg2=",0
+            .balign 4
 Set3        BYTE        "], wraps.",10,0
+            .balign 4
 Set4        BYTE        "Mem:Set failed. Something went horribly "
             BYTE        "wrong",10,0
+            .balign 4
 Zero1       BYTE        "Mem:Zero failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+            .balign 4
 Zero2       BYTE        "] and [arg2=",0
+            .balign 4
 Zero3       BYTE        "], wraps.",10,0
+            .balign 4
 Zero4       BYTE        "Mem:Zero failed. Something went horribly "
             BYTE        "wrong",10,0
+            .balign 4
 Rand1       BYTE        "Mem:Rand failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+            .balign 4
 Rand2       BYTE        "] and [arg2=",0
+            .balign 4
 Rand3       BYTE        "], wraps.",10,0
+            .balign 4
 Rand4       BYTE        "Mem:Rand failed. Something went horribly "
             BYTE        "wrong",10,0
+            .balign 4
 Cmp1        BYTE        "Mem:Cmp failed. Invalid data range specified. "
             BYTE        "Memory region [arg0,arg0+arg2), with [arg0=",0
+            .balign 4
 Cmp2        BYTE        "Mem:Cmp failed. Invalid data range specified. "
             BYTE        "Memory region [arg1,arg1+arg2), with [arg1=",0
+            .balign 4
 Cmp3        BYTE        "] and [arg2=",0
+            .balign 4
 Cmp4        BYTE        "], wraps.",10,0
 
 
@@ -206,18 +227,18 @@ Copy        GET         $3,:rJ
 1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
-            LDA         $1,:MM:__MEM:STRS:Copy1
-            LDA         $3,:MM:__MEM:STRS:Copy3
-            LDA         $5,:MM:__MEM:STRS:Copy4
+            GETA        $1,:MM:__MEM:STRS:Copy1
+            GETA        $3,:MM:__MEM:STRS:Copy3
+            GETA        $5,:MM:__MEM:STRS:Copy4
             PUSHJ       $0,:MM:__ERROR:Error5R24
 2H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg1
-            LDA         $1,:MM:__MEM:STRS:Copy2
-            LDA         $3,:MM:__MEM:STRS:Copy3
-            LDA         $5,:MM:__MEM:STRS:Copy4
+            GETA        $1,:MM:__MEM:STRS:Copy2
+            GETA        $3,:MM:__MEM:STRS:Copy3
+            GETA        $5,:MM:__MEM:STRS:Copy4
             PUSHJ       $0,:MM:__ERROR:Error5R24
-9H          LDA         $1,:MM:__MEM:STRS:Copy5
+9H          GETA        $1,:MM:__MEM:STRS:Copy5
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 
@@ -342,11 +363,11 @@ Set         GET         $3,:rJ
 1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
-            LDA         $1,:MM:__MEM:STRS:Set1
-            LDA         $3,:MM:__MEM:STRS:Set2
-            LDA         $5,:MM:__MEM:STRS:Set3
+            GETA        $1,:MM:__MEM:STRS:Set1
+            GETA        $3,:MM:__MEM:STRS:Set2
+            GETA        $5,:MM:__MEM:STRS:Set3
             PUSHJ       $0,:MM:__ERROR:Error5R24
-9H          LDA         $1,:MM:__MEM:STRS:Set4
+9H          GETA        $1,:MM:__MEM:STRS:Set4
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 
@@ -374,11 +395,11 @@ Zero        GET         $2,:rJ
 1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
-            LDA         $1,:MM:__MEM:STRS:Zero1
-            LDA         $3,:MM:__MEM:STRS:Zero2
-            LDA         $5,:MM:__MEM:STRS:Zero3
+            GETA        $1,:MM:__MEM:STRS:Zero1
+            GETA        $3,:MM:__MEM:STRS:Zero2
+            GETA        $5,:MM:__MEM:STRS:Zero3
             PUSHJ       $0,:MM:__ERROR:Error5R24
-9H          LDA         $1,:MM:__MEM:STRS:Zero4
+9H          GETA        $1,:MM:__MEM:STRS:Zero4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -414,11 +435,11 @@ Rand        GET         $2,:rJ
 1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
-            LDA         $1,:MM:__MEM:STRS:Rand1
-            LDA         $3,:MM:__MEM:STRS:Rand2
-            LDA         $5,:MM:__MEM:STRS:Rand3
+            GETA        $1,:MM:__MEM:STRS:Rand1
+            GETA        $3,:MM:__MEM:STRS:Rand2
+            GETA        $5,:MM:__MEM:STRS:Rand3
             PUSHJ       $0,:MM:__ERROR:Error5R24
-9H          LDA         $1,:MM:__MEM:STRS:Rand4
+9H          GETA        $1,:MM:__MEM:STRS:Rand4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
@@ -535,15 +556,15 @@ Cmp         GET         $3,:rJ
 1H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg0
-            LDA         $1,:MM:__MEM:STRS:Cmp1
-            LDA         $3,:MM:__MEM:STRS:Cmp3
-            LDA         $5,:MM:__MEM:STRS:Cmp4
+            GETA        $1,:MM:__MEM:STRS:Cmp1
+            GETA        $3,:MM:__MEM:STRS:Cmp3
+            GETA        $5,:MM:__MEM:STRS:Cmp4
             PUSHJ       $0,:MM:__ERROR:Error5R24
 2H          GET         t,:rJ % :rJ
             SET         $4,arg2
             SET         $2,arg1
-            LDA         $1,:MM:__MEM:STRS:Cmp2
-            LDA         $3,:MM:__MEM:STRS:Cmp3
-            LDA         $5,:MM:__MEM:STRS:Cmp4
+            GETA        $1,:MM:__MEM:STRS:Cmp2
+            GETA        $3,:MM:__MEM:STRS:Cmp3
+            GETA        $5,:MM:__MEM:STRS:Cmp4
             PUSHJ       $0,:MM:__ERROR:Error5R24
 

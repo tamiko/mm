@@ -30,32 +30,57 @@
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__FILE:STRS:
+            .balign 4
 Lock1       BYTE        "File:Lock failed. Could not lock handle [arg0=",0
+            .balign 4
 Lock2       BYTE        "]. Already locked.",10,0
+            .balign 4
 Unlock1     BYTE        "File:Unlock failed. Could not unlock handle [arg0=",0
+            .balign 4
 Unlock2     BYTE        "]. File handle is not locked.",10,0
+            .balign 4
 Open1       BYTE        "File:Open failed. Invalid file mode [arg1=",0
+            .balign 4
 Open2       BYTE        "] specified.",10,0
+            .balign 4
 Open3       BYTE        "File:Open failed. No free file handler "
             BYTE        "available.",10,0
+            .balign 4
 Open4       BYTE        "File:Open failed. Could not open file with "
             BYTE        "specified file mode [arg1=",0
+            .balign 4
 Open5       BYTE        "].",10,0
+            .balign 4
 Close1      BYTE        "File:Close failed. File handle [arg0=",0
+            .balign 4
 Close2      BYTE        "] locked by user or system.",10,0
+            .balign 4
 Close3      BYTE        "] not opened.",10,0
+            .balign 4
 Close4      BYTE        "File:Close failed. Could not close file handle [arg0=",0
+            .balign 4
 Close5      BYTE        "]. Internal state corrupted.",10,0
+            .balign 4
 Tell1       BYTE        "File:Tell failed. Could not read from file handle [arg0=",0
+            .balign 4
 Tell2       BYTE        "].",10,0
+            .balign 4
 Size1       BYTE        "File:Size failed. Could not read from file handle [arg0=",0
+            .balign 4
 Size2       BYTE        "].",10,0
+            .balign 4
 Seek1       BYTE        "File:Seek failed. Could not seek file handle [arg0=",0
+            .balign 4
 Seek2       BYTE        "] to position [arg1=",0
+            .balign 4
 Seek3       BYTE        "].",10,0
+            .balign 4
 Read1       BYTE        "File:Read failed. Could not read from file handle [arg0=",0
+            .balign 4
 Read2       BYTE        "].",10,0
+            .balign 4
 Write1      BYTE        "File:Write failed. Could not write to file handle [arg0=",0
+            .balign 4
 Write2      BYTE        "].",10,0
 
 
@@ -117,18 +142,18 @@ pool        IS          $2
             % Select lowest byte:
 LockJ       AND         arg0,arg0,#FF
             GET         $5,:rJ
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
 2H          LDBU        $4,pool,arg0
             BNZ         $4,9F % already in use
             SET         $4,#FF
 2H          STB         $4,pool,arg0
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         0,1
-9H          LDA         t,:MM:__FILE:PoolMutex
+9H          GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         0,0
@@ -141,9 +166,9 @@ Lock        SET         $3,arg0
             SET         t,arg0
             POP         0
 9H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Lock1
+            GETA        $1,:MM:__FILE:STRS:Lock1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Lock2
+            GETA        $3,:MM:__FILE:STRS:Lock2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 %%
@@ -165,19 +190,19 @@ Lock        SET         $3,arg0
 pool        IS          $2
 UnlockJ     CMPU        arg0,arg0,#FF
             GET         $5,:rJ
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
 2H          LDBU        $4,pool,arg0
             XOR         $4,$4,#FF
             BNZ         $4,9F % not locked
             SET         $4,#00
 2H          STB         $4,pool,arg0
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         1,1
-9H          LDA         t,:MM:__FILE:PoolMutex
+9H          GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         0,0
@@ -190,9 +215,9 @@ Unlock      SET         $3,arg0
             SET         t,arg0
             POP         0
 9H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Unlock1
+            GETA        $1,:MM:__FILE:STRS:Unlock1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Unlock2
+            GETA        $3,:MM:__FILE:STRS:Unlock2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -465,12 +490,12 @@ OpenTable   TRAP 0,Fopen,0; JMP 7F
 pool        IS          $2
 fh          IS          $3
 OpenJ       GET         $6,:rJ
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
             CMPU        t,arg1,4
             BP          t,9F
             % Find an unused fh:
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             SET         fh,0
 2H          LDBU        $4,pool,fh
             BZ          $4,1F % success
@@ -482,24 +507,24 @@ OpenJ       GET         $6,:rJ
 1H          ORL         arg1,#8
             STB         arg1,pool,fh
             ANDNL       arg1,#8
-            LDA         $4,:MM:__INTERNAL:Buffer
+            GETA        $4,:MM:__INTERNAL:Buffer
             STO         arg0,$4,0
             STO         arg1,$4,8
             SLU         $3,fh,3 % *8
-            LDA         $5,OpenTable
+            GETA        $5,OpenTable
             SET         t,$4
             GO          $4,$5,$3
 7H          BN          t,1F
             SRU         $3,fh,3 % /8
             SET         $0,fh
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$6
             POP         1,1
 1H          SRU         fh,$3,3 % fh
             SET         $0,0
             STB         $0,pool,fh
-9H          LDA         t,:MM:__FILE:PoolMutex
+9H          GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$6
             POP         0,0
@@ -517,7 +542,7 @@ Open        CMPU        t,arg1,4
             BP          t,9F
             % Are any file handles available?
             % TODO: This check is a bit racy...
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             SET         fh,0
 2H          LDBU        $4,pool,fh
             BZ          $4,1F % success
@@ -535,16 +560,16 @@ Open        CMPU        t,arg1,4
             POP         1,0
 7H          SET         t,$2 % :rJ
             SET         $2,arg1
-            LDA         $1,:MM:__FILE:STRS:Open4
-            LDA         $3,:MM:__FILE:STRS:Open5
+            GETA        $1,:MM:__FILE:STRS:Open4
+            GETA        $3,:MM:__FILE:STRS:Open5
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 8H          GET         t,:rJ % :rJ
-            LDA         $1,:MM:__FILE:STRS:Open3
+            GETA        $1,:MM:__FILE:STRS:Open3
             PUSHJ       $0,:MM:__ERROR:Error1
 9H          GET         t,:rJ % :rJ
             SET         $2,arg1
-            LDA         $1,:MM:__FILE:STRS:Open1
-            LDA         $3,:MM:__FILE:STRS:Open2
+            GETA        $1,:MM:__FILE:STRS:Open1
+            GETA        $3,:MM:__FILE:STRS:Open2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -818,9 +843,9 @@ pool        IS          $2
             % sanitize arg0:
 CloseJ      AND         arg0,arg0,#FF
             GET         $5,:rJ
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             LDBU        $3,pool,arg0
             BZ          $3,9F
             CMPU        t,$3,#FF
@@ -828,17 +853,17 @@ CloseJ      AND         arg0,arg0,#FF
             CMPU        t,$3,#EE
             BZ          t,9F
             SLU         arg0,arg0,3 % *8
-            LDA         $4,CloseTable
+            GETA        $4,CloseTable
             GO          $4,$4,arg0
 7H          SRU         arg0,arg0,3 % /8
             BN          t,9F
             SET         $3,0
             STBU        $3,pool,arg0
-            LDA         t,:MM:__FILE:PoolMutex
+            GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         0,1
-9H          LDA         t,:MM:__FILE:PoolMutex
+9H          GETA        t,:MM:__FILE:PoolMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$5
             POP         0,0
@@ -855,7 +880,7 @@ CloseJ      AND         arg0,arg0,#FF
 CloseG      SET         arg0,t
 Close       AND         $3,arg0,#FF
             % TODO: This check is a bit racy...
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             LDBU        $3,pool,$3
             BZ          $3,9F
             CMPU        t,$3,#FF
@@ -873,19 +898,19 @@ Close       AND         $3,arg0,#FF
             SET         $4,0
             STBU        $4,pool,$3
             SET         t,$1 % :rJ
-            LDA         $3,:MM:__FILE:STRS:Close4
+            GETA        $3,:MM:__FILE:STRS:Close4
             SET         $4,arg0
-            LDA         $5,:MM:__FILE:STRS:Close5
+            GETA        $5,:MM:__FILE:STRS:Close5
             PUSHJ       $2,:MM:__ERROR:Error3RB2
 8H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Close1
+            GETA        $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Close2
+            GETA        $3,:MM:__FILE:STRS:Close2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 9H          GET         t,:rJ % :rJ
-            LDA         $1,:MM:__FILE:STRS:Close1
+            GETA        $1,:MM:__FILE:STRS:Close1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Close3
+            GETA        $3,:MM:__FILE:STRS:Close3
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -905,7 +930,7 @@ Close       AND         $3,arg0,#FF
             .global :MM:__FILE:IsOpen
 pool        IS          $2
 IsOpenJ     AND         arg0,arg0,#FF
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
             BZ          $1,9F
             CMPU        t,$1,#FF
@@ -946,7 +971,7 @@ IsOpen      GET         $1,:rJ
             .global :MM:__FILE:IsReadable
 pool        IS          $2
 IsReadableJ AND         arg0,arg0,#FF
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
             CMPU        t,$1,#8 % :TextRead
             BZ          t,1F
@@ -988,7 +1013,7 @@ IsReadable  GET         $1,:rJ
             .global :MM:__FILE:IsWritable
 pool        IS          $2
 IsWritableJ AND         arg0,arg0,#FF
-            LDA         pool,:MM:__FILE:Pool
+            GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
             CMPU        t,$1,#9 % :TextRead
             BZ          t,1F
@@ -1288,7 +1313,7 @@ TellTable   TRAP 0,Ftell,0; JMP 7F
 TellJ       AND         arg0,arg0,#FF
             GET         $1,:rJ
             SLU         arg0,arg0,3 % *8
-            LDA         $2,TellTable
+            GETA        $2,TellTable
             GO          $2,$2,arg0
 7H          SET         ret0,t
             % check that ret0 >= 0
@@ -1305,9 +1330,9 @@ Tell        SET         $3,arg0
             SET         ret0,$2
             POP         1,0
 9H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Tell1
+            GETA        $1,:MM:__FILE:STRS:Tell1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Tell2
+            GETA        $3,:MM:__FILE:STRS:Tell2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 TellG       SET         $2,t
             GET         $0,:rJ
@@ -1358,9 +1383,9 @@ Size        GET         $1,:rJ
             SET         ret0,$2
             POP         1,0
 9H          SET         t,$1 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Size1
+            GETA        $1,:MM:__FILE:STRS:Size1
             SET         $2,arg0
-            LDA         $3,:MM:__FILE:STRS:Size2
+            GETA        $3,:MM:__FILE:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 SizeG       GET         $0,:rJ
             SET         $2,t
@@ -1643,7 +1668,7 @@ SeekTable   TRAP 0,Fseek,0; JMP 7F
 SeekJ       AND         arg0,arg0,#FF
             GET         $2,:rJ
             SLU         arg0,arg0,3 % *8
-            LDA         $3,SeekTable
+            GETA        $3,SeekTable
             SET         t,arg1
             GO          $3,$3,arg0
 7H          SET         ret0,t
@@ -1663,9 +1688,9 @@ Seek        SET         $4,arg0
 9H          SET         t,$2 % :rJ
             SET         $2,arg0
             SET         $4,arg1
-            LDA         $1,:MM:__FILE:STRS:Seek1
-            LDA         $3,:MM:__FILE:STRS:Seek2
-            LDA         $5,:MM:__FILE:STRS:Seek3
+            GETA        $1,:MM:__FILE:STRS:Seek1
+            GETA        $3,:MM:__FILE:STRS:Seek2
+            GETA        $5,:MM:__FILE:STRS:Seek3
             PUSHJ       $0,:MM:__ERROR:Error5RB24
 
 
@@ -1951,15 +1976,15 @@ ReadJ       BN          arg2,9F % invalid size
             PUSHJ       $4,IsReadableJ
             JMP         9F % not readable
             SLU         arg0,arg0,3 % *8
-            LDA         $4,ReadTable
-            LDA         t,ReadBuffer
+            GETA        $4,ReadTable
+            GETA        t,ReadBuffer
             PUSHJ       t,:MM:__THREAD:LockMutexG
             ADDU        t,t,#8
             STO         arg1,t,#0
             STO         arg2,t,#8
             GO          $4,$4,arg0
 7H          SET         ret0,t
-            LDA         t,ReadBuffer
+            GETA        t,ReadBuffer
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1
             NEG         $1,0,$1
@@ -1980,8 +2005,8 @@ Read        SET         $4,arg2
             SET         ret0,$1
             POP         1,0
 9H          SET         t,$0 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Read1
-            LDA         $3,:MM:__FILE:STRS:Read2
+            GETA        $1,:MM:__FILE:STRS:Read1
+            GETA        $3,:MM:__FILE:STRS:Read2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
@@ -2265,15 +2290,15 @@ WriteJ      BN          arg2,9F % invalid size
             PUSHJ       $4,IsWritableJ
             JMP         9F % not writable
             SLU         arg0,arg0,3 % *8
-            LDA         $4,WriteTable
-            LDA         t,WriteBuffer
+            GETA        $4,WriteTable
+            GETA        t,WriteBuffer
             PUSHJ       t,:MM:__THREAD:LockMutexG
             ADDU        t,t,#8
             STO         arg1,t,#0
             STO         arg2,t,#8
             GO          $4,$4,arg0
 7H          SET         ret0,t
-            LDA         t,WriteBuffer
+            GETA        t,WriteBuffer
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1
             NEG         $1,0,$1
@@ -2294,7 +2319,7 @@ Write       SET         $4,arg2
             SET         ret0,$1
             POP         1,0
 9H          SET         t,$0 % :rJ
-            LDA         $1,:MM:__FILE:STRS:Write1
-            LDA         $3,:MM:__FILE:STRS:Write2
+            GETA        $1,:MM:__FILE:STRS:Write1
+            GETA        $3,:MM:__FILE:STRS:Write2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
