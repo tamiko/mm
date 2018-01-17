@@ -118,7 +118,6 @@ PrintStatistics SWYM
             LDA         $31,TimingTotal
             STO         $30,$31
             GET         $0,:rJ
-            INCREMENT_COUNTER :MM:__STATISTICS:ThreadCriti,0,-1
             PUSHJ       $255,:MM:__INTERNAL:EnterCritical
 
             %
