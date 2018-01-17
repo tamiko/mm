@@ -99,13 +99,15 @@ Octa        GET         $0,:rJ
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
             PUT         :rJ,$5
-            LDO         $4,:MM:__RAND:FileHandle
+            GETA        $4,:MM:__RAND:FileHandle
+            LDO         $4,$4
             GETA        $2,:MM:__INTERNAL:Buffer
             SET         $3,#8
             PUSHJ       $1,:MM:__FILE:ReadJ
             JMP         9F
             PUT         :rJ,$0
-            LDO         $0,:MM:__INTERNAL:Buffer
+            GETA        $0,:MM:__INTERNAL:Buffer
+            LDO         $0,$0
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             POP         1,0
@@ -153,7 +155,8 @@ RangeU      SWYM
 %
             .global :MM:__RAND:SetJ
 SetJ        GET         $3,:rJ
-            LDO         $5,:MM:__RAND:FileHandle
+            GETA        $5,:MM:__RAND:FileHandle
+            LDO         $5,$5
             ADDU        t,arg0,arg1
             CMPU        t,t,arg0
             BN          t,9F

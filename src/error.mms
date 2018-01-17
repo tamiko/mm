@@ -422,7 +422,8 @@ Error5RB24  SET         $10,t
 
             % Respect a possible error handler:
             .global     :MM:__ERROR:ErrorHndl
-ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
+ErrorHndl   GETA        $0,:MM:__SYS:AtErrorAddr
+            LDO         $0,$0
             BNZ         $0,1F
             % Abort program:
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
@@ -452,7 +453,8 @@ ErrorHndl   LDO         $0,:MM:__SYS:AtErrorAddr
             PUSHJ       t,:MM:__ERROR:ErrorBanner
             GETA        t,:MM:__ERROR:STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
-            LDO         t,:MM:__SYS:AtErrorAddr
+            GETA        t,:MM:__SYS:AtErrorAddr
+            LDO         t,t
             PUSHJ       t,ErrRegG
             GETA        t,:MM:__ERROR:STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr

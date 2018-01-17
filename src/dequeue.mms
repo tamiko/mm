@@ -25,15 +25,15 @@
 %%
 
 %
-% :MM:__ADT:
+% :MM:__DEQUE:
 %
 
             %
             % We need two global registers for save/restore operations of
             % registers
             %
-            .global     :MM:__ADT:__t1
-            .global     :MM:__ADT:__t2
-            PREFIX      :MM:__ADT:
+            .global     :MM:__DEQUE:__t1
+            .global     :MM:__DEQUE:__t2
+            PREFIX      :MM:__DEQUE:
 __t1        GREG        0
 __t2        GREG        0

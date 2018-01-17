@@ -1,7 +1,7 @@
 cpp=cpp
 cpp_args=-D__GNU_AS -D__MMIXWARE -DSTATISTICS
 as=mmix-as
-as_args=-g -x -linker-allocated-gregs
+as_args=-g -x
 ld=mmix-ld
 ld_args=-g
 ar=mmix-ar
