@@ -24,9 +24,12 @@
 % SOFTWARE.
 %%
 
+#include "statistics.mmh"
+
 %
 % :MM:__THREAD:
 %
+
             .section .data,"wa",@progbits
             .balign 8
             .global :MM:__THREAD:interval
@@ -140,17 +143,27 @@ ThreadIDG   LDA         t,:MM:__INTERNAL:ThreadRing
 % :MM:__THREAD:CloneJ
 % :MM:__THREAD:CloneG
 %
+
+            %
+            % Disable timer prior to a TRIP invocation:
+            % (stores :rI in $1, sets $2 to -1)
+            %
+            .macro DISABLE_TIMER
+            GET         $1,:rI
+            BN          $1,1F
+            NEG         $2,0,1
+            PUT         :rI,$2
+            % We should be safe now™
+            .endm
+
             .global :MM:__THREAD:Clone
             .global :MM:__THREAD:CloneJ
             .global :MM:__THREAD:CloneG
 Clone       SWYM
-            % Disable timer and TRIP:
-            GET         $0,:rI
-            BN          $0,1F
-            NEG         $0,0,1
-            PUT         :rI,$0
-            % We should be safe now™
-1H          TRIP        0,:MM:__INTERNAL:Clone,0
+            DISABLE_TIMER
+1H          SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadClone
+            TRIP        0,:MM:__INTERNAL:Clone,0
             GET         $0,:rY
             BP          $0,1F
             NEG         $0,0,1
@@ -180,14 +193,10 @@ CloneG      GET         $0,:rJ
             .global :MM:__THREAD:Create
             .global :MM:__THREAD:CreateG
 Create      SWYM
-            % Disable timer and TRIP:
-            GET         $1,:rI
-            BN          $1,1F
-            NEG         $1,0,1
-            PUT         :rI,$1
-            SWYM
-            % We should be safe now™
-1H          TRIP        0,:MM:__INTERNAL:Create,0
+            DISABLE_TIMER
+1H          SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadCreat
+            TRIP        0,:MM:__INTERNAL:Create,0
             GET         $0,:rY
             POP         1,0
 CreateG     GET         $0,:rJ
@@ -207,14 +216,10 @@ CreateG     GET         $0,:rJ
 %
             .global :MM:__THREAD:Yield
 Yield       SWYM
-            % Disable timer and TRIP:
-            GET         $0,:rI
-            BN          $0,1F
-            NEG         $0,0,1
-            PUT         :rI,$0
-            SWYM
-            % We should be safe now™
-1H          TRIP        0,:MM:__INTERNAL:Yield,0
+            DISABLE_TIMER
+1H          SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadYield
+            TRIP        0,:MM:__INTERNAL:Yield,0
             POP         0
 
 
@@ -226,15 +231,11 @@ Yield       SWYM
 %   no return values
 %
             .global :MM:__THREAD:Exit
-Exit       SWYM
-            % Disable timer and TRIP:
-            GET         $0,:rI
-            BN          $0,1F
-            NEG         $0,0,1
-            PUT         :rI,$0
-            SWYM
-            % We should be safe now™
-1H          TRIP        0,:MM:__INTERNAL:Exit,0
+Exit        SWYM
+            DISABLE_TIMER
+1H          SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadExit
+            TRIP        0,:MM:__INTERNAL:Exit,0
             POP         0
 
 %%
@@ -251,11 +252,7 @@ Exit       SWYM
             .global :MM:__THREAD:IsRunningJ
             .global :MM:__THREAD:IsRunningG
 IsRunningJ  SWYM
-            % Disable timer:
-9H          GET         $1,:rI
-            BN          $1,1F
-            NEG         $2,0,1
-            PUT         :rI,$2
+            DISABLE_TIMER
 1H          LDA         $3,:MM:__INTERNAL:ThreadRing
             LDO         $3,$3
             SET         $2,$3
@@ -274,19 +271,22 @@ IsRunningJ  SWYM
             BN          $1,3F
             PUT         :rI,$1
 3H          POP         0,0
+
 IsRunning   SET         $2,$0
             GET         $0,:rJ
+            SET         $1,#0000
             PUSHJ       $1,IsRunningJ
             NEG         $1,0,1
-            SET         $1,#0000
+            SWYM
             PUT         :rJ,$0
             SET         $0,$1
             POP         1,0
 IsRunningG  SET         $2,t
             GET         $0,:rJ
-            PUSHJ       $1,IsRunningJ
-            NEG         t,0,1
             SET         t,#0000
+            PUSHJ       t,IsRunningJ
+            NEG         t,0,1
+            SWYM
             PUT         :rJ,$0
             POP         0,0
 

@@ -24,6 +24,8 @@
 % SOFTWARE.
 %%
 
+#include "statistics.mmh"
+
             %
             % Set up an internal buffer used for various purposes
             %
@@ -183,7 +185,9 @@ DoYield     SAVE        $255,0
             STO         $0,$4,#28 % UNSAVE address
             LDO         $4,$4,#18
 
-DoUnsave    LDA         $5,:MM:__INTERNAL:ThreadRing
+DoUnsave    SWYM
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadSwitc
+            LDA         $5,:MM:__INTERNAL:ThreadRing
             STO         $4,$5
             LDO         $5,$4,#08
             SET         $6,#00EE % new
