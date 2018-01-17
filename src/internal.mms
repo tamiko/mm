@@ -27,7 +27,8 @@
 #include "statistics.mmh"
 
             %
-            % Set up an internal buffer used for various purposes
+            % Set up an internal buffer and associated mutex that can be
+            % used for various purposes.
             %
 
             .section .data,"wa",@progbits

@@ -1,7 +1,7 @@
 %%
 % MMIX support library for various purposes.
 %
-% Copyright (C) 2013-2017 Matthias Maier <tamiko@kyomu.43-1.org>
+% Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
 %
 % Permission is hereby granted, free of charge, to any person
 % obtaining a copy of this software and associated documentation files
@@ -25,16 +25,15 @@
 %%
 
 %
-% :MM:Stack:
-%
-% TODO
-%
-%
+% :MM:__ADT:
 %
 
-#ifndef MM_STACK
-#define MM_STACK
-
-#include "__internal/__stack.mmh"
-
-#endif
+            %
+            % We need two global registers for save/restore operations of
+            % registers
+            %
+            .global     :MM:__ADT:__t1
+            .global     :MM:__ADT:__t2
+            PREFIX      :MM:__ADT:
+__t1        GREG        0
+__t2        GREG        0

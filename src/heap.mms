@@ -311,17 +311,20 @@ SizeJ       SET         $5,1
             LDO         $2,$1,0 % size
             CMPU        t,$2,3*OCT % size must be at least 3 octas
             BN          t,1F
+            % verify checksum1:
+            LDO         $3,$1,1*OCT % checksum1
+            XOR         $3,$3,arg0
+            CMPU        t,$3,$2
+            BNZ         t,1F
+            % verify checksum2:
             LDO         $3,$1,1*OCT % checksum1
             SUBU        $2,$2,1*OCT
             LDO         $4,$1,$2 % checksum2
             ADDU        $2,$2,1*OCT
-            NXOR        t,$3,$4 % verify checksum2
-            BNZ         t,1F
-            XOR         $3,$3,arg0 % verify checksum1
-            CMPU        t,$3,$2
+            NXOR        t,$3,$4
             BNZ         t,1F
             SUBU        ret0,$2,3*OCT
-            BN          $5,2F
+            BNZ         $5,2F
             POP         1,1 % return for SizeJ
 2H          POP         0,1 % return for ValidJ
 1H          POP         0,0
