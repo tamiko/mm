@@ -24,12 +24,12 @@
 % SOFTWARE.
 %%
 
-            .macro      __SAVE_REGISTERS
+            .macro      Deque:__SAVE_REGISTERS
             GET         :MM:__ADT:__t1,:rJ
             SET         :MM:__ADT:__t2,:$255
             .endm
 
-            .macro      __RESTORE_REGISTERS
+            .macro      Deque:__RESTORE_REGISTERS
             PUT         :rJ,:MM:__ADT:__t1
             SET         :MM:__ADT:__t1,$255
             SET         $255,:MM:__ADT:__t2
@@ -43,8 +43,8 @@
             % ptr --> DATA
             %
 
-            .macro      Deque:__Push front back size side=0
-            __SAVE_REGISTERS
+            .macro      Deque:__PUSH front back size side=0
+            Deque:__SAVE_REGISTERS
             BNZ         \front,__1h_dpu\@
             % sanity check: both registers must be #0:
             BNZ         \back,__er_dpu\@
@@ -68,7 +68,7 @@ __1h_dpu\@  SET         $255,\front
             SUBU        $255,$255,#10
             PUSHJ       $255,:MM:__HEAP:ValidG
             BN          $255,__er_dpu\@
-            % TODO: Additional checks?
+
             SET         $255,\size
             ADDU        $255,$255,#10
             PUSHJ       $255,:MM:__HEAP:AllocG
@@ -88,20 +88,20 @@ __1h_dpu\@  SET         $255,\front
             SET         $255,#0
             JMP         @+#8
 __er_dpu\@  NEG         $255,0,1
-            __RESTORE_REGISTERS
+            Deque:__RESTORE_REGISTERS
             .endm
 
             .macro      Deque:PushFront front back size
-            Deque:__Push \front,\back,\size,1
+            Deque:__PUSH \front,\back,\size,1
             .endm
 
             .macro      Deque:PushBack front back size
-            Deque:__Push \front,\back,\size,0
+            Deque:__PUSH \front,\back,\size,0
             .endm
 
 
-            .macro      Deque:__Pop front back side=0
-            __SAVE_REGISTERS
+            .macro      Deque:__POP front back side=0
+            Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
             SET         $255,\front
             SUBU        $255,$255,#10
@@ -111,7 +111,6 @@ __er_dpu\@  NEG         $255,0,1
             SUBU        $255,$255,#10
             PUSHJ       $255,:MM:__HEAP:ValidG
             BN          $255,__er_dpo\@
-            % TODO: Additional checks?
             CMP         $255,\front,\back
             BNZ         $255,__1h_dpo\@
             SET         $255,\front
@@ -138,13 +137,13 @@ __1h_dpo\@  SUBU        \front,\front,#10
             SET         $255,#0
             JMP         @+#8
 __er_dpo\@  NEG         $255,0,1
-            __RESTORE_REGISTERS
+            Deque:__RESTORE_REGISTERS
             .endm
 
             .macro      Deque:PopFront front back
-            Deque:__Pop \front,\back,1
+            Deque:__POP \front,\back,1
             .endm
 
             .macro      Deque:PopBack front back
-            Deque:__Pop \front,\back,0
+            Deque:__POP \front,\back,0
             .endm
