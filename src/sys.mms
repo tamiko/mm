@@ -90,7 +90,7 @@ Abort       SET         t,1
             .global :MM:__SYS:AtError
             .global :MM:__SYS:AtErrorG
 AtErrorG    SET         arg0,t
-AtError     LDA         $1,:MM:__SYS:AtErrorAddr
+AtError     GETA        $1,:MM:__SYS:AtErrorAddr
             STO         arg0,$1
             SET         t,arg0
             POP         0
