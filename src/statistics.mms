@@ -78,11 +78,15 @@ thread_clon BYTE        "    Number of Thread:Clone invocations:      ",0
 thread_crea BYTE        "    Number of Thread:Create invocations:     ",0
 thread_exit BYTE        "    Number of Thread:Exit invocations:       ",0
 
+hist1       BYTE        "]  ",0
+hist2       BYTE        "#",0
+hist3       BYTE        " ",0
+
 timing_head BYTE        "Timing statistics (using :rU):",10,0
 timing_tota BYTE        "    Total runtime:                           ",0
-timing_trip BYTE        "    Time spent in trip handler:              ",0
-timing_crit BYTE        "    Time spent in critical regions:          ",0
-timing_user BYTE        "    Time spent in preemptible user mode:     ",0
+timing_his1 BYTE        "        Trip handler:     [",0
+timing_his2 BYTE        "        Critical regions: [",0
+timing_his3 BYTE        "        User mode         [",0
 
 heap_header BYTE        "Heap statistics:",10,0
 heap_alloc  BYTE        "    Number of allocations:                   ",0
@@ -92,10 +96,7 @@ heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
 heap_hist1  BYTE        "    Allocations: ",10,0
 heap_hist2  BYTE        "           ",0
 heap_hist3  BYTE        "        >= ",0
-heap_hist4  BYTE        " bytes:  [",0
-heap_hist5  BYTE        " ]  ",0
-heap_hist6  BYTE        "#",0
-heap_hist7  BYTE        " ",0
+heap_hist4  BYTE        " bytes:    [",0
 
 
             .section .text,"ax",@progbits
@@ -107,6 +108,35 @@ heap_hist7  BYTE        " ",0
             PUSHJ       $255,:MM:__PRINT:StrG
             LDA         $255,\label
             LDO         $255,$255
+            PUSHJ       $255,:MM:__PRINT:UnsignedG
+            PUSHJ       $255,:MM:__PRINT:Ln
+            .endm
+
+            .macro      PRINT_HIST register1 register2 label width padding=0
+            LDA         $255,\label
+            PUSHJ       $255,:MM:__PRINT:StrG
+            SET         $255,#0000
+            PUT         :rD,$255
+            MULU        $30,\register1,\width
+            DIVU        $30,$30,\register2
+            .if \padding
+            GET         $255,:rR
+            BNP         $255,7F
+            ADDU        $30,$30,1
+            .endif
+7H          SET         $31,0
+4H          CMPU        $255,$31,$30
+            BN          $255,5F
+            LDA         $255,STRS:hist3
+            JMP         6F
+5H          LDA         $255,STRS:hist2
+6H          PUSHJ       $255,:MM:__PRINT:StrG
+            ADDU        $31,$31,1
+            CMPU        $255,$31,\width
+            BNZ         $255,4B
+            LDA         $255,STRS:hist1
+            PUSHJ       $255,:MM:__PRINT:StrG
+            SET         $255,\register1
             PUSHJ       $255,:MM:__PRINT:UnsignedG
             PUSHJ       $255,:MM:__PRINT:Ln
             .endm
@@ -141,20 +171,18 @@ PrintStatistics SWYM
             LDA         $255,STRS:timing_head
             PUSHJ       $255,:MM:__PRINT:StrG
             PRINT_FIELD STRS:timing_tota,TimingTotal
-            PRINT_FIELD STRS:timing_trip,TimingTripH
-            PRINT_FIELD STRS:timing_crit,TimingCriti
-            LDA         $255,STRS:timing_user
-            PUSHJ       $255,:MM:__PRINT:StrG
-            LDA         $255,TimingTotal
-            LDO         $255,$255
+            LDA         $1,TimingTotal
+            LDO         $1,$1
             LDA         $2,TimingTripH
             LDO         $2,$2
-            SUBU        $255,$255,$2
-            LDA         $2,TimingCriti
-            LDO         $2,$2
-            SUBU        $255,$255,$2
-            PUSHJ       $255,:MM:__PRINT:UnsignedG
-            PUSHJ       $255,:MM:__PRINT:Ln
+            LDA         $3,TimingCriti
+            LDO         $3,$3
+            SUBU        $4,$1,$2
+            SUBU        $4,$4,$3
+            % bar chart:
+            PRINT_HIST $2,$1,STRS:timing_his1,64
+            PRINT_HIST $3,$1,STRS:timing_his2,64
+            PRINT_HIST $4,$1,STRS:timing_his3,64
 
             %
             % Heap:
@@ -190,44 +218,21 @@ PrintStatistics SWYM
             SET         $255,10
             CMP         $255,$5,$255
             BNN         $255,5F
-            LDA         $255,STRS:heap_hist7
+            LDA         $255,STRS:hist3
             PUSHJ       $255,:MM:__PRINT:StrG
 5H          SET         $255,100
             CMP         $255,$5,$255
             BNN         $255,5F
-            LDA         $255,STRS:heap_hist7
+            LDA         $255,STRS:hist3
             PUSHJ       $255,:MM:__PRINT:StrG
 5H          SET         $255,1000
             CMP         $255,$5,$255
             BNN         $255,5F
-            LDA         $255,STRS:heap_hist7
+            LDA         $255,STRS:hist3
             PUSHJ       $255,:MM:__PRINT:StrG
 5H          PUSHJ       $4,:MM:__PRINT:Unsigned
-            LDA         $255,STRS:heap_hist4
-            PUSHJ       $255,:MM:__PRINT:StrG
-            SET         $4,#0000
-            PUT         :rD,$4
             LDO         $4,$3,$1
-            MULU        $4,$4,#40
-            DIVU        $4,$4,$2
-            GET         $255,:rR
-            BNP         $255,7F
-            ADDU        $4,$4,1
-7H          SET         $5,0
-4H          CMPU        $255,$5,$4
-            BN          $255,5F
-            LDA         $255,STRS:heap_hist7
-            JMP         6F
-5H          LDA         $255,STRS:heap_hist6
-6H          PUSHJ       $255,:MM:__PRINT:StrG
-            ADDU        $5,$5,1
-            CMPU        $255,$5,64
-            BNZ         $255,4B
-            LDA         $255,STRS:heap_hist5
-            PUSHJ       $255,:MM:__PRINT:StrG
-            LDO         $255,$3,$1
-            PUSHJ       $255,:MM:__PRINT:UnsignedG
-            PUSHJ       $255,:MM:__PRINT:Ln
+            PRINT_HIST  $4,$2,STRS:heap_hist4,64,1
             ADD         $1,$1,#0008
             JMP         1B
 9H          PUSHJ       $255,:MM:__INTERNAL:LeaveCritical
