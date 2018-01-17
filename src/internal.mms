@@ -103,7 +103,10 @@ Exit        IS          #F0
 
 9H          LDA         $1,:MM:__INTERNAL:STRS:SwitchError
             PUSHJ       $0,:MM:__ERROR:IError1
-TripHandler GET         $2,:rW
+TripHandler SWYM
+            STORE_SPECIAL :rU,:MM:__STATISTICS:__buffer
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadTripH
+            GET         $2,:rW
             GET         $1,:rJ
             SET         $0,$255
             %
@@ -245,6 +248,8 @@ DoUnsave    SWYM
             STO         $255,$1,$2
             SUBU        $2,$2,#8
             BNN         $2,1B
+            % We have to take statistics a bit prematurely:
+            STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingTripH
             % UNSAVE to get a valid context:
             UNSAVE      0,$0
             %
@@ -375,6 +380,7 @@ DoClone     SAVE        $255,0
             BN          $2,1F
             ADDU        $2,$2,#000B
             PUT         :rI,$2
+            STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingTripH
 1H          POP 0
 
             %
@@ -393,20 +399,29 @@ stored_int  OCTA        #FFFFFFFFFFFFFFFF
             PREFIX      :MM:__INTERNAL:
             .global :MM:__INTERNAL:EnterCritical
             .global :MM:__INTERNAL:LeaveCritical
-EnterCritical GET       $0,:rI
-            BN          $0,1F
+EnterCritical SWYM
+            GET         $0,:rI
             NEG         $1,0,1
+            LDA         $2,stored_int
+            BN          $0,1F
+            %
+            % If :rI is negative we are either in the TripHandler or
+            % preemptive threading is disabled. Do not update statistics in
+            % either of these cases...
+            %
+            INCREMENT_COUNTER :MM:__STATISTICS:ThreadCriti
+            STORE_SPECIAL :rU,:MM:__STATISTICS:__buffer
             PUT         :rI,$1
-            LDA         $2,stored_int
             STO         $0,$2
             POP         0,0
-1H          NEG         $0,0,1
-            LDA         $2,stored_int
-            STO         $0,$2
-            POP         0,0
+1H          STO         $1,$2
+2H          POP         0,0
 
-LeaveCritical LDA       $0,stored_int
+
+LeaveCritical SWYM
+            LDA         $0,stored_int
             LDO         $0,$0
             BN          $0,1F
+            STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingCriti
             PUT         :rI,$0
 1H          POP         0,0

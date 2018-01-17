@@ -29,11 +29,27 @@
 
 #ifdef STATISTICS
 
-            .macro      INCREMENT_COUNTER label offset=0
+            .macro      LOCK_STATISTICS
+            LDA         $30,:MM:__STATISTICS:__lock
+            NEG         $31,0,1
+            STO         $31,$30
+            .endm
+
+            .macro      UNLOCK_STATISTICS
+            LDA         $30,:MM:__STATISTICS:__lock
+            SET         $31,#0000
+            STO         $31,$30
+            .endm
+
+            .macro      INCREMENT_COUNTER label offset=0 increment=1
             LDA         $30,\label
             ADDU        $30,$30,\offset
             LDO         $31,$30
-            ADDU        $31,$31,1
+            .if \increment > 0
+            ADDU        $31,$31,\increment
+            .else
+            SUBU        $31,$31,(-\increment)
+            .endif
             STO         $31,$30
             .endm
 
@@ -46,17 +62,44 @@
             STO         $31,$30
             .endm
 
+            .macro      STORE_SPECIAL register label
+            GET         $30,\register
+            LDA         $31,\label
+            STO         $30,$31
+            .endm
+
+            .macro      STORE_DIFFERENCE register label1 label2
+            GET         $30,\register
+            LDA         $31,\label1
+            LDO         $31,$31
+            SUBU        $30,$30,$31
+            LDA         $31,\label2
+            LDO         $31,$31
+            ADDU        $30,$30,$31
+            LDA         $31,\label2
+            STO         $30,$31
+            .endm
+
 #else
 
-            .macro      INCREMENT_COUNTER label offset=0
-            SWYM
+            .macro      LOCK_STATISTICS
+            .endm
+
+            .macro      UNLOCK_STATISTICS
+            .endm
+
+            .macro      INCREMENT_COUNTER label offset=0 increment=1
             .endm
 
             .macro      STORE_MAX register label
-            SWYM
             .endm
 
-#endif
+            .macro      STORE_SPECIAL register label
+            .endm
 
+            .macro      STORE_DIFFERENCE register label1 label2
+            .endm
+
+#endif /* STATISTICS */
 
 #endif /* MM_INTERNAL_STATISTICS */
