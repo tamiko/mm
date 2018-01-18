@@ -24,25 +24,21 @@
 % SOFTWARE.
 %%
 
-%
-% Global register allocation
-%
+            %
+            % Arithmetic exception handler
+            %
 
-            %
-            % A global register used for passing arguments to G variant
-            % subroutines:
-            %
-            .global     :MM:t
-            PREFIX      :MM:
-t           GREG        0
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__INTERNAL:STRS:
+            .balign 4
+NotImplem   BYTE        "Arithmetic exception handler not implemented.\n",0
 
-            %
-            % Three internal global registers for save/restore operations.
-            %
-            .global     :MM:__INTERNAL:__t1
-            .global     :MM:__INTERNAL:__t2
-            .global     :MM:__INTERNAL:__t3
+            .section .text,"ax",@progbits
+            .global :MM:__INTERNAL:ExcHandler
             PREFIX      :MM:__INTERNAL:
-__t1        GREG        0
-__t2        GREG        0
-__t3        GREG        0
+ExcHandler  SWYM
+            SET         $0,$255
+            GET         $1,:rJ
+            % We do not handle arithmetic exceptions at the moment.
+            GETA        $1,:MM:__INTERNAL:STRS:NotImplem
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
