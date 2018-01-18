@@ -385,9 +385,10 @@ DoClone     SAVE        $255,0
             LDO         $2,$2
             BN          $2,1F
             ADDU        $2,$2,#000B
-            PUT         :rI,$2
             STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingTripH
+            PUT         :rI,$2
 1H          POP 0
+
 
             %
             % :MM:__INTERNAL:EnterCritical
@@ -400,6 +401,7 @@ DoClone     SAVE        $255,0
             .balign 8
             PREFIX      :MM:__INTERNAL:
 stored_int  OCTA        #FFFFFFFFFFFFFFFF
+
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__INTERNAL:
