@@ -25,16 +25,16 @@
 %%
 
             .macro      Deque:__SAVE_REGISTERS
-            GET         :MM:__DEQUE:__t1,:rJ
-            SET         :MM:__DEQUE:__t2,:$255
+            GET         :MM:__INTERNAL:__t1,:rJ
+            SET         :MM:__INTERNAL:__t2,:$255
             .endm
 
             .macro      Deque:__RESTORE_REGISTERS
-            PUT         :rJ,:MM:__DEQUE:__t1
-            SET         :MM:__DEQUE:__t1,$255
-            SET         $255,:MM:__DEQUE:__t2
-            CMP         :MM:__DEQUE:__t1,:MM:__DEQUE:__t1,#0
-            BZ          :MM:__DEQUE:__t1,@+#8
+            PUT         :rJ,:MM:__INTERNAL:__t1
+            SET         :MM:__INTERNAL:__t1,$255
+            SET         $255,:MM:__INTERNAL:__t2
+            CMP         :MM:__INTERNAL:__t1,:MM:__INTERNAL:__t1,#0
+            BZ          :MM:__INTERNAL:__t1,@+#8
             .endm
 
             %

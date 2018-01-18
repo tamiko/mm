@@ -41,7 +41,8 @@ GuardMessa  BYTE        "I'm sorry Dave. I'm afraid I can't do that. ",10
             .section .text,"ax",@progbits
             .global :MM:__INIT:__guard
             PREFIX      :MM:__INIT:
-__guard     GETA        $255,__guard
-            ADD         $255,$255,4
+t           IS          :MM:t
+__guard     GETA        t,__guard
+            ADD         t,t,4
             GETA        $1,:MM:__INIT:STRS:GuardMessa
             PUSHJ       $0,:MM:__ERROR:Error1

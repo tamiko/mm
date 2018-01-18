@@ -80,7 +80,7 @@ BinaryRead  IS          :BinaryRead
             .section .text,"ax",@progbits
             PREFIX      :MM:__RAND:
 
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 OCT         IS          #8
@@ -118,7 +118,7 @@ Octa        GET         $0,:rJ
 %%
 % :MM:__RAND:OctaG
 %
-% PUSHJ $255
+% PUSHJ
 %
             .global :MM:__RAND:OctaG
 OctaG       GET         $0,:rJ

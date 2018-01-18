@@ -37,7 +37,7 @@ Ln          BYTE        10,0
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__PRINT:
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 Fputs       IS          :Fputs
 StdOut      IS          :StdOut
@@ -64,11 +64,13 @@ StdOut      IS          :StdOut
             .global :MM:__PRINT:StrLnG
 Str         SET         t,$0
 StrG        SET         $0,t
+            SET         $255,t
             TRAP        0,Fputs,StdOut
             SET         t,$0
             POP         0,0
 StrLn       SET         t,$0
 StrLnG      SET         $0,t
+            SET         $255,t
             TRAP        0,Fputs,StdOut
             GET         $1,:rJ
             PUSHJ       t,Ln
@@ -150,7 +152,7 @@ RegP        ADD         $5,$1,$1
             PBNZ        ptr,2B
             SET         $3,'#'
             STB         $3,buffer,0
-            SET         t,buffer
+            SET         $255,buffer
             TRAP        0,Fputs,StdOut
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
@@ -198,7 +200,7 @@ Byte        GET         $10,:rJ
             ADDU        $2,$2,7
 1H          ADD         $2,$2,48
             STB         $2,buffer,1
-            SET         t,buffer
+            SET         $255,buffer
             TRAP        0,Fputs,StdOut
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
@@ -248,8 +250,8 @@ Unsigned    GET         $10,:rJ
             STB         t,buffer,ptr
             SUBU        ptr,ptr,1
             JMP         9B
-2H          ADDU        t,buffer,ptr
-            ADDU        t,t,1
+2H          ADDU        $255,buffer,ptr
+            ADDU        $255,$255,1
             TRAP        0,Fputs,StdOut
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
@@ -284,7 +286,7 @@ Signed      GET         $2,:rJ
             STCO        0,buffer,0
             SET         t,'-'
             STB         t,buffer,0
-            SET         t,buffer
+            SET         $255,buffer
             TRAP        0,Fputs,StdOut
             GETA        t,:MM:__INTERNAL:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
@@ -336,13 +338,13 @@ MemLn       GET         $2,:rJ
 %%
 % :MM:__PRINT:Ln
 %
-% PUSHJ, PUSHJ $255
+% PUSHJ
 %   no arguments
 %   no return value
 %
             .global :MM:__PRINT:Ln
 Ln          SET         $0,t
-            GETA        t,:MM:__PRINT:STRS:Ln
+            GETA        $255,:MM:__PRINT:STRS:Ln
             TRAP        0,Fputs,StdOut
             SET         t,$0
             POP         0,0

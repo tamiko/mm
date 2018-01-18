@@ -74,7 +74,7 @@ Fputs       IS          :Fputs
 StdErr      IS          :StdErr
 Halt        IS          :Halt
 
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 arg2        IS          $2
@@ -111,7 +111,7 @@ ErrByteG    SET         arg0,t
             ADDU        $2,$2,7
 1H          ADD         $2,$2,48
             STB         $2,buffer,1
-            SET         t,buffer
+            SET         $255,buffer
             TRAP        0,Fputs,StdErr
             POP         0,0
 
@@ -147,7 +147,7 @@ ErrRegG     SET         $0,t
             PBNZ        ptr,2B
             SET         $3,'#'
             STB         $3,buffer,0
-            SET         t,buffer
+            SET         $255,buffer
             TRAP        0,Fputs,StdErr
             SET         t,$4 % restore original value
             POP         0,0
@@ -159,16 +159,16 @@ ErrRegG     SET         $0,t
             .global     :MM:__ERROR:ErrorBanner
 ErrorBanner GET         $0,:rJ
             SET         $10,t
-            GETA        t,:MM:__ERROR:STRS:Error1
+            GETA        $255,:MM:__ERROR:STRS:Error1
             TRAP        0,Fputs,StdErr
             SET         t,$10
             SUBU        t,t,#4
             PUSHJ       t,ErrRegG
-            GETA        t,:MM:__ERROR:STRS:Error2
+            GETA        $255,:MM:__ERROR:STRS:Error2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__THREAD:ThreadIDG
             PUSHJ       t,ErrRegG
-            GETA        t,:MM:__ERROR:STRS:Error3
+            GETA        $255,:MM:__ERROR:STRS:Error3
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUT         :rJ,$0
@@ -185,7 +185,7 @@ ErrorBanner GET         $0,:rJ
 %
             .global :MM:__ERROR:IError0
 IError0     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            GETA        t,:MM:__ERROR:STRS:InternErro
+            GETA        $255,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -200,9 +200,9 @@ IError0     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError1
 IError1     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            GETA        t,:MM:__ERROR:STRS:InternErro
+            GETA        $255,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -218,11 +218,11 @@ IError1     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError2
 IError2     PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            GETA        t,:MM:__ERROR:STRS:InternErro
+            GETA        $255,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
-            SET         t,arg1
+            SET         $255,arg1
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -240,15 +240,15 @@ IError2     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 %
             .global :MM:__ERROR:IError4R3
 IError4R3   PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            GETA        t,:MM:__ERROR:STRS:InternErro
+            GETA        $255,:MM:__ERROR:STRS:InternErro
             TRAP        0,Fputs,StdErr
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
-            SET         t,arg1
+            SET         $255,arg1
             TRAP        0,Fputs,StdErr
             SET         t,arg2
             PUSHJ       t,ErrRegG
-            SET         t,arg3
+            SET         $255,arg3
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
 
@@ -285,7 +285,7 @@ Error0      SET         $10,t
 Error1      SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -304,9 +304,9 @@ Error1      SET         $10,t
 Error2      SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
-            SET         t,arg1
+            SET         $255,arg1
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -326,11 +326,11 @@ Error2      SET         $10,t
 Error3R2    SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             SET         t,arg1
             PUSHJ       t,ErrRegG
-            SET         t,arg2
+            SET         $255,arg2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -350,11 +350,11 @@ Error3R2    SET         $10,t
 Error3RB2   SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             SET         t,arg1
             PUSHJ       t,ErrByteG
-            SET         t,arg2
+            SET         $255,arg2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -376,15 +376,15 @@ Error3RB2   SET         $10,t
 Error5R24   SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             SET         t,arg1
             PUSHJ       t,ErrRegG
-            SET         t,arg2
+            SET         $255,arg2
             TRAP        0,Fputs,StdErr
             SET         t,arg3
             PUSHJ       t,ErrRegG
-            SET         t,arg4
+            SET         $255,arg4
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -406,15 +406,15 @@ Error5R24   SET         $10,t
 Error5RB24  SET         $10,t
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            SET         t,arg0
+            SET         $255,arg0
             TRAP        0,Fputs,StdErr
             SET         t,arg1
             PUSHJ       t,ErrByteG
-            SET         t,arg2
+            SET         $255,arg2
             TRAP        0,Fputs,StdErr
             SET         t,arg3
             PUSHJ       t,ErrRegG
-            SET         t,arg4
+            SET         $255,arg4
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             JMP         ErrorHndl
@@ -427,7 +427,7 @@ ErrorHndl   GETA        $0,:MM:__SYS:AtErrorAddr
             BNZ         $0,1F
             % Abort program:
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            GETA        t,:MM:__ERROR:STRS:Terminated
+            GETA        $255,:MM:__ERROR:STRS:Terminated
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__SYS:Abort
             % Continue execution if we encounter the special value -1:
@@ -437,11 +437,11 @@ ErrorHndl   GETA        $0,:MM:__SYS:AtErrorAddr
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            GETA        t,:MM:__ERROR:STRS:Continued2
+            GETA        $255,:MM:__ERROR:STRS:Continued2
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUSHJ       t,ErrRegG
-            GETA        t,:MM:__ERROR:STRS:Continued3
+            GETA        $255,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10
@@ -451,12 +451,12 @@ ErrorHndl   GETA        $0,:MM:__SYS:AtErrorAddr
 1H          PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            GETA        t,:MM:__ERROR:STRS:ErrorHndlC1
+            GETA        $255,:MM:__ERROR:STRS:ErrorHndlC1
             TRAP        0,Fputs,StdErr
             GETA        t,:MM:__SYS:AtErrorAddr
-            LDO         t,t
+            LDO         t,t,0
             PUSHJ       t,ErrRegG
-            GETA        t,:MM:__ERROR:STRS:ErrorHndlC2
+            GETA        $255,:MM:__ERROR:STRS:ErrorHndlC2
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10
@@ -464,11 +464,11 @@ ErrorHndl   GETA        $0,:MM:__SYS:AtErrorAddr
             PUSHJ       t,:MM:__INTERNAL:EnterCritical
             SET         t,$10
             PUSHJ       t,:MM:__ERROR:ErrorBanner
-            GETA        t,:MM:__ERROR:STRS:Continued1
+            GETA        $255,:MM:__ERROR:STRS:Continued1
             TRAP        0,Fputs,StdErr
             SET         t,$10
             PUSHJ       t,ErrRegG
-            GETA        t,:MM:__ERROR:STRS:Continued3
+            GETA        $255,:MM:__ERROR:STRS:Continued3
             TRAP        0,Fputs,StdErr
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             SET         t,$10

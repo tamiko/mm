@@ -104,7 +104,7 @@ Pool        BYTE        #EE,#EE,#EE
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__FILE:
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 arg2        IS          $2
@@ -512,9 +512,9 @@ OpenJ       GET         $6,:rJ
             STO         arg1,$4,8
             SLU         $3,fh,3 % *8
             GETA        $5,OpenTable
-            SET         t,$4
+            SET         $255,$4
             GO          $4,$5,$3
-7H          BN          t,1F
+7H          BN          $255,1F
             SRU         $3,fh,3 % /8
             SET         $0,fh
             GETA        t,:MM:__FILE:PoolMutex
@@ -856,7 +856,7 @@ CloseJ      AND         arg0,arg0,#FF
             GETA        $4,CloseTable
             GO          $4,$4,arg0
 7H          SRU         arg0,arg0,3 % /8
-            BN          t,9F
+            BN          $255,9F
             SET         $3,0
             STBU        $3,pool,arg0
             GETA        t,:MM:__FILE:PoolMutex
@@ -1315,7 +1315,7 @@ TellJ       AND         arg0,arg0,#FF
             SLU         arg0,arg0,3 % *8
             GETA        $2,TellTable
             GO          $2,$2,arg0
-7H          SET         ret0,t
+7H          SET         ret0,$255
             % check that ret0 >= 0
             BN          $0,9F
             PUT         :rJ,$1
@@ -1669,9 +1669,9 @@ SeekJ       AND         arg0,arg0,#FF
             GET         $2,:rJ
             SLU         arg0,arg0,3 % *8
             GETA        $3,SeekTable
-            SET         t,arg1
+            SET         $255,arg1
             GO          $3,$3,arg0
-7H          SET         ret0,t
+7H          SET         ret0,$255
             % check that ret0 >= 0
             BN          $0,9F
             PUT         :rJ,$2
@@ -1979,11 +1979,11 @@ ReadJ       BN          arg2,9F % invalid size
             GETA        $4,ReadTable
             GETA        t,ReadBuffer
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            ADDU        t,t,#8
-            STO         arg1,t,#0
-            STO         arg2,t,#8
+            ADDU        $255,t,#8
+            STO         arg1,$255,#0
+            STO         arg2,$255,#8
             GO          $4,$4,arg0
-7H          SET         ret0,t
+7H          SET         ret0,$255
             GETA        t,ReadBuffer
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1
@@ -2293,11 +2293,11 @@ WriteJ      BN          arg2,9F % invalid size
             GETA        $4,WriteTable
             GETA        t,WriteBuffer
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            ADDU        t,t,#8
-            STO         arg1,t,#0
-            STO         arg2,t,#8
+            ADDU        $255,t,#8
+            STO         arg1,$255,#0
+            STO         arg2,$255,#8
             GO          $4,$4,arg0
-7H          SET         ret0,t
+7H          SET         ret0,$255
             GETA        t,WriteBuffer
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             % check that ret0 != - size - 1

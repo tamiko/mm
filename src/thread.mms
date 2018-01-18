@@ -56,7 +56,7 @@ Exit        IS          #F0
             .section .text,"ax",@progbits
             PREFIX      :MM:__THREAD:
 
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 
 
@@ -70,7 +70,7 @@ arg0        IS          $0
 % :MM:__THREAD:EnableJ
 % :MM:__THREAD:EnableG
 %
-% PUSHJ %255
+% PUSHJ
 %
             .global :MM:__THREAD:Enable
             .global :MM:__THREAD:EnableJ
@@ -121,7 +121,7 @@ Disable     NEG         $1,0,1
 %
 % :MM:__THREAD:ThreadIDG
 %
-% PUSHJ %255
+% PUSHJ
 %
             .global :MM:__THREAD:ThreadID
             .global :MM:__THREAD:ThreadIDG
@@ -130,8 +130,8 @@ ThreadID    GETA        $0,:MM:__INTERNAL:ThreadRing
             LDO         $0,$0
             POP         1,0
 ThreadIDG   GETA        t,:MM:__INTERNAL:ThreadRing
-            LDO         t,t
-            LDO         t,t
+            LDO         t,t,0
+            LDO         t,t,0
             POP         0
 
 

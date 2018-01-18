@@ -124,43 +124,44 @@ heap_hist4  BYTE        " bytes:    [",0
             .section .text,"ax",@progbits
             .global     :MM:__STATISTICS:PrintStatistics
             PREFIX      :MM:__STATISTICS:
+t           IS          :MM:t
 
             .macro      PRINT_FIELD string label
-            GETA        $255,\string
-            PUSHJ       $255,:MM:__PRINT:StrG
-            GETA        $255,\label
-            LDO         $255,$255
-            PUSHJ       $255,:MM:__PRINT:UnsignedG
-            PUSHJ       $255,:MM:__PRINT:Ln
+            GETA        t,\string
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        t,\label
+            LDO         t,t,0
+            PUSHJ       t,:MM:__PRINT:UnsignedG
+            PUSHJ       t,:MM:__PRINT:Ln
             .endm
 
             .macro      PRINT_HIST register1 register2 label width padding=0
-            GETA        $255,\label
-            PUSHJ       $255,:MM:__PRINT:StrG
-            SET         $255,#0000
-            PUT         :rD,$255
+            GETA        t,\label
+            PUSHJ       t,:MM:__PRINT:StrG
+            SET         t,#0000
+            PUT         :rD,t
             MULU        $30,\register1,\width
             DIVU        $30,$30,\register2
             .if \padding
-            GET         $255,:rR
-            BNP         $255,7F
+            GET         t,:rR
+            BNP         t,7F
             ADDU        $30,$30,1
             .endif
 7H          SET         $31,0
-4H          CMPU        $255,$31,$30
-            BN          $255,5F
-            GETA        $255,STRS:hist3
+4H          CMPU        t,$31,$30
+            BN          t,5F
+            GETA        t,STRS:hist3
             JMP         6F
-5H          GETA        $255,STRS:hist2
-6H          PUSHJ       $255,:MM:__PRINT:StrG
+5H          GETA        t,STRS:hist2
+6H          PUSHJ       t,:MM:__PRINT:StrG
             ADDU        $31,$31,1
-            CMPU        $255,$31,\width
-            BNZ         $255,4B
-            GETA        $255,STRS:hist1
-            PUSHJ       $255,:MM:__PRINT:StrG
-            SET         $255,\register1
-            PUSHJ       $255,:MM:__PRINT:UnsignedG
-            PUSHJ       $255,:MM:__PRINT:Ln
+            CMPU        t,$31,\width
+            BNZ         t,4B
+            GETA        t,STRS:hist1
+            PUSHJ       t,:MM:__PRINT:StrG
+            SET         t,\register1
+            PUSHJ       t,:MM:__PRINT:UnsignedG
+            PUSHJ       t,:MM:__PRINT:Ln
             .endm
 
 PrintStatistics SWYM
@@ -170,14 +171,14 @@ PrintStatistics SWYM
             GETA        $31,TimingTotal
             STO         $30,$31
             GET         $0,:rJ
-            PUSHJ       $255,:MM:__INTERNAL:EnterCritical
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
 
             %
             % Threading:
             %
-            PUSHJ       $255,:MM:__PRINT:Ln
-            GETA        $255,STRS:thread_head
-            PUSHJ       $255,:MM:__PRINT:StrG
+            PUSHJ       t,:MM:__PRINT:Ln
+            GETA        t,STRS:thread_head
+            PUSHJ       t,:MM:__PRINT:StrG
             PRINT_FIELD STRS:thread_trip,ThreadTripH
             PRINT_FIELD STRS:thread_crit,ThreadCriti
             PRINT_FIELD STRS:thread_swit,ThreadSwitc
@@ -189,9 +190,9 @@ PrintStatistics SWYM
             %
             % Timing:
             %
-            PUSHJ       $255,:MM:__PRINT:Ln
-            GETA        $255,STRS:timing_head
-            PUSHJ       $255,:MM:__PRINT:StrG
+            PUSHJ       t,:MM:__PRINT:Ln
+            GETA        t,STRS:timing_head
+            PUSHJ       t,:MM:__PRINT:StrG
             PRINT_FIELD STRS:timing_tota,TimingTotal
             GETA        $1,TimingTotal
             LDO         $1,$1
@@ -209,9 +210,9 @@ PrintStatistics SWYM
             %
             % Heap:
             %
-            PUSHJ       $255,:MM:__PRINT:Ln
-            GETA        $255,STRS:heap_header
-            PUSHJ       $255,:MM:__PRINT:StrG
+            PUSHJ       t,:MM:__PRINT:Ln
+            GETA        t,STRS:heap_header
+            PUSHJ       t,:MM:__PRINT:StrG
             PRINT_FIELD STRS:heap_alloc,HeapAlloc
             PRINT_FIELD STRS:heap_deallo,HeapDealloc
             PRINT_FIELD STRS:heap_grow,HeapGrow
@@ -219,45 +220,45 @@ PrintStatistics SWYM
             %
             % Print a histogram:
             %
-            GETA        $255,STRS:heap_hist1
-            PUSHJ       $255,:MM:__PRINT:StrG
+            GETA        t,STRS:heap_hist1
+            PUSHJ       t,:MM:__PRINT:StrG
             SET         $1,#0000
             GETA        $2,HeapAlloc
             LDO         $2,$2
             GETA        $3,HeapSizes
-1H          SET         $255,#0100
-            CMPU        $255,$1,$255
-            BNN         $255,9F
-            SET         $255,#00f8
-            CMPU        $255,$1,$255
-            BN          $255,2F
-            GETA        $255,STRS:heap_hist3
+1H          SET         t,#0100
+            CMPU        t,$1,t
+            BNN         t,9F
+            SET         t,#00f8
+            CMPU        t,$1,t
+            BN          t,2F
+            GETA        t,STRS:heap_hist3
             JMP         3F
-2H          GETA        $255,STRS:heap_hist2
-3H          PUSHJ       $255,:MM:__PRINT:StrG
+2H          GETA        t,STRS:heap_hist2
+3H          PUSHJ       t,:MM:__PRINT:StrG
             ADDU        $5,$1,#8
             SLU         $5,$5,3
-            SET         $255,10
-            CMP         $255,$5,$255
-            BNN         $255,5F
-            GETA        $255,STRS:hist3
-            PUSHJ       $255,:MM:__PRINT:StrG
-5H          SET         $255,100
-            CMP         $255,$5,$255
-            BNN         $255,5F
-            GETA        $255,STRS:hist3
-            PUSHJ       $255,:MM:__PRINT:StrG
-5H          SET         $255,1000
-            CMP         $255,$5,$255
-            BNN         $255,5F
-            GETA        $255,STRS:hist3
-            PUSHJ       $255,:MM:__PRINT:StrG
+            SET         t,10
+            CMP         t,$5,t
+            BNN         t,5F
+            GETA        t,STRS:hist3
+            PUSHJ       t,:MM:__PRINT:StrG
+5H          SET         t,100
+            CMP         t,$5,t
+            BNN         t,5F
+            GETA        t,STRS:hist3
+            PUSHJ       t,:MM:__PRINT:StrG
+5H          SET         t,1000
+            CMP         t,$5,t
+            BNN         t,5F
+            GETA        t,STRS:hist3
+            PUSHJ       t,:MM:__PRINT:StrG
 5H          PUSHJ       $4,:MM:__PRINT:Unsigned
             LDO         $4,$3,$1
             PRINT_HIST  $4,$2,STRS:heap_hist4,64,1
             ADD         $1,$1,#0008
             JMP         1B
-9H          PUSHJ       $255,:MM:__INTERNAL:LeaveCritical
+9H          PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$0
 #endif
             POP         0

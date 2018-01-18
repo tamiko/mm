@@ -53,7 +53,7 @@ Pool        OCTA        #0000000000000000
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
 
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 OCT         IS          #8

@@ -41,7 +41,7 @@ AtErrorAddr OCTA        #0000000000000000
 
 Halt        IS          :Halt
 
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 
 
@@ -54,7 +54,7 @@ arg0        IS          $0
 %
 
             .global :MM:__SYS:Exit
-Exit        SET         t,0
+Exit        SET         $255,0
             % Good bye so long and thanks for all the fish.
             TRAP        0,Halt,0
 
@@ -68,7 +68,7 @@ Exit        SET         t,0
 %
 
             .global :MM:__SYS:Abort
-Abort       SET         t,1
+Abort       SET         $255,1
             % Good bye so long and thanks for all the fish.
             TRAP        0,Halt,0
 

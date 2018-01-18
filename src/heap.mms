@@ -97,7 +97,7 @@ Rand3       BYTE        "Heap:Rand failed. Something went horribly "
             PREFIX      :MM:__HEAP:
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 arg2        IS          $2
@@ -122,7 +122,7 @@ OCT         IS          #8
 %
 % :MM:__HEAP:AllocG
 %
-% PUSHJ $255.
+% PUSHJ
 %
 
             .global :MM:__HEAP:Alloc
@@ -188,7 +188,7 @@ AllocG      SET         $3,t
 %
 % :MM:__HEAP:DeallocG
 %
-% PUSHJ $255.
+% PUSHJ
 %
 
             .global :MM:__HEAP:Dealloc
@@ -362,7 +362,7 @@ SizeJ       SET         $5,1
 %
 % :MM:__HEAP:SizeG
 %
-% PUSHJ $255.
+% PUSHJ
 %
 
             .global :MM:__HEAP:Size
@@ -402,7 +402,7 @@ SizeG       SET         $3,t
 %
 % :MM:__HEAP:ValidG
 %
-% PUSHJ $255.
+% PUSHJ
 %
 
             .global :MM:__HEAP:Valid
@@ -563,7 +563,7 @@ Set         GET         $2,:rJ
 %
 % :MM:__HEAP:ZeroG
 %
-% PUSHJ $255.
+% PUSHJ
 %
 
             .global :MM:__HEAP:Zero
@@ -616,7 +616,7 @@ RandJ       GET         $1,:rJ
 %
 % :MM:__HEAP:RandG
 %
-% PUSHJ $255
+% PUSHJ
 %
 
             .global :MM:__HEAP:Rand

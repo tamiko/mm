@@ -87,7 +87,7 @@ Cmp4        BYTE        "], wraps.",10,0
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__MEM:
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 arg2        IS          $2

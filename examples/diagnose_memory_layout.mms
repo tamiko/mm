@@ -31,7 +31,7 @@ str_endl    BYTE        " ]",10,0
 
 
             .section .text,"xa",@progbits
-t           IS          $255
+t           IS          :MM:t
 arg0        IS          $0
 arg1        IS          $1
 
@@ -142,4 +142,4 @@ Main        SET         $2,t
             ADDU        $1,$1,#8
             BNZ         $0,1B
 
-            PUSHJ       $255,MM:Sys:Exit
+            PUSHJ       t,MM:Sys:Exit
