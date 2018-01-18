@@ -24,22 +24,108 @@
 % SOFTWARE.
 %%
 
-%
-% Deque - double-ended queue
-%
-% Internally implemented as double-linked list
-%
-%           Deque:PushF register1, register2, size
-%           Deque:PopF  register1, register2
-%           Deque:PushB register1, register2, size
-%           Deque:PopB  register1, register2
-%           Deque:Save  register1, register2, label
-%           Deque:Load  register1, register2, label
-%
-
 #ifndef MM_ADT
 #define MM_ADT
 
+            PREFIX      :MM:
+
+%
+% :MM:ADT:
+%
+% This header file sets up a number of assembler macros to set up and
+% maintain data structures. The macros internally call allocator and
+% deallocator subroutines in :MM:Heap while preserving all register
+% contents (with the exception of the specified registers that get
+% modified.
+%
+
+%
+% Deque - double-ended queue
+% ==========================
+%
+%  - "front" and "back" have to be local/global register names. These
+%    registers will contain pointer to memory regions of a specified size
+%    (when allocated via Deque:PushF, or Deque:PushB).
+%
+%    "front" and "back" must neither be the temporary register $255, nor
+%    the (library internal) register :MM:t.
+%
+% Usage example
+% """"
+%
+%           % prepare registers:
+%           SET         $0,#0
+%           SET         $1,#0
+%           % Push two memory regions with a size of 16 bytes:
+%           Deque:PushF $0,$1,#10
+%           JMP         9F
+%           Deque:PushF $0,$1,#10
+%           JMP         9F
+%           % empty the deque:
+% 1H        SWYM
+%           Deque:Check $0,$1
+%           JMP         2F % deque is empty
+%           Deque:PopB  $0,$1
+%           JMP         9F
+%           JMP         1B
+%           % ...
+%
+% 9H        % error handling
+% """"
+%
+%
+% Deque:PushF front, back, size
+% Deque:PushB front, back, size
+%
+%  - Push an element to the deque. size is either a register or an
+%    immediate expression specifying the size of the memory region that
+%    should be allocated.
+%
+%    Prerequisite: Before pushing a first entry (either to front or back)
+%    the registers front and back have to be nulled (i.e. contain #0).
+%
+%    Execution continues at @+#8 if successful and at @+#4 on failure.
+%
+%
+% Deque:PopF  front, back
+% Deque:PopB  front, back
+%
+%  - Pop the top (or bottom) most element by deallocating the memory region
+%    in question and updating the front and/or back register.
+%
+%    Execution continues at @+#8 if successful and at @+#4 on failure.
+%
+%
+% Deque:SizeF front, back, result
+% Deque:SizeB front, back, result
+%
+%  - Returns the size of first or last element of the deque in the register
+%    "result". "result" may be any register (including :MM:t and $255)
+%    different from "front" and "back".
+%
+%    Execution continues at @+#8 if successful and at @+#4 on failure.
+%
+%
+% Deque:Save  front, back, label
+% Deque:Load  front, back, label
+%
+%  - Save a pointer to the deque to the memory region M8[label].
+%
+%    Prerequisite: label has to point to an OCTA allocated in the data or
+%    pool segment.
+%
+%    Execution continues at @+#8 if successful and at @+#4 on failure.
+%
+%
+% Deque:Check front, back
+%
+%  - Execution continues at @+#8 if the registers front, back describe a
+%    valid and _non-empty_ deque. Otherwise the deque is considered to be
+%    empty and execution continues at @+#4.
+%
+
 #include "__internal/deque.mms"
 
-#endif
+            PREFIX      :
+
+#endif /* MM_ADT */

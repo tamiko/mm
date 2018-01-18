@@ -162,6 +162,49 @@ __er_dpo\@  NEG         $255,0,1
             .endm
 
             %
+            % The size operation:
+            %
+
+            .macro      Deque:__SIZE front back result side=0
+            Deque:__SAVE_REGISTERS
+            % sanity check: both registers must hold a valid memory address:
+            .if \side
+            SET         :MM:t,\front
+            .else
+            SET         :MM:t,\back
+            .endif
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dsi\@
+            .if \side
+            SET         :MM:t,\front
+            .else
+            SET         :MM:t,\back
+            .endif
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:SizeG
+            SUBU        \result,:MM:t,#10
+            .if \result==":MM:t"
+            SET         :MM:__INTERNAL:__t2,:MM:t
+            .endif
+            .if \result=="$255"
+            SET         :MM:__INTERNAL:__t3,:MM:t
+            .endif
+            SET         $255,#0
+            JMP         @+#8
+__er_dsi\@  NEG         $255,0,1
+            Deque:__RESTORE_REGISTERS
+            .endm
+
+            .macro      Deque:SizeF front back result
+            Deque:__SIZE \front,\back,\result,1
+            .endm
+
+            .macro      Deque:SizeB front back result
+            Deque:__SIZE \front,\back,\result,0
+            .endm
+
+            %
             % The save operation:
             %
 
@@ -187,7 +230,6 @@ __er_dpo\@  NEG         $255,0,1
 __er_dst\@  NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
             .endm
-
 
             %
             % The load operation:
@@ -217,3 +259,23 @@ __er_dlo\@  NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
             .endm
 
+            %
+            % The check operation:
+            %
+
+            .macro      Deque:Check front back
+            Deque:__SAVE_REGISTERS
+            % Check that both registers hold a valid memory address
+            SET         :MM:t,\front
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dch\@
+            SET         :MM:t,\back
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dch\@
+            SET         $255,#0
+            JMP         @+#8
+__er_dch\@  NEG         $255,0,1
+            Deque:__RESTORE_REGISTERS
+            .endm
