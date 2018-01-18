@@ -1,12 +1,9 @@
-===========================================
  MMIX support library for various purposes
 ===========================================
 
-Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
-
 
 How to compile and run mmix programs
-====================================
+------------------------------------
 
 * TODO: mmix-ld
 * TODO: Compilation pipeline
@@ -17,7 +14,7 @@ How to compile and run mmix programs
 
 
 Dynamic memory allocation in `:PoolSegment`
-===========================================
+-------------------------------------------
 
 The heap will be organized as memory blocks inside the pool segment of the
 executable. This needs some cooperation from the user: The convention (as
@@ -29,7 +26,7 @@ library assumes that this pointer is `OCTA` aligned.
 
 
 The temporary registers `$255` and `:MM:t`
-==========================================
+------------------------------------------
 
 * Neither mmixal, nor GNU guarantee that the contents of the temporary
   register `$255` is preserved after a `JMP`, `PUSHJ` instruction, or `LDA`
@@ -44,8 +41,17 @@ The temporary registers `$255` and `:MM:t`
   the contents of `:MM:t`, though).
 
 
+Global register usage
+---------------------
+
+The library avoids unnecessary allocation of global registers by not using
+`LDA` instructions at the expense of a slight runtime overhead. The library
+allocated 3 global registers (`GREG`s) for internal use and an additional
+global register `:MM:t` for calling library routines (see next section).
+
+
 Calling convention and error handling
-=====================================
+-------------------------------------
 
 Suroutines come in a number of different variants.
 
@@ -79,7 +85,7 @@ t           IS          :MM:t
 
 
 Copying
-=======
+-------
 ```
 Copyright (C) 2013-2018 Matthias Maier <tamiko@kyomu.43-1.org>
 
