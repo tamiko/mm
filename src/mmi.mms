@@ -26,8 +26,8 @@
 
             %
             % Set the beginning of the .text section to #00. The first
-            % instructions assembled into the .text section determine the
-            % trip handlers and the entry point into the program.
+            % instructions assembled into the .text section are the entry
+            % point for trip handlers and program startup.
             %
 
             .set __.MMIX.start..text,#00
@@ -38,35 +38,41 @@
             %
 
             .section .text,"ax",@progbits
-            .global :MM:__INIT:__trip
             .global :MM:__INIT:__entry
+            .global :MM:__INIT:__trampoline
             PREFIX      :MM:__INIT:
-            .org #00    % H TRIP command / rI timer
-__trip      PUSHJ       $255,:MM:__INTERNAL:TripHandler
+            .org #000    % H TRIP command / rI timer
+__entry     JMP 1F
+            .org #010    % D "integer divide check"
+            JMP 2F
+            .org #020    % V "integer overflow"
+            JMP 2F
+            .org #030    % W "float-to-fix overflow"
+            JMP 2F
+            .org #040    % I "floating invalid operation"
+            JMP 2F
+            .org #050    % O "floating overflow"
+            JMP 2F
+            .org #060    % U "floating underflow"
+            JMP 2F
+            .org #070    % Z "floating division by zero"
+            JMP 2F
+            .org #080    % X "floating inexact"
+            JMP 2F
+            .org #0F0    % entry point
+            JMP 3F
+
+            .org #100
+__trampoline SWYM
+1H          PUSHJ       $255,:MM:__INTERNAL:TripHandler
             PUT         :rJ,$255
             GET         $255,:rB
             RESUME
-            .org #10    % D "integer divide check"
-            JMP 1F
-            .org #20    % V "integer overflow"
-            JMP 1F
-            .org #30    % W "float-to-fix overflow"
-            JMP 1F
-            .org #40    % I "floating invalid operation"
-            JMP 1F
-            .org #50    % O "floating overflow"
-            JMP 1F
-            .org #60    % U "floating underflow"
-            JMP 1F
-            .org #70    % Z "floating division by zero"
-            JMP 1F
-            .org #80    % X "floating inexact"
-1H          PUSHJ       $255,:MM:__INTERNAL:ExcHandler
+2H          PUSHJ       $255,:MM:__INTERNAL:ExcHandler
             PUT         :rJ,$255
             GET         $255,:rB
             RESUME
-            .org #F0    % entry point
-__entry     JMP         :MM:__INIT:__init
+3H          JMP         :MM:__INIT:__init
 
             %
             % Startup code: hide argc, argv and address of Main.
