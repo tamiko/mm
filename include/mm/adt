@@ -28,8 +28,8 @@
 % TODO
 %
 
-#ifndef MM_DEQUE
-#define MM_DEQUE
+#ifndef MM_ADT
+#define MM_ADT
 
 #include "__internal/deque.mms"
 
