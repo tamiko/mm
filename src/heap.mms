@@ -347,7 +347,7 @@ SizeJ       SET         $5,1
             NXOR        t,$3,$4
             BNZ         t,1F
             SUBU        ret0,$2,3*OCT
-            BNZ         $5,2F
+            BZ          $5,2F
             POP         1,1 % return for SizeJ
 2H          POP         0,1 % return for ValidJ
 1H          POP         0,0
