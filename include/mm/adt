@@ -25,7 +25,16 @@
 %%
 
 %
-% TODO
+% Deque - double-ended queue
+%
+% Internally implemented as double-linked list
+%
+%           Deque:PushF register1, register2, size
+%           Deque:PopF  register1, register2
+%           Deque:PushB register1, register2, size
+%           Deque:PopB  register1, register2
+%           Deque:Save  register1, register2, label
+%           Deque:Load  register1, register2, label
 %
 
 #ifndef MM_ADT

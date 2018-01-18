@@ -24,6 +24,10 @@
 % SOFTWARE.
 %%
 
+            %
+            % Save and restore registers
+            %
+
             .macro      Deque:__SAVE_REGISTERS
             GET         :MM:__INTERNAL:__t1,:rJ
             SET         :MM:__INTERNAL:__t2,:MM:t
@@ -38,10 +42,15 @@
             BZ          :MM:__INTERNAL:__t1,@+#8
             .endm
 
+            % We store a closed, double-linked list:
             %
             %         ptr to next
             %         ptr to previous
             % ptr --> DATA
+            %
+
+            %
+            % The push operation:
             %
 
             .macro      Deque:__PUSH front back size side=0
@@ -91,14 +100,17 @@ __er_dpu\@  NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
             .endm
 
-            .macro      Deque:PushFront front back size
+            .macro      Deque:PushF front back size
             Deque:__PUSH \front,\back,\size,1
             .endm
 
-            .macro      Deque:PushBack front back size
+            .macro      Deque:PushB front back size
             Deque:__PUSH \front,\back,\size,0
             .endm
 
+            %
+            % The pop operation:
+            %
 
             .macro      Deque:__POP front back side=0
             Deque:__SAVE_REGISTERS
@@ -141,10 +153,67 @@ __er_dpo\@  NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
             .endm
 
-            .macro      Deque:PopFront front back
+            .macro      Deque:PopF front back
             Deque:__POP \front,\back,1
             .endm
 
-            .macro      Deque:PopBack front back
+            .macro      Deque:PopB front back
             Deque:__POP \front,\back,0
             .endm
+
+            %
+            % The save operation:
+            %
+
+            .macro      Deque:Store front back label
+            Deque:__SAVE_REGISTERS
+            % sanity check: both registers must hold a valid memory address:
+            SET         :MM:t,\front
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dst\@
+            SET         :MM:t,\back
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dst\@
+            % save front element at label:
+            SUBU        \front,\front,#10
+            GETA        :MM:t,\label
+            STO         \front,:MM:t,0
+            SET         \front,#0
+            SET         \back,#0
+            SET         $255,#0
+            JMP         @+#8
+__er_dst\@  NEG         $255,0,1
+            Deque:__RESTORE_REGISTERS
+            .endm
+
+
+            %
+            % The load operation:
+            %
+
+            .macro      Deque:Load front back label
+            Deque:__SAVE_REGISTERS
+            % sanity check: M8[label] must hold a valid memory address
+            GETA        :MM:t,\label
+            LDO         :MM:t,:MM:t,#0
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dlo\@
+            GETA        :MM:t,\label
+            LDO         :MM:t,:MM:t,#0
+            LDO         :MM:t,:MM:t,#8 % back element
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dlo\@
+            % save deque structure in front and back registers:
+            GETA        :MM:t,\label
+            LDO         :MM:t,:MM:t,#0
+            ADDU        \front,:MM:t,#10
+            LDO         :MM:t,:MM:t,#8 % back element
+            ADDU        \back,:MM:t,#10
+            SET         $255,#0
+            JMP         @+#8
+__er_dlo\@  NEG         $255,0,1
+            Deque:__RESTORE_REGISTERS
+            .endm
+
