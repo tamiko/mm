@@ -34,7 +34,17 @@
             .global __.MMIX.start..text
 
             %
-            % Register :MM:__INTERNAL:TripHandler and :MM:__INIT:__init
+            % Register :MM:__INTERNAL:TripHandler,
+            % :MM:__INTERNAL:ExcHandler and :MM:__INIT:__init.
+            %
+            % We have to make sure to preserve the exact current state
+            % before we make a near/far jump to the TripHandler or init
+            % section. A far jump will globber global register $255, thus
+            % we have to do the following PUSHJ/JMP dance with the help of
+            % a (near) trampoline section.
+            %
+            % Further let us explicitly assemble all returns here - this is
+            % very convenient for setting breakpoints.
             %
 
             .section .text,"ax",@progbits
@@ -42,40 +52,94 @@
             .global :MM:__INIT:__trampoline
             PREFIX      :MM:__INIT:
             .org #000    % H TRIP command / rI timer
-__entry     JMP 1F
+__entry     PUSHJ       $255,1F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #010    % D "integer divide check"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #020    % V "integer overflow"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #030    % W "float-to-fix overflow"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #040    % I "floating invalid operation"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #050    % O "floating overflow"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #060    % U "floating underflow"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #070    % Z "floating division by zero"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #080    % X "floating inexact"
-            JMP 2F
+            PUSHJ       $255,2F
+            PUT         :rJ,$255
+            GET         $255,:rB
+            RESUME
             .org #0F0    % entry point
-            JMP 3F
+            JMP         3F
 
             .org #100
 __trampoline SWYM
-1H          PUSHJ       $255,:MM:__INTERNAL:TripHandler
-            PUT         :rJ,$255
-            GET         $255,:rB
-            RESUME
-2H          PUSHJ       $255,:MM:__INTERNAL:ExcHandler
-            PUT         :rJ,$255
-            GET         $255,:rB
-            RESUME
-3H          JMP         :MM:__INIT:__init
+            % Prepare (possible) far jump:
+1H          GET         $0,:rW
+            SET         $1,$255
+            SET         $2,:MM:t
+            JMP         :MM:__INTERNAL:TripHandler
+
+            % Prepare (possible) far jump:
+2H          GET         $0,:rW
+            SET         $1,$255
+            SET         $2,:MM:t
+            JMP         :MM:__INTERNAL:ExcHandler
+
+3H          SWYM
+            %
+            % Prepare entry into Main. Eventually we will RESUME (and
+            % actually start the program) with the resume sequence:
+            %   PUT :rJ,$255
+            %   GET $255,:rW
+            %   RESUME
+            %
+            PUT         :rW,$255      % RESUME at Main
+            PUT         :rB,$255      % keep address of Main in $255
+            SETML       $255,#F700
+            PUT         :rX,$255
+            SET         $255,#0
+            %
+            % Save initial state, store stack address in $0
+            %
+            SAVE        $255,0
+            SET         $0,$255
+            %
+            % Make a near/far jump to the init section
+            %
+            JMP         :MM:__INIT:__init
+
+
 
             %
-            % Startup code: hide argc, argv and address of Main.
+            % Startup code.
             % Compilation units can assemble initialization code into the
             % .init section that gets run at program startup before Main is
             % called.
@@ -89,23 +153,7 @@ InitError   BYTE        "Fatal initialization error.",10,0
             .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
 Stack_Segment IS        :Stack_Segment
-            %
-            % Prepare RESUME. Eventually we will entry into Main with the
-            % resume sequence
-            %   PUT :rJ,$255
-            %   GET $255,:rW
-            %   RESUME
-            %
-__init      PUT         :rW,$255      % RESUME at Main
-            PUT         :rB,$255      % keep address of Main in $255
-            SETML       $255,#F700
-            PUT         :rX,$255
-            SET         $255,#0
-            %
-            % Save initial state, store stack address in $0
-            %
-            SAVE        $255,0
-            SET         $0,$255
+__init      SWYM
             %
             % Initialize the ThreadRing and create a single entry for the
             % main thread that will eventually start executing at the Main
@@ -123,18 +171,18 @@ __init      PUT         :rW,$255      % RESUME at Main
             ADDU        $2,$2,#8
             SET         $4,$2
             PUSHJ       $3,:MM:__HEAP:AllocJ
-            JMP         2F
+            JMP         __fatal
             SET         $5,$1
             SET         $6,$3
             SET         $7,$2
             PUSHJ       $4,:MM:__MEM:CopyJ
-            JMP         2F
+            JMP         __fatal
             GETA        $255,:MM:__INTERNAL:ThreadTmpl
             STO         $3,$255,#0
             STO         $0,$255,#8
             SET         $5,#30
             PUSHJ       $4,:MM:__HEAP:AllocJ
-            JMP         2F
+            JMP         __fatal
             XOR         $5,$5,$5
             STO         $5,$4,#00 % Thread ID: 0
             STO         $5,$4,#08 % State: running
@@ -150,8 +198,9 @@ __init      PUT         :rW,$255      % RESUME at Main
             %
             PUSHJ       $1,1F
 1H          SET         $255,#0
+            SET         :MM:t,#0
             JMP         3F
-2H          GETA        $1,:MM:__INIT:STRS:InitError
+__fatal     GETA        $1,:MM:__INIT:STRS:InitError
             PUSHJ       $0,:MM:__ERROR:IError1
 3H          SWYM
 

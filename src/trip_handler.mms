@@ -70,10 +70,11 @@ Create      IS          #D0
 Clone       IS          #E0
 Exit        IS          #F0
 
-TripHandler GET         $0,:rW
-            SET         $1,$255
-            SET         $2,:MM:t
-            SAVE        $255,0
+            %
+            % The trampoline already populated $0, $1, $2 with the contents
+            % of :rW, $255 and :MM:t, respectively.
+            %
+TripHandler SAVE        $255,0
             SET         $0,$255
             STORE_SPECIAL :rU,:MM:__STATISTICS:__buffer
             INCREMENT_COUNTER :MM:__STATISTICS:ThreadTripH
