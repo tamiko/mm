@@ -105,6 +105,20 @@
 %
 %    Execution continues at @+#8 if successful and at @+#4 on failure.
 %
+% Deque:adv   front, back
+% Deque:rew   front, back
+%
+%  Internally, the deque is organized as a closed, doubly-linked list
+%  (meaning that the next pointer of the last element points to the first
+%  elements and vice versa.)
+%
+%  - Rotate the deque "clockwise" or "counter-clockwise":
+%    Deque:adv advances "front" to the next element (that would have been
+%    accessible after a PopF) and sets "back" to "front".
+%    Deque:rew rewinds by setting "front" to "back" and setting "back" to
+%    the penultimate element (that would have been accessible after a
+%    PopB).
+%
 %
 % Deque:Save  front, back, label
 % Deque:Load  front, back, label

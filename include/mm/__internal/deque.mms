@@ -279,3 +279,45 @@ __er_dlo\@  NEG         $255,0,1
 __er_dch\@  NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
             .endm
+
+            %
+            % The adv/rew operations:
+            %
+
+            .macro      Deque:__ADVANCE front back side=0
+            Deque:__SAVE_REGISTERS
+            % sanity check: both registers must hold a valid memory address:
+            SET         :MM:t,\front
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dav\@
+            SET         :MM:t,\back
+            SUBU        :MM:t,:MM:t,#10
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dav\@
+            % save front element at label:
+            .if \side
+            SET         \back,\front
+            SUBU        \front,#10
+            LDO         \front,\front,#0 % next
+            ADDU        \front,#10
+            .else
+            SET         \front,\back
+            SUBU        \back,#10
+            LDO         \back,\back,#8 % previous
+            ADDU        \back,#10
+            .endif
+            SET         $255,#0
+            JMP         @+#8
+__er_dav\@  NEG         $255,0,1
+            Deque:__RESTORE_REGISTERS
+            .endm
+
+            .macro      Deque:adv front back
+            Deque:__ADVANCE \front,\back,1
+            .endm
+
+            .macro      Deque:rew front back
+            Deque:__ADVANCE \front,\back,0
+            .endm
+
