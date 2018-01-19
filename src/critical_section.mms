@@ -47,12 +47,10 @@ EnterCritical SWYM
             GET         $0,:rI
             NEG         $1,0,1
             GETA        $2,stored_int
-            BN          $0,1F
-            %
             % If :rI is negative we are either in the TripHandler or
             % preemptive threading is disabled. Do not update statistics in
             % either of these cases...
-            %
+            BN          $0,1F
             INCREMENT_COUNTER :MM:__STATISTICS:ThreadCriti
             STORE_SPECIAL :rU,:MM:__STATISTICS:__buffer
             PUT         :rI,$1
@@ -65,6 +63,9 @@ EnterCritical SWYM
 LeaveCritical SWYM
             GETA        $0,stored_int
             LDO         $0,$0
+            % If the stored :rI is negative we are either in the
+            % TripHandler or preemptive threading is disabled. Do not
+            % update statistics in either of these cases...
             BN          $0,1F
             STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingCriti
             PUT         :rI,$0
