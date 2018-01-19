@@ -24,43 +24,28 @@ __dave      BYTE        "I am Dave!",10,0
             .text
 t           IS          :MM:t
 
+            %
+            % Three threads that print the __alice, __bob and __dave
+            % strings for a specified amount of time:
+            %
+
 timeout     IS          #0010
 
-
 Thread1     SWYM
-1H          GET         $5,:rU
-            SETML       $6,timeout
-            CMP         $5,$5,$6
-            BP          $5,8F
             GETA        t,__alice
-            PUSHJ       t,MM:Print:StrG
-#ifndef PREEMPTIVE
-            PUSHJ       t,MM:Thread:Yield
-#endif
-            JMP         1B
-8H          PUSHJ       t,MM:Thread:Exit
-
+            JMP         1F
 
 Thread2     SWYM
-1H          GET         $5,:rU
-            SETML       $6,timeout
-            CMP         $5,$5,$6
-            BP          $5,8F
             GETA        t,__bob
-            PUSHJ       t,MM:Print:StrG
-#ifndef PREEMPTIVE
-            PUSHJ       t,MM:Thread:Yield
-#endif
-            JMP         1B
-8H          PUSHJ       t,MM:Thread:Exit
-
+            JMP         1F
 
 Thread3     SWYM
-1H          GET         $5,:rU
-            SETML       $6,timeout
-            CMP         $5,$5,$6
-            BP          $5,8F
             GETA        t,__dave
+
+1H          SETML       $0,timeout
+1H          GET         $1,:rU
+            CMP         $1,$1,$0
+            BP          $1,8F
             PUSHJ       t,MM:Print:StrG
 #ifndef PREEMPTIVE
             PUSHJ       t,MM:Thread:Yield
@@ -68,6 +53,10 @@ Thread3     SWYM
             JMP         1B
 8H          PUSHJ       t,MM:Thread:Exit
 
+            %
+            % In Main we create all three threads and wait for them to
+            % finish. After that print some statistics
+            %
 
 Main        SWYM
             GETA        t,Thread1
@@ -77,7 +66,7 @@ Main        SWYM
             GETA        t,Thread3
             PUSHJ       t,MM:Thread:CreateG
 #ifdef PREEMPTIVE
-            SETML       t,#0001
+            SETL        t,#1000
             PUSHJ       t,MM:Thread:EnableG
 #endif
 
