@@ -6,10 +6,11 @@
 #include <mm/sys>
 
             .section .data,"wa",@progbits
+            .balign 4
 HelloString BYTE        "Hello World!",10,0
 
             .section .text,"xa",@progbits
 t           IS          :MM:t
-Main        LDA         t,HelloString
+Main        GETA        t,HelloString
             PUSHJ       t,MM:Print:StrG
             PUSHJ       t,MM:Sys:Exit
