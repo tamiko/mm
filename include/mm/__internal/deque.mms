@@ -298,14 +298,14 @@ __er_dch\@  NEG         $255,0,1
             % save front element at label:
             .if \side
             SET         \back,\front
-            SUBU        \front,#10
+            SUBU        \front,\front,#10
             LDO         \front,\front,#0 % next
-            ADDU        \front,#10
+            ADDU        \front,\front,#10
             .else
             SET         \front,\back
-            SUBU        \back,#10
+            SUBU        \back,\back,#10
             LDO         \back,\back,#8 % previous
-            ADDU        \back,#10
+            ADDU        \back,\back,#10
             .endif
             SET         $255,#0
             JMP         @+#8
