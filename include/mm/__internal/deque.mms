@@ -63,7 +63,12 @@
             % initialize:
             SET         :MM:t,\size
             PUSHJ       :MM:t,:MM:__HEAP:AllocG
-            SUBU        :MM:t,:MM:t,#10 % use the last two OCTAs of payload area
+            % lock memory region
+            SUBU        :MM:t,:MM:t,#18
+            NEGU        $255,0,1
+            STO         $255,:MM:t,0
+            % use the last two OCTAs of payload area
+            ADDU        :MM:t,:MM:t,#08
             STO         :MM:t,:MM:t,#00
             STO         :MM:t,:MM:t,#08
             ADDU        :MM:t,:MM:t,#10
@@ -80,7 +85,11 @@ __1h_dpu\@  SET         :MM:t,\front
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\size
             PUSHJ       :MM:t,:MM:__HEAP:AllocG
-            SUBU        :MM:t,:MM:t,#10
+            % lock memory region
+            SUBU        :MM:t,:MM:t,#18
+            NEGU        $255,0,1
+            STO         $255,:MM:t,0
+            ADDU        :MM:t,:MM:t,#08
             SUBU        \front,\front,#10
             SUBU        \back,\back,#10
             STO         \back,:MM:t,#08
@@ -125,6 +134,12 @@ __er_dpu\@  NEG         $255,0,1
             CMP         :MM:t,\front,\back
             BNZ         :MM:t,__1h_dpo\@
             SET         :MM:t,\front
+            % Unlock memory region:
+            SUBU        :MM:t,:MM:t,#18
+            SET         $255,#0000
+            STO         $255,:MM:t,0
+            ADDU        :MM:t,:MM:t,#18
+            % Deallocate:
             PUSHJ       :MM:t,:MM:__HEAP:DeallocG
             SET         \front,#0
             SET         \back,#0
@@ -139,6 +154,12 @@ __1h_dpo\@  SUBU        \front,\front,#10
             ADDU        :MM:t,\back,#10
             LDO         \back,\back,#08
             .endif
+            % Unlock memory region:
+            SUBU        :MM:t,:MM:t,#18
+            SET         $255,#0000
+            STO         $255,:MM:t,0
+            ADDU        :MM:t,:MM:t,#18
+            % Deallocate:
             PUSHJ       :MM:t,:MM:__HEAP:DeallocG
             STO         \front,\back,#00
             STO         \back,\front,#08
