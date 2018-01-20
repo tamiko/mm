@@ -28,8 +28,9 @@
 % :MM:__HEAP:
 %
 % General memory layout of an allocated block of memory is:
-%           OCTA  size (data + 3 OCTS)
+%           OCTA  size      (data + payload + 3 OCTS)
 %           OCTA  checksum1 (xor size ptr)
+%           OCTAs payload   (currently 3 OCTAs)
 %    ptr -> OCTAs data
 %           OCTA  checksum2 (nxor size ptr)
 %
@@ -106,6 +107,9 @@ ret1        IS          $1
 ret2        IS          $2
 OCT         IS          #8
 
+% payload + Checksum + size of 6 OCTAs:
+payload     IS          #30
+
 
 %%
 % :MM:__HEAP:AllocJ
@@ -131,8 +135,8 @@ OCT         IS          #8
 AllocJ      GET         $1,:rJ
             ADDU        $0,arg0,#F % round up to next OCTA
             ANDN        $0,$0,#F
-            ADDU        $0,$0,3*OCT
-            CMPU        t,$0,3*OCT % check for overflow
+            ADDU        $0,$0,payload
+            CMPU        t,$0,payload % check for overflow
             BN          t,1F
             SET         $3,$0
             PUSHJ       $2,:MM:__RAW_POOL:Alloc
@@ -140,13 +144,13 @@ AllocJ      GET         $1,:rJ
             PUT         :rJ,$1
             SET         $1,$2
             STO         $0,$1,0 % store size
-            ADDU        $2,$2,2*OCT
+            ADDU        $2,$2,payload-OCT
             XOR         $2,$2,$0
             STO         $2,$1,1*OCT % store checksum1
             SUBU        $0,$0,1*OCT
             NXOR        $2,$2,0
             STO         $2,$1,$0 % store checksum2
-            ADDU        ret0,$1,2*OCT
+            ADDU        ret0,$1,payload-OCT
             GET         $1,:rJ
             PUT         :rJ,$1
             POP         1,1
@@ -199,11 +203,11 @@ DeallocJ    GET         $1,:rJ
             PUSHJ       $2,SizeJ
             JMP         1F % Invalid pointer
             % Zero out metadata:
-            SUBU        $3,arg0,2*OCT % raw pointer
+            SUBU        $3,arg0,payload-OCT % raw pointer
             STCO        0,$3,0 % size field
             STCO        0,$3,1*OCT % checksum1
             PREST       #10,$3
-            ADDU        $4,$2,2*OCT
+            ADDU        $4,$2,payload-OCT
             STCO        0,$3,$4 % checksum2
             PREST       #8,$3,$4
             ADDU        $4,$4,1*OCT % size
@@ -324,15 +328,15 @@ ValidJ      SET         $5,0
 SizeJ       SET         $5,1
             % A pointer to memory must be inside the pool segment:
 1H          GETA        t,Pool_Segment
-            ADDU        t,t,2*OCT
+            ADDU        t,t,payload-OCT
             CMPU        t,arg0,t
             BN          t,1F
             GETA        t,Stack_Segment
             CMPU        t,arg0,t
             BNN         t,1F
-            SUBU        $1,arg0,2*OCT
+            SUBU        $1,arg0,payload-OCT
             LDO         $2,$1,0 % size
-            CMPU        t,$2,3*OCT % size must be at least 3 octas
+            CMPU        t,$2,payload % size must be at least the payload
             BN          t,1F
             % verify checksum1:
             LDO         $3,$1,1*OCT % checksum1
@@ -346,7 +350,7 @@ SizeJ       SET         $5,1
             ADDU        $2,$2,1*OCT
             NXOR        t,$3,$4
             BNZ         t,1F
-            SUBU        ret0,$2,3*OCT
+            SUBU        ret0,$2,payload
             BZ          $5,2F
             POP         1,1 % return for SizeJ
 2H          POP         0,1 % return for ValidJ
