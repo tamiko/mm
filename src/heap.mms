@@ -133,13 +133,15 @@ payload     IS          #30
             .global :MM:__HEAP:AllocJ
             .global :MM:__HEAP:AllocG
 AllocJ      GET         $1,:rJ
+            SET         $3,t
             ADDU        $0,arg0,#F % round up to next OCTA
             ANDN        $0,$0,#F
             ADDU        $0,$0,payload
             CMPU        t,$0,payload % check for overflow
             BN          t,1F
-            SET         $3,$0
-            PUSHJ       $2,:MM:__RAW_POOL:Alloc
+            SET         $5,$0
+            PUSHJ       $4,:MM:__RAW_POOL:Alloc
+            SET         $2,$4
             BZ          $2,1F
             PUT         :rJ,$1
             SET         $1,$2
@@ -147,12 +149,13 @@ AllocJ      GET         $1,:rJ
             ADDU        $2,$2,payload-OCT
             XOR         $2,$2,$0
             STO         $2,$1,1*OCT % store checksum1
+            SET         t,#0000
+            STO         t,$1,2*OCT % set first payload OCTA to zero
             SUBU        $0,$0,1*OCT
             NXOR        $2,$2,0
             STO         $2,$1,$0 % store checksum2
             ADDU        ret0,$1,payload-OCT
-            GET         $1,:rJ
-            PUT         :rJ,$1
+            SET         t,$3
             POP         1,1
 1H          PUT         :rJ,$1
             POP         0,0
@@ -327,7 +330,8 @@ ValidJ      SET         $5,0
             JMP         1F
 SizeJ       SET         $5,1
             % A pointer to memory must be inside the pool segment:
-1H          GETA        t,Pool_Segment
+1H          SET         $6,t
+            GETA        t,Pool_Segment
             ADDU        t,t,payload-OCT
             CMPU        t,arg0,t
             BN          t,1F
@@ -351,10 +355,12 @@ SizeJ       SET         $5,1
             NXOR        t,$3,$4
             BNZ         t,1F
             SUBU        ret0,$2,payload
+            SET         t,$6
             BZ          $5,2F
             POP         1,1 % return for SizeJ
 2H          POP         0,1 % return for ValidJ
-1H          POP         0,0
+1H          SET         t,$6
+            POP         0,0
 
 
 %%
@@ -447,7 +453,7 @@ CopyJ       GET         $2,:rJ
             SET         $7,arg1
             PUSHJ       $6,SizeJ % size of arg1
             JMP         1F
-            CMPU        t,$5,$6
+            CMPU        $7,$5,$6
             CSN         $6,t,$5
             SET         $4,arg0
             SET         $5,arg1
@@ -478,8 +484,8 @@ Copy        GET         $2,:rJ
             PUSHJ       $6,SizeJ % size of arg1
             JMP         2F
             % No point to call into CopyJ for 5 instuctions...
-            CMPU        t,$5,$6
-            CSN         $6,t,$5
+            CMPU        $7,$5,$6
+            CSN         $6,$7,$5
             SET         $4,arg0
             SET         $5,arg1
             PUSHJ       $3,:MM:__MEM:CopyJ
@@ -578,7 +584,6 @@ Zero        GET         $1,:rJ
             PUSHJ       $2,ZeroJ
             JMP         1F
             PUT         :rJ,$1
-            SET         t,arg0
             POP         0,0
 1H          SET         t,$1 %:rJ
             SET         $2,arg0
@@ -631,7 +636,6 @@ Rand        GET         $1,:rJ
             PUSHJ       $2,RandJ
             JMP         1F
             PUT         :rJ,$1
-            SET         t,arg0
             POP         0,0
 1H          SET         t,$1 % :rJ
             SET         $2,arg0

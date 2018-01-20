@@ -25,7 +25,7 @@
 %%
 
 %
-% :MM:__File:
+% :MM:__FILE:
 %
 
             .section .data,"wa",@progbits
