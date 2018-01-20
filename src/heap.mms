@@ -34,6 +34,9 @@
 %    ptr -> OCTAs data
 %           OCTA  checksum2 (nxor size ptr)
 %
+% We use the first OCTA in payload as a locking mechanism: If it is
+% nonzero, Dealloc and Realloc will fail.
+%
 % Actual memory management is delegated to :MM:__RAW_POOL:Alloc,
 % :MM:__RAW_POOL:Dealloc.
 %
@@ -49,6 +52,8 @@ Alloc2      BYTE        "]. Out of memory.",10,0
 Free1       BYTE        "Heap:Free failed. Invalid pointer [arg0=",0
             .balign 4
 Free2       BYTE        "]. Double free or corruption.",10,0
+            .balign 4
+Free3       BYTE        "]. Memory region is locked.",10,0
             .balign 4
 Size1       BYTE        "Heap:Size failed. Invalid pointer [arg0=",0
             .balign 4
@@ -67,10 +72,12 @@ Reallo1     BYTE        "Heap:Realloc failed. Invalid pointer [arg0=",0
             .balign 4
 Reallo2     BYTE        "].",10,0
             .balign 4
-Reallo3     BYTE        "Heap:Realloc failed. Could not request a Heapory "
+Reallo2b    BYTE        "]. Memory region locked.",10,0
+            .balign 4
+Reallo3     BYTE        "Heap:Realloc failed. Could not request a memory "
             BYTE        "block of size [arg1=",0
             .balign 4
-Reallo4     BYTE        "]. Out of Heapory.",10,0
+Reallo4     BYTE        "]. Out of memory.",10,0
             .balign 4
 Reallo5     BYTE        "Heap::Realloc failed. Something went horribly "
             BYTE        "wrong",10,0
@@ -151,8 +158,8 @@ AllocJ      GET         $1,:rJ
             STO         $2,$1,1*OCT % store checksum1
             SET         t,#0000
             STO         t,$1,2*OCT % set first payload OCTA to zero
-            SUBU        $0,$0,1*OCT
             NXOR        $2,$2,0
+            SUBU        $0,$0,1*OCT
             STO         $2,$1,$0 % store checksum2
             ADDU        ret0,$1,payload-OCT
             SET         t,$3
@@ -202,9 +209,15 @@ AllocG      SET         $3,t
             .global :MM:__HEAP:DeallocJ
             .global :MM:__HEAP:DeallocG
 DeallocJ    GET         $1,:rJ
-            SET         $3,arg0
-            PUSHJ       $2,SizeJ
+            SET         $5,t
+            SET         $7,arg0
+            PUSHJ       $6,SizeJ
             JMP         1F % Invalid pointer
+            SET         $2,$6
+            % Check if memory region is locked:
+            SUBU        $3,arg0,payload-3*OCT % first payload OCTA
+            LDO         $3,$3
+            BNZ         $3,1F
             % Zero out metadata:
             SUBU        $3,arg0,payload-OCT % raw pointer
             STCO        0,$3,0 % size field
@@ -215,10 +228,14 @@ DeallocJ    GET         $1,:rJ
             PREST       #8,$3,$4
             ADDU        $4,$4,1*OCT % size
             % And deallocate:
-            PUSHJ       $2,:MM:__RAW_POOL:Dealloc
+            SET         $7,$3
+            SET         $8,$4
+            PUSHJ       $6,:MM:__RAW_POOL:Dealloc
             PUT         :rJ,$1
+            SET         t,$5
             POP         0,1
 1H          PUT         :rJ,$1
+            SET         t,$5
             POP         0,0
 DeallocG    SET         $0,t
 Dealloc     SET         $3,arg0
@@ -227,6 +244,19 @@ Dealloc     SET         $3,arg0
             JMP         1F
             PUT         :rJ,$1
             POP         0,0
+            % Deallocation failed. Check if memory region is valid but
+            % locked:
+1H          SET         t,arg0
+            PUSHJ       t,ValidG
+            BN          t,1F
+            SUBU        t,arg0,payload-3*OCT % first payload OCTA
+            LDO         t,t,0
+            BZ          t,1F
+            SET         t,$1 % :rJ
+            SET         $2,arg0
+            GETA        $1,:MM:__HEAP:STRS:Free1
+            GETA        $3,:MM:__HEAP:STRS:Free3
+            PUSHJ       $0,:MM:__ERROR:Error3R2
 1H          SET         t,$1 % :rJ
             SET         $2,arg0
             GETA        $1,:MM:__HEAP:STRS:Free1
@@ -249,6 +279,10 @@ ReallocJ    GET         $2,:rJ
             SET         $4,arg0
             PUSHJ       $3,ValidJ
             JMP         1F
+            % Check if memory region is locked:
+            SUBU        $3,arg0,payload-3*OCT % first payload OCTA
+            LDO         $3,$3
+            BNZ         $3,1F
             SET         $4,arg1
             PUSHJ       $3,AllocJ
             JMP         1F
@@ -282,6 +316,10 @@ Realloc     GET         $2,:rJ
             SET         $4,arg0
             PUSHJ       $3,ValidJ
             JMP         1F
+            % Check if memory region is locked:
+            SUBU        $3,arg0,payload-3*OCT % first payload OCTA
+            LDO         $3,$3
+            BNZ         $3,8F
             SET         $4,arg1
             PUSHJ       $3,AllocJ
             JMP         2F
@@ -299,6 +337,11 @@ Realloc     GET         $2,:rJ
             SET         $2,arg0
             GETA        $1,:MM:__HEAP:STRS:Reallo1
             GETA        $3,:MM:__HEAP:STRS:Reallo2
+            PUSHJ       $0,:MM:__ERROR:Error3R2
+8H          SET         t,$2 % :rJ
+            SET         $2,arg0
+            GETA        $1,:MM:__HEAP:STRS:Reallo1
+            GETA        $3,:MM:__HEAP:STRS:Reallo2b
             PUSHJ       $0,:MM:__ERROR:Error3R2
 2H          SET         t,$2 % :rJ
             SET         $2,arg1
