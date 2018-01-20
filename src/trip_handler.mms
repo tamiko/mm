@@ -301,9 +301,9 @@ __return    SWYM
             %
             GETA        $2,:MM:__THREAD:interval
             LDO         $2,$2
+            STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingTripH
             BN          $2,1F
             ADDU        $2,$2,#000B
-            STORE_DIFFERENCE :rU,:MM:__STATISTICS:__buffer,:MM:__STATISTICS:TimingTripH
             PUT         :rI,$2
 1H          POP 0
 
