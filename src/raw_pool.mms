@@ -29,9 +29,44 @@
 %
 % :MM:__RAW_POOL:
 %
-% A very minimalistic memory pool implementation.
+% A minimalistic memory pool implementation.
 %
-% TODO: Implement a heap structure for efficiently storing the pool.
+% The heap will be organized as memory blocks inside the :PoolSegment.
+% Allocations are done in multiples of 2 OCTAs (16 bytes), minimum 2 OCTAs.
+%
+% By convention M_8[:Pool_Segment] points to the first unallocated OCTA in
+% the :PoolSegment and all memory including and above the address is
+% assumed to be available for allocation. If we run out of memory in the
+% pool, the :MM:__RAW_POOL:Grow subroutine will try to allocate a new,
+% large chunk of memory (~100MB or more) by advancing the
+% M_8[:Pool_Segment] pointer.
+%
+% User programs utilizing address space from the pool segment manually must
+% obey this rule by 'allocating' memory by modifying M_8[:Pool_Segment]
+% appropriately. The library assumes that this pointer is `OCTA` aligned.
+%
+% We maintain a single list of free memory regions:
+%
+% Pool ->   OCTA ptr1    ->   OCTA ptr2    ->  ...  ->   OCTA ptrN  -> #0
+%           OCTA size1        OCTA size2                 OCTA sizeN
+%           OCTAs ...         OCTAs ...                  OCTAs ...
+%
+% And keep the list ordered in the sense that Pool < ptr1 < ... < ptrN.
+%
+%  - During deallocation adjacent memory blocks are automatically merged.
+%    (This is a O(1) operation).
+%
+%  - When allocating, we first try to find a matching memory block. If that
+%    fails the first one that is large enough is chopped in two.
+%
+% TODO:
+%
+%  - Implement a buddy allocator?
+%
+%  - Implement a small object allocator for small memory requests?
+%
+%  - Worst case for the allocator is currently O(n), where n is the number
+%    of entries in the pool list. That could be improved to log(n)...
 %
 
             .section .data,"wa",@progbits
@@ -229,7 +264,7 @@ Grow        SWYM
 
 %%
 % :MM:__RAW_POOL:Alloc
-%   Allocate a continous block of memory. arg1 is aligned to
+%   Allocate a contiguous block of memory. arg1 is aligned to
 %   2*OCT and set to at least 2*OCT.
 %
 % PUSHJ:
