@@ -44,8 +44,10 @@
 % ==========================
 %
 %  - "front" and "back" have to be local/global register names. These
-%    registers will contain pointer to memory regions of a specified size
-%    (when allocated via Deque:PushF, or Deque:PushB).
+%    registers will contain pointers to memory regions of a specified size
+%    (when allocated via Deque:PushF, or Deque:PushB). The memory regions
+%    are heap allocated, thus the usual operations in :MM:Heap can be
+%    applied.
 %
 %    "front" and "back" must neither be the temporary register $255, nor
 %    the (library internal) register :MM:t.
@@ -95,15 +97,6 @@
 %
 %    Execution continues at @+#8 if successful and at @+#4 on failure.
 %
-%
-% Deque:SizeF front, back, result
-% Deque:SizeB front, back, result
-%
-%  - Returns the size of first or last element of the deque in the register
-%    "result". "result" may be any register (including :MM:t and $255)
-%    different from "front" and "back".
-%
-%    Execution continues at @+#8 if successful and at @+#4 on failure.
 %
 % Deque:adv   front, back
 % Deque:rew   front, back

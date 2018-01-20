@@ -42,7 +42,9 @@
             BZ          :MM:__INTERNAL:__t1,@+#8
             .endm
 
-            % We store a closed, double-linked list:
+            % We store a closed, double-linked list. Further, we take
+            % advantage that the heap allocator allocates a payload area
+            % before the ptr. Use the last two OCTAs of the payload area:
             %
             %         ptr to next
             %         ptr to previous
@@ -60,8 +62,8 @@
             BNZ         \back,__er_dpu\@
             % initialize:
             SET         :MM:t,\size
-            ADDU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            SUBU        :MM:t,:MM:t,#10 % use the last two OCTAs of payload area
             STO         :MM:t,:MM:t,#00
             STO         :MM:t,:MM:t,#08
             ADDU        :MM:t,:MM:t,#10
@@ -71,16 +73,14 @@
             JMP         __er_dpu\@+#4
             % sanity check: both registers must hold a valid memory address:
 __1h_dpu\@  SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\back
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\size
-            ADDU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            SUBU        :MM:t,:MM:t,#10
             SUBU        \front,\front,#10
             SUBU        \back,\back,#10
             STO         \back,:MM:t,#08
@@ -116,18 +116,15 @@ __er_dpu\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
             SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpo\@
             SET         :MM:t,\back
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpo\@
             % special case: last element
             CMP         :MM:t,\front,\back
             BNZ         :MM:t,__1h_dpo\@
             SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:DeallocG
             SET         \front,#0
             SET         \back,#0
@@ -136,10 +133,10 @@ __er_dpu\@  NEG         $255,0,1
 __1h_dpo\@  SUBU        \front,\front,#10
             SUBU        \back,\back,#10
             .if \side
-            SET         :MM:t,\front
+            ADDU        :MM:t,\front,#10
             LDO         \front,\front,#00
             .else
-            SET         :MM:t,\back
+            ADDU        :MM:t,\back,#10
             LDO         \back,\back,#08
             .endif
             PUSHJ       :MM:t,:MM:__HEAP:DeallocG
@@ -162,49 +159,6 @@ __er_dpo\@  NEG         $255,0,1
             .endm
 
             %
-            % The size operation:
-            %
-
-            .macro      Deque:__SIZE front back result side=0
-            Deque:__SAVE_REGISTERS
-            % sanity check: both registers must hold a valid memory address:
-            .if \side
-            SET         :MM:t,\front
-            .else
-            SET         :MM:t,\back
-            .endif
-            SUBU        :MM:t,:MM:t,#10
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
-            BN          :MM:t,__er_dsi\@
-            .if \side
-            SET         :MM:t,\front
-            .else
-            SET         :MM:t,\back
-            .endif
-            SUBU        :MM:t,:MM:t,#10
-            PUSHJ       :MM:t,:MM:__HEAP:SizeG
-            SUBU        \result,:MM:t,#10
-            .if \result==":MM:t"
-            SET         :MM:__INTERNAL:__t2,:MM:t
-            .endif
-            .if \result=="$255"
-            SET         :MM:__INTERNAL:__t3,:MM:t
-            .endif
-            SET         $255,#0
-            JMP         @+#8
-__er_dsi\@  NEG         $255,0,1
-            Deque:__RESTORE_REGISTERS
-            .endm
-
-            .macro      Deque:SizeF front back result
-            Deque:__SIZE \front,\back,\result,1
-            .endm
-
-            .macro      Deque:SizeB front back result
-            Deque:__SIZE \front,\back,\result,0
-            .endm
-
-            %
             % The save operation:
             %
 
@@ -212,11 +166,9 @@ __er_dsi\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
             SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dst\@
             SET         :MM:t,\back
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dst\@
             % save front element at label:
@@ -240,11 +192,13 @@ __er_dst\@  NEG         $255,0,1
             % sanity check: M8[label] must hold a valid memory address
             GETA        :MM:t,\label
             LDO         :MM:t,:MM:t,#0
+            ADDU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dlo\@
             GETA        :MM:t,\label
             LDO         :MM:t,:MM:t,#0
             LDO         :MM:t,:MM:t,#8 % back element
+            ADDU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dlo\@
             % save deque structure in front and back registers:
@@ -267,11 +221,9 @@ __er_dlo\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % Check that both registers hold a valid memory address
             SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dch\@
             SET         :MM:t,\back
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dch\@
             SET         $255,#0
@@ -288,11 +240,9 @@ __er_dch\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
             SET         :MM:t,\front
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dav\@
             SET         :MM:t,\back
-            SUBU        :MM:t,:MM:t,#10
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dav\@
             % save front element at label:
