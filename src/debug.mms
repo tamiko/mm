@@ -37,7 +37,11 @@ pool1       BYTE        "    [",0
             .balign 4
 pool2       BYTE        "] [size = ",0
             .balign 4
-pool3       BYTE        "] --> [next = ",0
+pool3a      BYTE        "] USED --> [next = ",0
+            .balign 4
+pool3b      BYTE        "] free --> [next = ",0
+            .balign 4
+pool3c      BYTE        "] SENT --> [next = ",0
             .balign 4
 pool4       BYTE        "]",10,0
             .balign 4
@@ -123,22 +127,44 @@ PrintPool   GET         $0,:rJ
             PUSHJ       t,:MM:__PRINT:StrG
             GETA        $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
-2H          BZ          $2,1F
+            % Print sentinel:
             GETA        t,STRS:pool1
             PUSHJ       t,:MM:__PRINT:StrG
             SET         t,$2
             PUSHJ       t,:MM:__PRINT:RegG
             GETA        t,STRS:pool2
             PUSHJ       t,:MM:__PRINT:StrG
-            LDO         t,$2,#8
+            LDO         t,$2,#10
             PUSHJ       t,:MM:__PRINT:RegG
-            GETA        t,STRS:pool3
+            GETA        t,STRS:pool3c
             PUSHJ       t,:MM:__PRINT:StrG
             LDO         t,$2,#0
             PUSHJ       t,:MM:__PRINT:RegG
             GETA        t,STRS:pool4
             PUSHJ       t,:MM:__PRINT:StrG
-            LDO         $2,$2
+            % Print memory chunks:
+            LDO         $3,$2
+2H          CMP         $4,$2,$3
+            BZ          $4,1F
+            GETA        t,STRS:pool1
+            PUSHJ       t,:MM:__PRINT:StrG
+            SET         t,$3
+            PUSHJ       t,:MM:__PRINT:RegG
+            GETA        t,STRS:pool2
+            PUSHJ       t,:MM:__PRINT:StrG
+            LDO         t,$3,#10
+            PUSHJ       t,:MM:__PRINT:RegG
+            LDO         t,$3,#18
+            BNZ         t,3F
+            GETA        t,STRS:pool3a
+            JMP         4F
+3H          GETA        t,STRS:pool3b
+4H          PUSHJ       t,:MM:__PRINT:StrG
+            LDO         t,$3,#0
+            PUSHJ       t,:MM:__PRINT:RegG
+            GETA        t,STRS:pool4
+            PUSHJ       t,:MM:__PRINT:StrG
+            LDO         $3,$3
             JMP         2B
 1H          PUSHJ       t,:MM:__PRINT:Ln
             PUT         :rJ,$0
