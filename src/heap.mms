@@ -141,8 +141,8 @@ payload     IS          #30
             .global :MM:__HEAP:AllocG
 AllocJ      GET         $1,:rJ
             SET         $3,t
-            ADDU        $0,arg0,#F % round up to next OCTA
-            ANDN        $0,$0,#F
+            ADDU        $0,arg0,#7 % round up to next OCTA
+            ANDN        $0,$0,#7
             ADDU        $0,$0,payload
             CMPU        t,$0,payload % check for overflow
             BN          t,1F
