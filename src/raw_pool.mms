@@ -74,12 +74,29 @@ Alloc1      BYTE        "__RAW_POOL::Alloc failed. "
 Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
+            %
+            % Let us store a pointer to the memory region in the data
+            % section:
+            %
+
             .section .data,"wa",@progbits
-            .global     :MM:__RAW_POOL:Memory
-            .global     :MM:__RAW_POOL:Pool
             PREFIX      :MM:__RAW_POOL:
+            .global     :MM:__RAW_POOL:Memory
 Memory      OCTA        #0000000000000000
-Pool        OCTA        #0000000000000000
+
+            %
+            % The free list pool is organized as a partially ordered,
+            % doubly-linked list. Create 'no_entries' sentinels for a
+            % spread of 'spread' bytes:
+            %
+
+spread      IS          #80
+spread_shft IS          7
+no_entries  IS          8
+            .global     :MM:__RAW_POOL:Pool
+            .balign     8
+Pool        .fill       #20 * no_entries
+
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__RAW_POOL:
@@ -204,44 +221,52 @@ Initialize  SWYM
             % We need another 4 OCTAs (sentinel):
             SET         $5,#20
             ADDU        $5,$4,$5
-            % And another one (freelist sentinel):
-            SET         $6,#20
-            ADDU        $6,$5,$6
             % $2 ptr to sentinel
             % $3 ptr to free
             % $4 ptr to sentinel
-            % $5 ptr to FreeList sentinel
-            % $6 new pointer of free region in pool segment
+            % $5 new pointer of free region in pool segment
             % Update M8[:Pool_Segment]:
-            STO         $6,$1,0
+            STO         $5,$1,0
             % First sentinel node:
             STO         $3,$2,0*OCT % ptr to free
             STO         $4,$2,1*OCT % ptr to SENT
-            SET         $6,#0
-            STO         $6,$2,2*OCT % mark in use
-            STO         $6,$2,3*OCT % mark in use
+            SET         $5,#0
+            STO         $5,$2,2*OCT % mark in use
+            STO         $5,$2,3*OCT % mark in use
             % free node:
             STO         $4,$3,0*OCT % ptr to SENT
             STO         $2,$3,1*OCT % ptr to SENT
-            STO         $5,$3,2*OCT % create free list (and mark free)
-            STO         $5,$3,3*OCT % create free list (and mark free)
             % Second sentinel node:
             STO         $2,$4,0*OCT % ptr to SENT
             STO         $3,$4,1*OCT % ptr to free
-            SET         $6,#0
-            STO         $6,$4,2*OCT % mark in use
-            STO         $6,$4,3*OCT % mark in use
-            % Create FreeList sentinel:
-            STO         $5,$5,0*OCT % ptr to self (size 0)
-            STO         $5,$5,1*OCT % ptr to self
-            STO         $3,$5,2*OCT
-            STO         $3,$5,3*OCT
-            % Store pointer to sentinel node:
-            GETA        $6,:MM:__RAW_POOL:Pool
-            STO         $5,$6
+            SET         $5,#0
+            STO         $5,$4,2*OCT % mark in use
+            STO         $5,$4,3*OCT % mark in use
             % Store memory region:
-            GETA        $6,:MM:__RAW_POOL:Memory
-            STO         $2,$6
+            GETA        $5,:MM:__RAW_POOL:Memory
+            STO         $2,$5
+            % Create FreeList sentinels:
+            GETA        $0,:MM:__RAW_POOL:Pool
+            SET         $1,no_entries
+            SLU         $1,$1,5
+1H          SUB         $1,$1,#20
+            ADDU        $2,$0,$1
+            STO         $2,$2,0*OCT % ptr to self (size 0)
+            STO         $2,$2,1*OCT % ptr to self
+            ADDU        $4,$2,#20
+            STO         $4,$2,2*OCT % fl ptr
+            SUBU        $4,$2,#20
+            STO         $4,$2,3*OCT % fl ptr
+            BNZ         $1,1B
+            % Put our free region at the end and make the list cyclic:
+            STO         $3,$0,3*OCT
+            STO         $0,$3,2*OCT
+            SET         $1,no_entries
+            SUBU        $1,$1,1
+            SLU         $1,$1,5
+            ADDU        $4,$0,$1
+            STO         $3,$4,2*OCT
+            STO         $4,$3,3*OCT
             POP         0
 
 
@@ -309,11 +334,10 @@ __out       SWYM
             SET         $5,#0
             STO         $5,$3,2*OCT
             STO         $5,$3,3*OCT
-            % Split chunk if beneficial. We have an overhead of #50 bytes
-            % per allocation. So let us say we want to have at least a
-            % block of #80 bytes.
+            % Split chunk if beneficial. Let's require at least 'spread'
+            % bytes:
             SUBU        $2,$4,$0
-            CMP         $2,$2,#80
+            CMP         $2,$2,spread
             BN          $2,1F
             ADD         $2,$3,$0 % new chunk
             LDO         $5,$3,0 % next chunk
@@ -323,9 +347,14 @@ __out       SWYM
             STO         $2,$3,0
             STO         $2,$5,OCT
             % Update FreeList:
-            GETA        $4,:MM:__RAW_POOL:Pool
-            LDO         $4,$4 % sentinel
-            LDO         $5,$4,2*OCT % next
+            SRU         $4,$4,spread_shft
+            SET         $5,no_entries-1
+            CMP         $5,$5,$4
+            CSN         $4,$5,#0
+            SLU         $4,$4,5
+            GETA        $5,:MM:__RAW_POOL:Pool
+            ADDU        $5,$5,$4
+            LDO         $4,$5,3*OCT % previous
             STO         $5,$2,2*OCT
             STO         $4,$2,3*OCT
             STO         $2,$4,2*OCT
