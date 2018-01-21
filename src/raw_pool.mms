@@ -44,11 +44,11 @@
 %
 % We maintain a doubly-linked list of used/free memory regions:
 %
-% Pool ->   OCTA  ptr     ->   OCTA  ptr     ->  ...  ->   OCTA  ptr   -> #0
-% #0   <-   OCTA  ptr     <-   OCTA  ptr     <-  ...  <-   OCTA  ptr
-%           OCTA  status/ptr   OCTA  status/ptr            OCTA  status/ptr
-%           OCTA  status/ptr   OCTA  status/ptr            OCTA  status/ptr
-%           OCTAs ...          OCTAs ...                   OCTAs ...
+%          -> OCTA  ptr           -> ... -> OCTA  ptr           -> circular
+% circular <- OCTA  ptr           <- ... <- OCTA  ptr
+%             OCTA  status/fl ptr           OCTA  status/fl ptr
+%             OCTA  status/fl ptr           OCTA  status/fl ptr
+%             OCTAs ...                     OCTAs ...
 %
 % And keep the list ordered in the sense that Pool < ptr1 < ... < ptrN.
 %
@@ -75,8 +75,10 @@ Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             BYTE        "range specified.",10,0
 
             .section .data,"wa",@progbits
+            .global     :MM:__RAW_POOL:Memory
             .global     :MM:__RAW_POOL:Pool
             PREFIX      :MM:__RAW_POOL:
+Memory      OCTA        #0000000000000000
 Pool        OCTA        #0000000000000000
 
             .section .text,"ax",@progbits
@@ -128,10 +130,6 @@ Dealloc     GET         $2,:rJ
             BNZ         $3,9F
             LDO         $3,$0,3*OCT % status
             BNZ         $3,9F
-            % Deallocate:
-            NEG         $3,0,1
-            STO         $3,$0,2*OCT % mark free
-            STO         $3,$0,3*OCT % mark free
             % Merge left:
             LDO         $3,$0,OCT   % previous
             LDO         $5,$3,2*OCT % status
@@ -142,6 +140,11 @@ Dealloc     GET         $2,:rJ
             LDO         $5,$0,0     % next
             STO         $3,$5,OCT
             STO         $5,$3,0
+            % Update freelist:
+            LDO         $5,$3,2*OCT % next
+            LDO         $6,$3,3*OCT % previous
+            STO         $5,$6,2*OCT
+            STO         $6,$5,3*OCT
             SET         $0,$3
             % Merge right:
 1H          LDO         $3,$0,0     % next
@@ -153,11 +156,20 @@ Dealloc     GET         $2,:rJ
             LDO         $5,$3,0     % next
             STO         $0,$5,OCT
             STO         $5,$0,0
-1H          SWYM
-#ifdef STATISTICS
-            % TODO
-            %STORE_MAX   $0,:MM:__STATISTICS:HeapMaxNonC
-#endif
+            % Update freelist:
+            LDO         $5,$3,2*OCT % next
+            LDO         $6,$3,3*OCT % previous
+            STO         $5,$6,2*OCT
+            STO         $6,$5,3*OCT
+            % Add entry to freelist:
+1H          GETA        $4,:MM:__RAW_POOL:Pool
+            LDO         $4,$4 % sentinel
+            LDO         $5,$4,2*OCT % next
+            STO         $5,$0,2*OCT
+            STO         $4,$0,3*OCT
+            STO         $0,$4,2*OCT
+            STO         $0,$5,3*OCT
+            % Return:
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$2
             POP         0
@@ -183,42 +195,53 @@ Initialize  SWYM
             % Align to OCTA:
             ADDU        $2,$2,#7
             ANDN        $2,$2,#7
-            % Wen need 4 OCTAs (sentinel):
+            % We need 4 OCTAs (sentinel):
             SET         $3,#20
             ADDU        $3,$2,$3
             % Generously allocate three quarters of the Pool segment:
             SETH        $4,#1800
             ADDU        $4,$1,$4
-            % Wen need another 4 OCTAs (sentinel):
+            % We need another 4 OCTAs (sentinel):
             SET         $5,#20
             ADDU        $5,$4,$5
-            % $2 ptr to SENT
+            % And another one (freelist sentinel):
+            SET         $6,#20
+            ADDU        $6,$5,$6
+            % $2 ptr to sentinel
             % $3 ptr to free
-            % $4 ptr to SENT
-            % $5 new pointer of free region in pool segment
+            % $4 ptr to sentinel
+            % $5 ptr to FreeList sentinel
+            % $6 new pointer of free region in pool segment
             % Update M8[:Pool_Segment]:
-            STO         $5,$1,0
+            STO         $6,$1,0
             % First sentinel node:
             STO         $3,$2,0*OCT % ptr to free
             STO         $4,$2,1*OCT % ptr to SENT
-            SET         $5,#0
-            STO         $5,$2,2*OCT % mark in use
-            STO         $5,$2,3*OCT % mark in use
+            SET         $6,#0
+            STO         $6,$2,2*OCT % mark in use
+            STO         $6,$2,3*OCT % mark in use
             % free node:
             STO         $4,$3,0*OCT % ptr to SENT
             STO         $2,$3,1*OCT % ptr to SENT
-            NEGU        $5,0,1
-            STO         $5,$3,2*OCT % mark free
-            STO         $5,$3,3*OCT % mark free
+            STO         $5,$3,2*OCT % create free list (and mark free)
+            STO         $5,$3,3*OCT % create free list (and mark free)
             % Second sentinel node:
             STO         $2,$4,0*OCT % ptr to SENT
             STO         $3,$4,1*OCT % ptr to free
-            SET         $5,#0
-            STO         $5,$4,2*OCT % mark in use
-            STO         $5,$4,3*OCT % mark in use
+            SET         $6,#0
+            STO         $6,$4,2*OCT % mark in use
+            STO         $6,$4,3*OCT % mark in use
+            % Create FreeList sentinel:
+            STO         $5,$5,0*OCT % ptr to self (size 0)
+            STO         $5,$5,1*OCT % ptr to self
+            STO         $3,$5,2*OCT
+            STO         $3,$5,3*OCT
             % Store pointer to sentinel node:
-            GETA        $3,:MM:__RAW_POOL:Pool
-            STO         $2,$3
+            GETA        $6,:MM:__RAW_POOL:Pool
+            STO         $5,$6
+            % Store memory region:
+            GETA        $6,:MM:__RAW_POOL:Memory
+            STO         $2,$6
             POP         0
 
 
@@ -238,8 +261,7 @@ Alloc       GET         $1,:rJ
             ADDU        $0,$0,#7
             ANDN        $0,$0,#7
 #ifdef STATISTICS
-            SRU         $2,arg0,3
-            SUBU        $2,$2,8
+            SRU         $2,arg0,4
             SET         $3,#00F8
             ODIF        $3,$2,$3
             SUBU        $2,$2,$3
@@ -257,43 +279,56 @@ Alloc       GET         $1,:rJ
             GETA        $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
             %
-            % 2nd pass: Use any chunk that is sufficiently large:
+            % Go through FreeList and use the first chunk that is
+            % sufficiently large:
             %
 1H          SET         $3,$2
-2H          LDO         $3,$3,0
+2H          LDO         $3,$3,2*OCT
             CMP         $4,$3,$2
-            BZ          $4,__fatal % sentinel reached, no luck
-            LDO         $4,$3,3*OCT
-            BZ          $4,2B % chunk in use, go to next
+            BZ          $4,__fatal % no luck, sentinel reached
             LDO         $4,$3,0
             SUBU        $4,$4,$3 % size
             CMP         $5,$0,$4
-            BP          $5,2B % chunk too small, go to next
-            % use chunk
-            SET         $5,#0
-            STO         $5,$3,2*OCT % mark in use
-            STO         $5,$3,3*OCT % mark in use
+            BNP         $5,__out
+            % chunk too small, go to next
+            JMP         2B
+            %
+            % Use chunk:
+            %
             % $0 - size requested
             % $3 - ptr
             % $4 - size of chunk
-
+__out       SWYM
+            % Update FreeList:
+            LDO         $5,$3,2*OCT % next
+            LDO         $6,$3,3*OCT % previous
+            STO         $5,$6,2*OCT
+            STO         $6,$5,3*OCT
+            % Mark in use:
+            SET         $5,#0
+            STO         $5,$3,2*OCT
+            STO         $5,$3,3*OCT
             % Split chunk if beneficial. We have an overhead of #50 bytes
-            % per allocation. So let uss say we want to have at least a
+            % per allocation. So let us say we want to have at least a
             % block of #80 bytes.
-__out       SUBU        $2,$4,$0
+            SUBU        $2,$4,$0
             CMP         $2,$2,#80
             BN          $2,1F
             ADD         $2,$3,$0 % new chunk
             LDO         $5,$3,0 % next chunk
-            % Mark free:
-            NEG         $6,0,1
-            STO         $6,$2,2*OCT
-            STO         $6,$2,3*OCT
             % Update pointer:
-            STO         $2,$3,0
             STO         $5,$2,0
             STO         $3,$2,OCT
+            STO         $2,$3,0
             STO         $2,$5,OCT
+            % Update FreeList:
+            GETA        $4,:MM:__RAW_POOL:Pool
+            LDO         $4,$4 % sentinel
+            LDO         $5,$4,2*OCT % next
+            STO         $5,$2,2*OCT
+            STO         $4,$2,3*OCT
+            STO         $2,$4,2*OCT
+            STO         $2,$5,3*OCT
 1H          ADDU        $0,$3,#20
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$1

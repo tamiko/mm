@@ -31,7 +31,9 @@
             .section .data,"wa",@progbits
             PREFIX      :MM:__DEBUG:STRS:
             .balign 4
-pool_str    BYTE        "Memory pool:",10,0
+memory_str  BYTE        "Pool memory:",10,0
+            .balign 4
+pool_str    BYTE        "Free list:",10,0
             .balign 4
 pool1       BYTE        "    [",0
             .balign 4
@@ -117,12 +119,59 @@ Stack_Segment IS        :Stack_Segment
 
 
             %
+            % PrintMemory - pool memory:
+            %
+
+
+            .global     :MM:__DEBUG:PrintMemory
+PrintMemory GET         $0,:rJ
+            GETA        t,STRS:memory_str
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        $2,:MM:__RAW_POOL:Memory
+            LDO         $2,$2
+            % Print memory chunks:
+            SET         $3,$2
+2H          SWYM
+            GETA        t,STRS:pool1
+            PUSHJ       t,:MM:__PRINT:StrG
+            SET         t,$3
+            PUSHJ       t,:MM:__PRINT:RegG
+            GETA        t,STRS:pool2
+            PUSHJ       t,:MM:__PRINT:StrG
+            LDO         t,$3,0
+            SUBU        t,t,$3
+            CSN         t,t,#20
+            PUSHJ       t,:MM:__PRINT:RegG
+            SET         $4,#20
+            CMP         t,t,$4
+            BP          t,1F
+            GETA        t,STRS:pool3c
+            JMP         4F
+1H          LDO         t,$3,#18
+            BNZ         t,3F
+            GETA        t,STRS:pool3a
+            JMP         4F
+3H          GETA        t,STRS:pool3b
+4H          PUSHJ       t,:MM:__PRINT:StrG
+            LDO         t,$3,#0
+            PUSHJ       t,:MM:__PRINT:RegG
+            GETA        t,STRS:pool4
+            PUSHJ       t,:MM:__PRINT:StrG
+            LDO         $3,$3
+            CMP         $4,$2,$3
+            BNZ         $4,2B
+            PUSHJ       t,:MM:__PRINT:Ln
+            PUT         :rJ,$0
+            POP         0
+
+
+            %
             % PrintPool - print memory pool
             %
 
 
-            .global     :MM:__DEBUG:PrintPool
-PrintPool   GET         $0,:rJ
+            .global     :MM:__DEBUG:PrintFree
+PrintFree   GET         $0,:rJ
             GETA        t,STRS:pool_str
             PUSHJ       t,:MM:__PRINT:StrG
             GETA        $2,:MM:__RAW_POOL:Pool
@@ -142,7 +191,7 @@ PrintPool   GET         $0,:rJ
             PUSHJ       t,:MM:__PRINT:RegG
             SET         $4,#20
             CMP         t,t,$4
-            BNZ         t,1F
+            BP          t,1F
             GETA        t,STRS:pool3c
             JMP         4F
 1H          LDO         t,$3,#18
@@ -151,11 +200,11 @@ PrintPool   GET         $0,:rJ
             JMP         4F
 3H          GETA        t,STRS:pool3b
 4H          PUSHJ       t,:MM:__PRINT:StrG
-            LDO         t,$3,#0
+            LDO         t,$3,#10
             PUSHJ       t,:MM:__PRINT:RegG
             GETA        t,STRS:pool4
             PUSHJ       t,:MM:__PRINT:StrG
-            LDO         $3,$3
+            LDO         $3,$3,#10
             CMP         $4,$2,$3
             BNZ         $4,2B
             PUSHJ       t,:MM:__PRINT:Ln
