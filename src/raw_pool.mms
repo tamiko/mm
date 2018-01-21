@@ -36,20 +36,17 @@
 %
 % By convention M_8[:Pool_Segment] points to the first unallocated OCTA in
 % the :PoolSegment and all memory including and above the address is
-% assumed to be available for allocation. If we run out of memory in the
-% pool, the :MM:__RAW_POOL:Grow subroutine will try to allocate a new,
-% large chunk of memory (~100MB or more) by advancing the
-% M_8[:Pool_Segment] pointer.
+% assumed to be available for allocation.
 %
 % User programs utilizing address space from the pool segment manually must
 % obey this rule by 'allocating' memory by modifying M_8[:Pool_Segment]
-% appropriately. The library assumes that this pointer is `OCTA` aligned.
+% appropriately.
 %
 % We maintain a doubly-linked list of used/free memory regions:
 %
 % Pool ->   OCTA  ptr     ->   OCTA  ptr     ->  ...  ->   OCTA  ptr   -> #0
 % #0   <-   OCTA  ptr     <-   OCTA  ptr     <-  ...  <-   OCTA  ptr
-%           OCTA  size         OCTA  size                  OCTA  size
+%           OCTA  status/ptr   OCTA  status/ptr            OCTA  status/ptr
 %           OCTA  status/ptr   OCTA  status/ptr            OCTA  status/ptr
 %           OCTAs ...          OCTAs ...                   OCTAs ...
 %
@@ -71,7 +68,7 @@
             .section .data,"wa",@progbits
             PREFIX      :MM:__RAW_POOL:STRS:
             .balign 4
-Grow1       BYTE        "__RAW_POOL::Grow failed. "
+Alloc1      BYTE        "__RAW_POOL::Alloc failed. "
             BYTE        "Out of memory.",10,0
             .balign 4
 Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
@@ -123,26 +120,24 @@ Dealloc     GET         $2,:rJ
             BNN         $5,9F
             CMPU        $5,$4,$0
             BNP         $5,9F
-            LDO         $3,$0,2*OCT % size
+            LDO         $3,$0,0
+            SUBU        $3,$3,$0 % size
             CMPU        $5,$1,$3
             BP          $5,9F
+            LDO         $3,$0,2*OCT % status
+            BNZ         $3,9F
             LDO         $3,$0,3*OCT % status
             BNZ         $3,9F
             % Deallocate:
             NEG         $3,0,1
+            STO         $3,$0,2*OCT % mark free
             STO         $3,$0,3*OCT % mark free
             % Merge left:
             LDO         $3,$0,OCT   % previous
-            LDO         $4,$3,2*OCT % size
-            ADDU        $5,$3,$4
-            CMPU        $5,$5,$0
-            BNZ         $5,1F
+            LDO         $5,$3,2*OCT % status
+            BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
-            % Update size:
-            LDO         $5,$0,2*OCT % size
-            ADDU        $4,$4,$5
-            STO         $4,$3,2*OCT
             % Update pointer:
             LDO         $5,$0,0     % next
             STO         $3,$5,OCT
@@ -150,16 +145,10 @@ Dealloc     GET         $2,:rJ
             SET         $0,$3
             % Merge right:
 1H          LDO         $3,$0,0     % next
-            LDO         $4,$0,2*OCT % size
-            ADDU        $5,$0,$4
-            CMPU        $5,$5,$3
-            BNZ         $5,1F
+            LDO         $5,$3,2*OCT % status
+            BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
-            % Update size:
-            LDO         $5,$3,2*OCT % size
-            ADDU        $4,$4,$5
-            STO         $4,$0,2*OCT
             % Update pointer:
             LDO         $5,$3,0     % next
             STO         $0,$5,OCT
@@ -178,7 +167,9 @@ Dealloc     GET         $2,:rJ
 
 %%
 % :MM:__RAW_POOL:Initialize
-%   Create a sentinel entry in our doubly-linked list:
+%   Initialize the memory pool. Generously allocate three quarters of the
+%   Pool segment and create two sentinel entries at the beginning and end.
+%   (And set up a doubly-linked list.)
 %
 % PUSHJ:
 %   no arguments
@@ -187,87 +178,49 @@ Dealloc     GET         $2,:rJ
 %
             .global :MM:__RAW_POOL:Initialize
 Initialize  SWYM
-            % Wen need 4 OCTAs:
-            SET         $0,#20
             GETA        $1,Pool_Segment
             LDO         $2,$1
             % Align to OCTA:
             ADDU        $2,$2,#7
             ANDN        $2,$2,#7
-            ADDU        $3,$2,$0
+            % Wen need 4 OCTAs (sentinel):
+            SET         $3,#20
+            ADDU        $3,$2,$3
+            % Generously allocate three quarters of the Pool segment:
+            SETH        $4,#1800
+            ADDU        $4,$1,$4
+            % Wen need another 4 OCTAs (sentinel):
+            SET         $5,#20
+            ADDU        $5,$4,$5
+            % $2 ptr to SENT
+            % $3 ptr to free
+            % $4 ptr to SENT
+            % $5 new pointer of free region in pool segment
             % Update M8[:Pool_Segment]:
-            STO         $3,$1,0
-            % Create sentinel node:
-            STO         $2,$2,0*OCT % ptr
-            STO         $2,$2,1*OCT % ptr
-            STO         $0,$2,2*OCT % size
-            SET         $3,#0
-            STO         $3,$2,3*OCT % mark in use
+            STO         $5,$1,0
+            % First sentinel node:
+            STO         $3,$2,0*OCT % ptr to free
+            STO         $4,$2,1*OCT % ptr to SENT
+            SET         $5,#0
+            STO         $5,$2,2*OCT % mark in use
+            STO         $5,$2,3*OCT % mark in use
+            % free node:
+            STO         $4,$3,0*OCT % ptr to SENT
+            STO         $2,$3,1*OCT % ptr to SENT
+            NEGU        $5,0,1
+            STO         $5,$3,2*OCT % mark free
+            STO         $5,$3,3*OCT % mark free
+            % Second sentinel node:
+            STO         $2,$4,0*OCT % ptr to SENT
+            STO         $3,$4,1*OCT % ptr to free
+            SET         $5,#0
+            STO         $5,$4,2*OCT % mark in use
+            STO         $5,$4,3*OCT % mark in use
             % Store pointer to sentinel node:
             GETA        $3,:MM:__RAW_POOL:Pool
             STO         $2,$3
             POP         0
 
-
-%%
-% :MM:__RAW_POOL:Grow
-%   Increase available memory by allocating memory from the pool
-%   segment. Ensure that at least a contiguous block of arg0 bytes is
-%   available for allocation
-%
-% PUSHJ:
-%   arg0 - minimal size of a contigous block available
-%   no return value
-%
-            .global :MM:__RAW_POOL:Grow
-Grow        SWYM
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapGrow
-            % Allocate
-            %   - align to OCTA
-            %   - at least twice the size as requested
-            %   - at least 128MiB (#0800 0000 bytes)
-            ADDU        $0,$0,#7
-            ANDN        $0,$0,#7
-            SLU         $0,arg0,1
-            SETML       $1,#0800
-            CMPU        $2,$0,$1
-            CSN         $0,$2,$1
-            % Sanity checks:
-            GETA        $1,Pool_Segment
-            LDO         $2,$1
-            % Align to OCTA:
-            ADDU        $2,$2,#7
-            ANDN        $2,$2,#7
-            ADDU        $3,$2,$0
-            CMPU        $4,$1,$2 % valid pointer in M_8[:Pool_Segment]?
-            BNN         $4,9F
-            CMPU        $4,$1,$3
-            BNN         $4,9F % check for overflow
-            GETA        $4,Stack_Segment
-            CMPU        $5,$4,$3 % check for valid range
-            BNP         $5,9F
-            % $0 - size
-            % $1 - Pool_Segment
-            % $2 - ptr
-            % Update M8[:Pool_Segment]:
-            STO         $3,$1,0
-            % Update pointer:
-            GETA        $1,:MM:__RAW_POOL:Pool
-            LDO         $1,$1       % sentinel
-            LDO         $3,$1,1*OCT % last element
-            STO         $2,$1,1*OCT
-            STO         $2,$3,0*OCT
-            % Create entry:
-            STO         $1,$2,0*OCT
-            STO         $3,$2,1*OCT
-            STO         $0,$2,2*OCT % size
-            NEGU        $4,0,1
-            STO         $4,$2,3*OCT % mark free
-            % Merge left:
-            % TODO
-            POP         0
-9H          GETA        $1,:MM:__RAW_POOL:STRS:Grow1
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
 %%
 % :MM:__RAW_POOL:Alloc
@@ -301,34 +254,32 @@ Alloc       GET         $1,:rJ
             LDO         $2,$2
             PBNZ        $2,1F
             PUSHJ       $2,Initialize
-__retry     SET         $3,arg0
-            PUSHJ       $2,Grow
             GETA        $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
-
             %
             % 2nd pass: Use any chunk that is sufficiently large:
             %
-
 1H          SET         $3,$2
 2H          LDO         $3,$3,0
             CMP         $4,$3,$2
-            BZ          $4,__retry % sentinel reached, no luck
+            BZ          $4,__fatal % sentinel reached, no luck
             LDO         $4,$3,3*OCT
             BZ          $4,2B % chunk in use, go to next
-            LDO         $4,$3,2*OCT % size
+            LDO         $4,$3,0
+            SUBU        $4,$4,$3 % size
             CMP         $5,$0,$4
             BP          $5,2B % chunk too small, go to next
+            % use chunk
             SET         $5,#0
+            STO         $5,$3,2*OCT % mark in use
             STO         $5,$3,3*OCT % mark in use
-
             % $0 - size requested
             % $3 - ptr
             % $4 - size of chunk
 
-            % Split chunk if beneficial
-            % We have an overhead of #50 bytes per allocation. So let's say
-            % we want to have at least a block of #80 bytes.
+            % Split chunk if beneficial. We have an overhead of #50 bytes
+            % per allocation. So let uss say we want to have at least a
+            % block of #80 bytes.
 __out       SUBU        $2,$4,$0
             CMP         $2,$2,#80
             BN          $2,1F
@@ -336,11 +287,8 @@ __out       SUBU        $2,$4,$0
             LDO         $5,$3,0 % next chunk
             % Mark free:
             NEG         $6,0,1
+            STO         $6,$2,2*OCT
             STO         $6,$2,3*OCT
-            % Update sizes:
-            STO         $0,$3,2*OCT
-            SUBU        $4,$4,$0
-            STO         $4,$2,2*OCT
             % Update pointer:
             STO         $2,$3,0
             STO         $5,$2,0
@@ -350,4 +298,6 @@ __out       SUBU        $2,$4,$0
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$1
             POP         1,0
+__fatal     GETA        $1,:MM:__RAW_POOL:STRS:Alloc1
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 

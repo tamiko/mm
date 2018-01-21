@@ -127,34 +127,25 @@ PrintPool   GET         $0,:rJ
             PUSHJ       t,:MM:__PRINT:StrG
             GETA        $2,:MM:__RAW_POOL:Pool
             LDO         $2,$2
-            % Print sentinel:
-            GETA        t,STRS:pool1
-            PUSHJ       t,:MM:__PRINT:StrG
-            SET         t,$2
-            PUSHJ       t,:MM:__PRINT:RegG
-            GETA        t,STRS:pool2
-            PUSHJ       t,:MM:__PRINT:StrG
-            LDO         t,$2,#10
-            PUSHJ       t,:MM:__PRINT:RegG
-            GETA        t,STRS:pool3c
-            PUSHJ       t,:MM:__PRINT:StrG
-            LDO         t,$2,#0
-            PUSHJ       t,:MM:__PRINT:RegG
-            GETA        t,STRS:pool4
-            PUSHJ       t,:MM:__PRINT:StrG
             % Print memory chunks:
-            LDO         $3,$2
-2H          CMP         $4,$2,$3
-            BZ          $4,1F
+            SET         $3,$2
+2H          SWYM
             GETA        t,STRS:pool1
             PUSHJ       t,:MM:__PRINT:StrG
             SET         t,$3
             PUSHJ       t,:MM:__PRINT:RegG
             GETA        t,STRS:pool2
             PUSHJ       t,:MM:__PRINT:StrG
-            LDO         t,$3,#10
+            LDO         t,$3,0
+            SUBU        t,t,$3
+            CSN         t,t,#20
             PUSHJ       t,:MM:__PRINT:RegG
-            LDO         t,$3,#18
+            SET         $4,#20
+            CMP         t,t,$4
+            BNZ         t,1F
+            GETA        t,STRS:pool3c
+            JMP         4F
+1H          LDO         t,$3,#18
             BNZ         t,3F
             GETA        t,STRS:pool3a
             JMP         4F
@@ -165,8 +156,9 @@ PrintPool   GET         $0,:rJ
             GETA        t,STRS:pool4
             PUSHJ       t,:MM:__PRINT:StrG
             LDO         $3,$3
-            JMP         2B
-1H          PUSHJ       t,:MM:__PRINT:Ln
+            CMP         $4,$2,$3
+            BNZ         $4,2B
+            PUSHJ       t,:MM:__PRINT:Ln
             PUT         :rJ,$0
             POP         0
 
