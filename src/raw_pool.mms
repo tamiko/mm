@@ -261,7 +261,8 @@ Alloc       GET         $1,:rJ
             ADDU        $0,$0,#7
             ANDN        $0,$0,#7
 #ifdef STATISTICS
-            SRU         $2,arg0,4
+            SUBU        $2,$0,1
+            SRU         $2,$2,3
             SET         $3,#00F8
             ODIF        $3,$2,$3
             SUBU        $2,$2,$3
