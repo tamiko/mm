@@ -55,14 +55,9 @@
 %  - During deallocation adjacent memory blocks are automatically merged.
 %    (This is a O(1) operation).
 %
-% TODO:
-%
-%  - Implement a buddy allocator?
-%
-%  - Implement a small object allocator for small memory requests?
-%
-%  - Worst case for the allocator is currently O(n), where n is the number
-%    of entries in the pool list. That could be improved to log(n)...
+%  - We keep a sorted, doubly-linked list of free memory regions (in 2*OCT,
+%    3*OCT) and add sentinel entries to access common memory sizes <=4kb
+%    quickly.
 %
 
             .section .data,"wa",@progbits
@@ -181,19 +176,26 @@ Dealloc     GET         $2,:rJ
             % Add entry to free list:
 1H          LDO         $4,$0,0
             SUBU        $4,$4,$0
-            SRU         $4,$4,spread_shft
-            INCL        $4,#1
-            SET         $5,no_entries-1
-            CMP         $5,$5,$4
-            CSN         $4,$5,#0
-            SLU         $4,$4,5
-            GETA        $5,:MM:__RAW_POOL:Pool
-            ADDU        $5,$5,$4
-            LDO         $4,$5,3*OCT % previous
+            SRU         $5,$4,spread_shft
+            INCL        $5,#1
+            SET         $6,no_entries-1
+            CMP         $6,$6,$5
+            CSN         $5,$6,#0
+            SLU         $5,$5,5
+            GETA        $6,:MM:__RAW_POOL:Pool
+            ADDU        $6,$6,$5
+            % Sort by size:
+2H          LDO         $6,$6,3*OCT
+            LDO         $7,$6,0
+            SUBU        $7,$7,$6
+            CMP         $5,$7,$4
+            BP          $5,2B
+            % Put into list:
+            LDO         $5,$6,2*OCT % next
             STO         $5,$0,2*OCT
-            STO         $4,$0,3*OCT
-            STO         $0,$4,2*OCT
+            STO         $6,$0,3*OCT
             STO         $0,$5,3*OCT
+            STO         $0,$6,2*OCT
             % Return:
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$2
@@ -362,19 +364,27 @@ __out       SWYM
             STO         $2,$3,0
             STO         $2,$5,OCT
             % Add entry to free list:
-            SRU         $4,$4,spread_shft
-            INCL        $4,#1
-            SET         $5,no_entries-1
-            CMP         $5,$5,$4
-            CSN         $4,$5,#0
-            SLU         $4,$4,5
-            GETA        $5,:MM:__RAW_POOL:Pool
-            ADDU        $5,$5,$4
-            LDO         $4,$5,3*OCT % previous
+            SUBU        $4,$4,$0
+            SRU         $5,$4,spread_shft
+            INCL        $5,#1
+            SET         $6,no_entries-1
+            CMP         $6,$6,$5
+            CSN         $5,$6,#0
+            SLU         $5,$5,5
+            GETA        $6,:MM:__RAW_POOL:Pool
+            ADDU        $6,$6,$5
+            % Sort by size:
+2H          LDO         $6,$6,3*OCT
+            LDO         $7,$6,0
+            SUBU        $7,$7,$6
+            CMP         $5,$7,$4
+            BP          $5,2B
+            % Put into list:
+            LDO         $5,$6,2*OCT % next
             STO         $5,$2,2*OCT
-            STO         $4,$2,3*OCT
-            STO         $2,$4,2*OCT
+            STO         $6,$2,3*OCT
             STO         $2,$5,3*OCT
+            STO         $2,$6,2*OCT
 1H          ADDU        $0,$3,#20
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$1
