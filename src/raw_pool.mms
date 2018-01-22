@@ -29,10 +29,9 @@
 %
 % :MM:__RAW_POOL:
 %
-% A minimalistic memory pool implementation.
+% A memory pool implementation with sorted free list.
 %
 % The heap will be organized as memory blocks inside the :PoolSegment.
-% Allocations are done in multiples of 2 OCTAs (16 bytes), minimum 2 OCTAs.
 %
 % By convention M_8[:Pool_Segment] points to the first unallocated OCTA in
 % the :PoolSegment and all memory including and above the address is
@@ -44,20 +43,43 @@
 %
 % We maintain a doubly-linked list of used/free memory regions:
 %
-%          -> OCTA  ptr           -> ... -> OCTA  ptr           -> circular
-% circular <- OCTA  ptr           <- ... <- OCTA  ptr
-%             OCTA  status/fl ptr           OCTA  status/fl ptr
-%             OCTA  status/fl ptr           OCTA  status/fl ptr
-%             OCTAs ...                     OCTAs ...
+%          ┌─────────────────────┐           ┌─────────────────────┐
+%          │ OCTA  ptr           ---> ... -> │ OCTA  ptr           ---> SENT.
+% SENT. <--- OCTA  ptr           │ <- ... <--- OCTA  ptr           │
+%          │ OCTA  status/fl ptr │           │ OCTA  status/fl ptr │
+%          │ OCTA  status/fl ptr │           │ OCTA  status/fl ptr │
+%          │ ─────────────────── │           │ ─────────────────── │
+%          │ OCTAs payload       │           │ OCTAs payload       │
+%          └─────────────────────┘           └─────────────────────┘
 %
 % And keep the list ordered in the sense that Pool < ptr1 < ... < ptrN.
 %
-%  - During deallocation adjacent memory blocks are automatically merged.
-%    (This is a O(1) operation).
-%
 %  - We keep a sorted, doubly-linked list of free memory regions (in 2*OCT,
 %    3*OCT) and add sentinel entries to access common memory sizes <=4kb
-%    quickly.
+%    in 128 byte increments quickly:
+%
+%      Pool+#00:                                         Pool+#20:
+%
+%    ┌──────────┐    ┌─────────────────────┐           ┌──────────┐
+%    │ sentinel │    │ OCTA  ptr           │           │ sentinel │
+%    │          │    │ OCTA  ptr           │           │          │
+%    │ s/fl ptr ---> │ OCTA  status/fl ptr ---> ... -> │ s/fl ptr ---> ...
+%    │ s/fl ptr │ <--- OCTA  status/fl ptr │ <- ... <--- s/fl ptr │ <- ...
+%    └──────────┘    │ ─────────────────── │           └──────────┘
+%                    │ OCTAs payload       │
+%                    └─────────────────────┘
+%
+%    The sentinels are kept at fixed memory locations in the .data section:
+%      Pool + i * #20, i = 0, 1, 2, ...
+%    Allocation happens on a first fit basis. That way allocation has a
+%    fixed complexity of O(1). (With a worst case constant proportional to
+%    the number of bins.)
+%
+%  - During deallocation adjacent memory blocks are automatically merged.
+%    (This is an O(1) operation). And sorted back into the list of free
+%    memory regions. When __ALIGN_TO_SPREAD is set this is an O(1)
+%    operation for memory chunks of size <= 4kb. Worst case complexity is
+%    O(n).
 %
 
             .section .data,"wa",@progbits
@@ -90,7 +112,6 @@ spread_mask IS          #7F
 spread_shft IS          7
 no_entries  IS          31
 #define __ALIGN_TO_SPREAD
-
 
             %
             % Our memory pool :-)
@@ -365,8 +386,10 @@ __out       SWYM
             SET         $5,#0
             STO         $5,$3,2*OCT
             STO         $5,$3,3*OCT
-            % Split chunk if beneficial. Let's require at least 'spread'
+            %
+            % Split chunk if beneficial. Let us require at least 'spread'
             % bytes:
+            %
             SUBU        $2,$4,$0
             CMP         $2,$2,spread
             BN          $2,1F
