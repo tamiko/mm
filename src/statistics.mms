@@ -45,6 +45,8 @@
             .global     :MM:__STATISTICS:HeapDealloc
             .global     :MM:__STATISTICS:HeapChunks
             .global     :MM:__STATISTICS:HeapMaxNonC
+            .global     :MM:__STATISTICS:HeapSBRKtmp
+            .global     :MM:__STATISTICS:HeapSBRK
             .global     :MM:__STATISTICS:HeapSizes
             .global     :MM:__STATISTICS:__buffer
             .global     :MM:__STATISTICS:__lock
@@ -63,6 +65,8 @@ HeapAlloc   OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
 HeapChunks  OCTA        #0000000000000000
 HeapMaxNonC OCTA        #0000000000000000
+HeapSBRKtmp OCTA        #0000000000000000
+HeapSBRK    OCTA        #0000000000000000
 HeapSizes   .fill       0x100
 __buffer    OCTA        #0000000000000000
 __lock      OCTA        #0000000000000000
@@ -109,6 +113,8 @@ heap_alloc  BYTE        "    Number of allocations:                   ",0
 heap_deallo BYTE        "    Number of deallocations:                 ",0
             .balign 4
 heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
+            .balign 4
+heap_sbrk   BYTE        "    Highest allocated address (SBRK):        ",0
             .balign 4
 heap_hist1  BYTE        "    Allocations: ",10,0
             .balign 4
@@ -214,6 +220,11 @@ PrintStatistics SWYM
             PRINT_FIELD STRS:heap_alloc,HeapAlloc
             PRINT_FIELD STRS:heap_deallo,HeapDealloc
             PRINT_FIELD STRS:heap_nonc,HeapMaxNonC
+            GETA        t,STRS:heap_sbrk
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        t,HeapSBRK
+            LDO         t,t,0
+            PUSHJ       t,:MM:__PRINT:RegLnG
             %
             % Print a histogram:
             %

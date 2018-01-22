@@ -286,7 +286,7 @@ Initialize  SWYM
             % Store memory region:
             GETA        $5,:MM:__RAW_POOL:Memory
             STO         $2,$5
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,3
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks
             STORE_MAX :MM:__STATISTICS:HeapChunks,:MM:__STATISTICS:HeapMaxNonC
             % Create free list sentinels:
             GETA        $0,:MM:__RAW_POOL:Pool
@@ -397,7 +397,7 @@ __out       SWYM
             SUBU        $2,$4,$0
             CMP         $2,$2,spread
             BN          $2,1F
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks
             STORE_MAX :MM:__STATISTICS:HeapChunks,:MM:__STATISTICS:HeapMaxNonC
             ADD         $2,$3,$0 % new chunk
             LDO         $5,$3,0 % next chunk
@@ -428,7 +428,14 @@ __out       SWYM
             STO         $6,$2,3*OCT
             STO         $2,$5,3*OCT
             STO         $2,$6,2*OCT
-1H          ADDU        $0,$3,#20
+1H          SWYM
+#ifdef STATISTICS
+            ADDU        $2,$0,$3
+            GETA        $4,:MM:__STATISTICS:HeapSBRKtmp
+            STO         $2,$4
+            STORE_MAX :MM:__STATISTICS:HeapSBRKtmp,:MM:__STATISTICS:HeapSBRK
+#endif
+            ADDU        $0,$3,#20
             PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$1
             POP         1,0
