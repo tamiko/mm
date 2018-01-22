@@ -53,12 +53,14 @@
             STO         $31,$30
             .endm
 
-            .macro      STORE_MAX register label
-            GETA        $30,\label
+            .macro      STORE_MAX label1 label2
+            GETA        $30,\label2
             LDO         $31,$30
-            ODIF        $30,\register,$31
+            GETA        $30,\label1
+            LDO         $30,$30
+            ODIF        $30,$30,$31
             ADDU        $31,$31,$30
-            GETA        $30,\label
+            GETA        $30,\label2
             STO         $31,$30
             .endm
 

@@ -177,6 +177,7 @@ Dealloc     GET         $2,:rJ
             BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,-1
             % Update pointer:
             LDO         $5,$0,0     % next
             STO         $3,$5,OCT
@@ -193,6 +194,7 @@ Dealloc     GET         $2,:rJ
             BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,-1
             % Update pointer:
             LDO         $5,$3,0     % next
             STO         $0,$5,OCT
@@ -284,6 +286,8 @@ Initialize  SWYM
             % Store memory region:
             GETA        $5,:MM:__RAW_POOL:Memory
             STO         $2,$5
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,3
+            STORE_MAX :MM:__STATISTICS:HeapChunks,:MM:__STATISTICS:HeapMaxNonC
             % Create free list sentinels:
             GETA        $0,:MM:__RAW_POOL:Pool
             SET         $1,no_entries
@@ -393,6 +397,8 @@ __out       SWYM
             SUBU        $2,$4,$0
             CMP         $2,$2,spread
             BN          $2,1F
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
+            STORE_MAX :MM:__STATISTICS:HeapChunks,:MM:__STATISTICS:HeapMaxNonC
             ADD         $2,$3,$0 % new chunk
             LDO         $5,$3,0 % next chunk
             % Update pointer:

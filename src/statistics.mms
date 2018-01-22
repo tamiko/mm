@@ -41,9 +41,9 @@
             .global     :MM:__STATISTICS:TimingTotal
             .global     :MM:__STATISTICS:TimingTripH
             .global     :MM:__STATISTICS:TimingCriti
-            .global     :MM:__STATISTICS:HeapGrow
             .global     :MM:__STATISTICS:HeapAlloc
             .global     :MM:__STATISTICS:HeapDealloc
+            .global     :MM:__STATISTICS:HeapChunks
             .global     :MM:__STATISTICS:HeapMaxNonC
             .global     :MM:__STATISTICS:HeapSizes
             .global     :MM:__STATISTICS:__buffer
@@ -61,7 +61,7 @@ TimingTripH OCTA        #0000000000000000
 TimingCriti OCTA        #0000000000000000
 HeapAlloc   OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
-HeapGrow    OCTA        #0000000000000000
+HeapChunks  OCTA        #0000000000000000
 HeapMaxNonC OCTA        #0000000000000000
 HeapSizes   .fill       0x100
 __buffer    OCTA        #0000000000000000
@@ -107,8 +107,6 @@ heap_header BYTE        "Heap statistics:",10,0
 heap_alloc  BYTE        "    Number of allocations:                   ",0
             .balign 4
 heap_deallo BYTE        "    Number of deallocations:                 ",0
-            .balign 4
-heap_grow   BYTE        "    Number of heap grow operations:          ",0
             .balign 4
 heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
             .balign 4
@@ -215,7 +213,6 @@ PrintStatistics SWYM
             PUSHJ       t,:MM:__PRINT:StrG
             PRINT_FIELD STRS:heap_alloc,HeapAlloc
             PRINT_FIELD STRS:heap_deallo,HeapDealloc
-            PRINT_FIELD STRS:heap_grow,HeapGrow
             PRINT_FIELD STRS:heap_nonc,HeapMaxNonC
             %
             % Print a histogram:
