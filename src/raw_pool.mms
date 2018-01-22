@@ -177,7 +177,7 @@ Dealloc     GET         $2,:rJ
             BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,-1
+            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
             % Update pointer:
             LDO         $5,$0,0     % next
             STO         $3,$5,OCT
@@ -194,7 +194,7 @@ Dealloc     GET         $2,:rJ
             BZ          $5,1F
             LDO         $5,$3,3*OCT % status
             BZ          $5,1F
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,-1
+            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
             % Update pointer:
             LDO         $5,$3,0     % next
             STO         $0,$5,OCT
@@ -335,14 +335,22 @@ Alloc       GET         $1,:rJ
             ODIF        $3,$2,$3
             SUBU        $2,$2,$3
             INCREMENT_COUNTER :MM:__STATISTICS:HeapSizes,$2
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotAllo,0,$2
 #endif
             % Add header:
             ADDU        $0,$0,#20
 #ifdef      __ALIGN_TO_SPREAD
+#ifdef STATISTICS
+            SET         $2,$0
+#endif
             % And align to spread
             SET         $5,spread_mask
             ADDU        $0,$0,$5
             ANDN        $0,$0,$5
+#ifdef STATISTICS
+            SUBU        $2,$0,$2
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotOver,0,$2
+#endif
 #endif
             %
             % Initialize the pool if necessary:

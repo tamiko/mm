@@ -29,27 +29,19 @@
 
 #ifdef STATISTICS
 
-            .macro      LOCK_STATISTICS
-            GETA        $30,:MM:__STATISTICS:__lock
-            NEG         $31,0,1
-            STO         $31,$30
-            .endm
-
-            .macro      UNLOCK_STATISTICS
-            GETA        $30,:MM:__STATISTICS:__lock
-            SET         $31,#0000
-            STO         $31,$30
-            .endm
-
             .macro      INCREMENT_COUNTER label offset=0 increment=1
             GETA        $30,\label
             ADDU        $30,$30,\offset
             LDO         $31,$30
-            .if \increment > 0
             ADDU        $31,$31,\increment
-            .else
-            SUBU        $31,$31,(-\increment)
-            .endif
+            STO         $31,$30
+            .endm
+
+            .macro      DECREMENT_COUNTER label offset=0 increment=1
+            GETA        $30,\label
+            ADDU        $30,$30,\offset
+            LDO         $31,$30
+            SUBU        $31,$31,\increment
             STO         $31,$30
             .endm
 
@@ -84,13 +76,10 @@
 
 #else
 
-            .macro      LOCK_STATISTICS
-            .endm
-
-            .macro      UNLOCK_STATISTICS
-            .endm
-
             .macro      INCREMENT_COUNTER label offset=0 increment=1
+            .endm
+
+            .macro      DECREMENT_COUNTER label offset=0 increment=1
             .endm
 
             .macro      STORE_MAX register label

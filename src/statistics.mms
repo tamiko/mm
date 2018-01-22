@@ -42,6 +42,8 @@
             .global     :MM:__STATISTICS:TimingTripH
             .global     :MM:__STATISTICS:TimingCriti
             .global     :MM:__STATISTICS:HeapAlloc
+            .global     :MM:__STATISTICS:HeapTotAllo
+            .global     :MM:__STATISTICS:HeapTotOver
             .global     :MM:__STATISTICS:HeapDealloc
             .global     :MM:__STATISTICS:HeapChunks
             .global     :MM:__STATISTICS:HeapMaxNonC
@@ -62,6 +64,8 @@ TimingTotal OCTA        #0000000000000000
 TimingTripH OCTA        #0000000000000000
 TimingCriti OCTA        #0000000000000000
 HeapAlloc   OCTA        #0000000000000000
+HeapTotAllo OCTA        #0000000000000000
+HeapTotOver OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
 HeapChunks  OCTA        #0000000000000000
 HeapMaxNonC OCTA        #0000000000000000
@@ -114,6 +118,10 @@ heap_deallo BYTE        "    Number of deallocations:                 ",0
             .balign 4
 heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
             .balign 4
+heap_total  BYTE        "    Total allocated bytes:                   ",0
+            .balign 4
+heap_over   BYTE        "    Total overprovision:                     ",0
+            .balign 4
 heap_sbrk   BYTE        "    Highest allocated address (SBRK):        ",0
             .balign 4
 heap_hist1  BYTE        "    Allocations: ",10,0
@@ -137,6 +145,14 @@ t           IS          :MM:t
             LDO         t,t,0
             PUSHJ       t,:MM:__PRINT:UnsignedG
             PUSHJ       t,:MM:__PRINT:Ln
+            .endm
+
+            .macro      PRINT_FLDHX string label
+            GETA        t,\string
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        t,\label
+            LDO         t,t,0
+            PUSHJ       t,:MM:__PRINT:RegLnG
             .endm
 
             .macro      PRINT_HIST register1 register2 label width padding=0
@@ -220,11 +236,9 @@ PrintStatistics SWYM
             PRINT_FIELD STRS:heap_alloc,HeapAlloc
             PRINT_FIELD STRS:heap_deallo,HeapDealloc
             PRINT_FIELD STRS:heap_nonc,HeapMaxNonC
-            GETA        t,STRS:heap_sbrk
-            PUSHJ       t,:MM:__PRINT:StrG
-            GETA        t,HeapSBRK
-            LDO         t,t,0
-            PUSHJ       t,:MM:__PRINT:RegLnG
+            PRINT_FLDHX STRS:heap_total,HeapTotAllo
+            PRINT_FLDHX STRS:heap_over,HeapTotOver
+            PRINT_FLDHX STRS:heap_sbrk,HeapSBRK
             %
             % Print a histogram:
             %
