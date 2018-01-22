@@ -86,8 +86,16 @@ Memory      OCTA        #0000000000000000
             %
 
 spread      IS          #80
+spread_mask IS          #7F
 spread_shft IS          7
-no_entries  IS          8
+no_entries  IS          31
+#define __ALIGN_TO_SPREAD
+
+
+            %
+            % Our memory pool :-)
+            %
+
             .global     :MM:__RAW_POOL:Pool
             .balign     8
 Pool        .fill       #20 * no_entries
@@ -305,6 +313,12 @@ Alloc       GET         $1,:rJ
 #endif
             % Add header:
             ADDU        $0,$0,#20
+#ifdef      __ALIGN_TO_SPREAD
+            % And align to spread
+            SET         $5,spread_mask
+            ADDU        $0,$0,$5
+            ANDN        $0,$0,$5
+#endif
             %
             % Initialize the pool if necessary:
             %
