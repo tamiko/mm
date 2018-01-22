@@ -157,7 +157,7 @@ Dealloc     GET         $2,:rJ
             LDO         $5,$0,0     % next
             STO         $3,$5,OCT
             STO         $5,$3,0
-            % Update freelist:
+            % Update free list:
             LDO         $5,$3,2*OCT % next
             LDO         $6,$3,3*OCT % previous
             STO         $5,$6,2*OCT
@@ -173,15 +173,23 @@ Dealloc     GET         $2,:rJ
             LDO         $5,$3,0     % next
             STO         $0,$5,OCT
             STO         $5,$0,0
-            % Update freelist:
+            % Update free list:
             LDO         $5,$3,2*OCT % next
             LDO         $6,$3,3*OCT % previous
             STO         $5,$6,2*OCT
             STO         $6,$5,3*OCT
-            % Add entry to freelist:
-1H          GETA        $4,:MM:__RAW_POOL:Pool
-            LDO         $4,$4 % sentinel
-            LDO         $5,$4,2*OCT % next
+            % Add entry to free list:
+1H          LDO         $4,$0,0
+            SUBU        $4,$4,$0
+            SRU         $4,$4,spread_shft
+            INCL        $4,#1
+            SET         $5,no_entries-1
+            CMP         $5,$5,$4
+            CSN         $4,$5,#0
+            SLU         $4,$4,5
+            GETA        $5,:MM:__RAW_POOL:Pool
+            ADDU        $5,$5,$4
+            LDO         $4,$5,3*OCT % previous
             STO         $5,$0,2*OCT
             STO         $4,$0,3*OCT
             STO         $0,$4,2*OCT
@@ -245,7 +253,7 @@ Initialize  SWYM
             % Store memory region:
             GETA        $5,:MM:__RAW_POOL:Memory
             STO         $2,$5
-            % Create FreeList sentinels:
+            % Create free list sentinels:
             GETA        $0,:MM:__RAW_POOL:Pool
             SET         $1,no_entries
             SLU         $1,$1,5
@@ -299,16 +307,23 @@ Alloc       GET         $1,:rJ
             % Initialize the pool if necessary:
             %
             GETA        $2,:MM:__RAW_POOL:Pool
-            LDO         $2,$2
-            PBNZ        $2,1F
-            PUSHJ       $2,Initialize
-            GETA        $2,:MM:__RAW_POOL:Pool
-            LDO         $2,$2
+            LDO         $3,$2
+            PBNZ        $3,1F
+            PUSHJ       $3,Initialize
             %
-            % Go through FreeList and use the first chunk that is
+            % Rotate free list to correct bin:
+            %
+1H          SRU         $4,$0,spread_shft
+            SET         $5,no_entries-1
+            CMP         $5,$5,$4
+            CSN         $4,$5,#0
+            SLU         $4,$4,5
+            ADDU        $2,$2,$4
+            SET         $3,$2
+            %
+            % Go through free list and use the first chunk that is
             % sufficiently large:
             %
-1H          SET         $3,$2
 2H          LDO         $3,$3,2*OCT
             CMP         $4,$3,$2
             BZ          $4,__fatal % no luck, sentinel reached
@@ -325,7 +340,7 @@ Alloc       GET         $1,:rJ
             % $3 - ptr
             % $4 - size of chunk
 __out       SWYM
-            % Update FreeList:
+            % Update free list:
             LDO         $5,$3,2*OCT % next
             LDO         $6,$3,3*OCT % previous
             STO         $5,$6,2*OCT
@@ -346,8 +361,9 @@ __out       SWYM
             STO         $3,$2,OCT
             STO         $2,$3,0
             STO         $2,$5,OCT
-            % Update FreeList:
+            % Add entry to free list:
             SRU         $4,$4,spread_shft
+            INCL        $4,#1
             SET         $5,no_entries-1
             CMP         $5,$5,$4
             CSN         $4,$5,#0
