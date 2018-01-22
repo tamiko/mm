@@ -237,7 +237,7 @@ PrintStatistics SWYM
 2H          GETA        t,STRS:heap_hist2
 3H          PUSHJ       t,:MM:__PRINT:StrG
             ADDU        $5,$1,#8
-            SLU         $5,$5,3
+            SLU         $5,$5,4
             SET         t,10
             CMP         t,$5,t
             BNN         t,5F

@@ -305,7 +305,7 @@ Alloc       GET         $1,:rJ
             ANDN        $0,$0,#7
 #ifdef STATISTICS
             SUBU        $2,$0,1
-            SRU         $2,$2,3
+            SRU         $2,$2,4
             SET         $3,#00F8
             ODIF        $3,$2,$3
             SUBU        $2,$2,$3
