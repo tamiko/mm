@@ -155,6 +155,10 @@ InitError   BYTE        "Fatal initialization error.",10,0
 Stack_Segment IS        :Stack_Segment
 __init      SWYM
             %
+            % Initialize the memory pool:
+            %
+            PUSHJ       :MM:t,:MM:__RAW_POOL:Initialize
+            %
             % Initialize the ThreadRing and create a single entry for the
             % main thread that will eventually start executing at the Main
             % label. Further, save a pristine thread image at ThreadTmpl

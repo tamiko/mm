@@ -353,16 +353,10 @@ Alloc       GET         $1,:rJ
 #endif
 #endif
             %
-            % Initialize the pool if necessary:
-            %
-            GETA        $2,:MM:__RAW_POOL:Pool
-            LDO         $3,$2
-            PBNZ        $3,1F
-            PUSHJ       $3,Initialize
-            %
             % Rotate free list to correct bin:
             %
-1H          SRU         $4,$0,spread_shft
+            GETA        $2,:MM:__RAW_POOL:Pool
+            SRU         $4,$0,spread_shft
             SET         $5,no_entries-1
             CMP         $5,$5,$4
             CSN         $4,$5,#0
