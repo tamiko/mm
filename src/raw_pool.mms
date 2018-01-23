@@ -148,10 +148,11 @@ OCT         IS          #8
 Initialize  SWYM
             GETA        $1,Pool_Segment
             LDO         $2,$1
-            % Align to spread:
+            % Align to OCTA and spread, subtract #20 for first sentinel:
             SET         $3,spread_mask
             ADDU        $2,$2,$3
             ANDN        $2,$2,$3
+            SUBU        $2,$2,#20
             % We need 4 OCTAs (sentinel):
             SET         $3,#20
             ADDU        $3,$2,$3
