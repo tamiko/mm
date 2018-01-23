@@ -96,20 +96,21 @@ OCT         IS          #8
             % Arguments for Fread:
             .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
-            GETA        t,:MM:__INTERNAL:BufferMutex
-            PUSHJ       t,:MM:__THREAD:LockMutexG
-            PUT         :rJ,$5
+            GETA        $1,:MM:__INTERNAL:BufferMutex
+            GETA        $2,:MM:__INTERNAL:Buffer
+            SET         $4,$1
+            PUSHJ       $3,:MM:__THREAD:LockMutex
             GETA        $4,:MM:__RAND:FileHandle
             LDO         $4,$4
-            GETA        $2,:MM:__INTERNAL:Buffer
-            SET         $3,#8
-            PUSHJ       $1,:MM:__FILE:ReadJ
+            SET         $5,$2
+            SET         $6,#8
+            PUSHJ       $3,:MM:__FILE:ReadJ
             JMP         9F
+            LDO         $2,$2
+            SET         $4,$1
+            PUSHJ       $3,:MM:__THREAD:UnlockMutex
             PUT         :rJ,$0
-            GETA        $0,:MM:__INTERNAL:Buffer
-            LDO         $0,$0
-            GETA        t,:MM:__INTERNAL:BufferMutex
-            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            SET         $0,$2
             POP         1,0
 9H          GETA        $2,:MM:__RAND:STRS:Octa1
             PUSHJ       $1,:MM:__ERROR:IError1
