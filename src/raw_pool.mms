@@ -335,7 +335,7 @@ Alloc       GET         $1,:rJ
             ODIF        $3,$2,$3
             SUBU        $2,$2,$3
             INCREMENT_COUNTER :MM:__STATISTICS:HeapSizes,$2
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotAllo,0,$2
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotAllo,0,$0
 #endif
             % Add header:
             ADDU        $0,$0,#20
