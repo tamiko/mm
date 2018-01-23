@@ -267,6 +267,7 @@ Alloc       GET         $1,:rJ
             % sufficiently large:
             %
 2H          LDO         $3,$3,2*OCT
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotSear
             CMP         $4,$3,$2
             BZ          $4,__fatal % no luck, sentinel reached
             LDO         $4,$3,0
@@ -319,6 +320,7 @@ __out       SWYM
             ADDU        $6,$6,$5
             % Sort by size:
 2H          LDO         $6,$6,3*OCT
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotPlac
             LDO         $7,$6,0
             SUBU        $7,$7,$6
             CMP         $5,$7,$4
@@ -428,6 +430,7 @@ Dealloc     GET         $2,:rJ
             ADDU        $6,$6,$5
             % Sort by size:
 2H          LDO         $6,$6,3*OCT
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapTotPlac
             LDO         $7,$6,0
             SUBU        $7,$7,$6
             CMP         $5,$7,$4

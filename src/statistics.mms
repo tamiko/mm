@@ -43,6 +43,8 @@
             .global     :MM:__STATISTICS:TimingCriti
             .global     :MM:__STATISTICS:HeapAlloc
             .global     :MM:__STATISTICS:HeapTotAllo
+            .global     :MM:__STATISTICS:HeapTotSear
+            .global     :MM:__STATISTICS:HeapTotPlac
             .global     :MM:__STATISTICS:HeapTotOver
             .global     :MM:__STATISTICS:HeapDealloc
             .global     :MM:__STATISTICS:HeapChunks
@@ -51,7 +53,6 @@
             .global     :MM:__STATISTICS:HeapSBRK
             .global     :MM:__STATISTICS:HeapSizes
             .global     :MM:__STATISTICS:__buffer
-            .global     :MM:__STATISTICS:__lock
             PREFIX      :MM:__STATISTICS:
 ThreadTripH OCTA        #0000000000000000
 ThreadCriti OCTA        #0000000000000000
@@ -64,6 +65,8 @@ TimingTotal OCTA        #0000000000000000
 TimingTripH OCTA        #0000000000000000
 TimingCriti OCTA        #0000000000000000
 HeapAlloc   OCTA        #0000000000000000
+HeapTotSear OCTA        #0000000000000000
+HeapTotPlac OCTA        #0000000000000000
 HeapTotAllo OCTA        #0000000000000000
 HeapTotOver OCTA        #0000000000000000
 HeapDealloc OCTA        #0000000000000000
@@ -73,7 +76,6 @@ HeapSBRKtmp OCTA        #0000000000000000
 HeapSBRK    OCTA        #0000000000000000
 HeapSizes   .fill       0x100
 __buffer    OCTA        #0000000000000000
-__lock      OCTA        #0000000000000000
 
             .section .data,"wa",@progbits
             PREFIX      :MM:__STATISTICS:STRS:
@@ -117,6 +119,10 @@ heap_alloc  BYTE        "    Number of allocations:                   ",0
 heap_deallo BYTE        "    Number of deallocations:                 ",0
             .balign 4
 heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
+            .balign 4
+heap_searc  BYTE        "    Total searches (best fit):               ",0
+            .balign 4
+heap_place  BYTE        "    Total searches (free-list placement):    ",0
             .balign 4
 heap_total  BYTE        "    Total allocated bytes:                   ",0
             .balign 4
@@ -236,6 +242,8 @@ PrintStatistics SWYM
             PRINT_FIELD STRS:heap_alloc,HeapAlloc
             PRINT_FIELD STRS:heap_deallo,HeapDealloc
             PRINT_FIELD STRS:heap_nonc,HeapMaxNonC
+            PRINT_FIELD STRS:heap_searc,HeapTotSear
+            PRINT_FIELD STRS:heap_place,HeapTotPlac
             PRINT_FLDHX STRS:heap_total,HeapTotAllo
             PRINT_FLDHX STRS:heap_over,HeapTotOver
             PRINT_FLDHX STRS:heap_sbrk,HeapSBRK
