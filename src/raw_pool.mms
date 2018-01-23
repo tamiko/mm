@@ -26,7 +26,7 @@
 
 #include "statistics.mmh"
 
-%
+%%
 % :MM:__RAW_POOL:
 %
 % A memory pool implementation with sorted free list.
@@ -82,6 +82,64 @@
 %    O(n).
 %
 
+%
+% Tuning parameter:
+%
+
+%
+% __SORT_FREELIST
+% if defined the free list is kept sorted. This is an O(1) operation in
+% case __ALIGN_TO_SPREAD is set and the allocation is less or equal to
+% spread * no_entries.
+%
+
+#define __SORT_FREELIST
+
+%
+% __DISABLE_BINNING
+% if defined binning is disabled.
+%
+
+% #define __DISABLE_BINNING
+
+%
+% __ALLOCATE_FROM_LAST_BIN
+% Always allocate from last entry in last bin, i.e. largest memory region.
+%
+
+#define __ALLOCATE_FROM_LAST_BIN
+
+%
+% If defined, allocations (including header) are rounded up to a multiple
+% of spread
+%
+
+#define __ALIGN_TO_SPREAD
+
+
+%
+% The free list pool is organized as a partially ordered,
+% doubly-linked list. Create 'no_entries' sentinels for a
+% spread of 'spread' bytes:
+%
+            PREFIX      :MM:__RAW_POOL:
+spread      IS          #80
+spread_mask IS          #7F
+spread_shft IS          7
+#ifndef __DISABLE_BINNING
+no_entries  IS          32
+#else
+no_entries  IS          1
+#endif
+
+%
+%%
+
+
+            %
+            % String constants:
+            %
+
             .section .data,"wa",@progbits
             PREFIX      :MM:__RAW_POOL:STRS:
             .balign 4
@@ -100,18 +158,6 @@ Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             PREFIX      :MM:__RAW_POOL:
             .global     :MM:__RAW_POOL:Memory
 Memory      OCTA        #0000000000000000
-
-            %
-            % The free list pool is organized as a partially ordered,
-            % doubly-linked list. Create 'no_entries' sentinels for a
-            % spread of 'spread' bytes:
-            %
-
-spread      IS          #80
-spread_mask IS          #7F
-spread_shft IS          7
-no_entries  IS          31
-#define __ALIGN_TO_SPREAD
 
             %
             % Our memory pool :-)
@@ -252,16 +298,18 @@ Alloc       GET         $1,:rJ
             INCREMENT_COUNTER :MM:__STATISTICS:HeapTotOver,0,$2
 #endif
 #endif
+            GETA        $2,:MM:__RAW_POOL:Pool
+#ifndef __ALLOCATE_FROM_LAST_BIN
             %
             % Rotate free list to correct bin:
             %
-            GETA        $2,:MM:__RAW_POOL:Pool
             SRU         $4,$0,spread_shft
             SET         $5,no_entries-1
             CMP         $5,$5,$4
             CSN         $4,$5,#0
             SLU         $4,$4,5
             ADDU        $2,$2,$4
+#endif
             SET         $3,$2
             %
             % Go through free list and use the first chunk that is
@@ -325,7 +373,9 @@ __out       SWYM
             LDO         $7,$6,0
             SUBU        $7,$7,$6
             CMP         $5,$7,$4
+#ifdef __SORT_FREELIST
             BP          $5,2B
+#endif
             % Put into list:
             LDO         $5,$6,2*OCT % next
             STO         $5,$2,2*OCT
@@ -435,7 +485,9 @@ Dealloc     GET         $2,:rJ
             LDO         $7,$6,0
             SUBU        $7,$7,$6
             CMP         $5,$7,$4
+#ifdef __SORT_FREELIST
             BP          $5,2B
+#endif
             % Put into list:
             LDO         $5,$6,2*OCT % next
             STO         $5,$0,2*OCT
