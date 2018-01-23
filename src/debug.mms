@@ -47,6 +47,20 @@ pool3c      BYTE        "] SENT --> [next = ",0
             .balign 4
 pool4       BYTE        "]",10,0
             .balign 4
+plot1       BYTE        "] |",0
+            .balign 4
+plot2       BYTE        " ",0
+            .balign 4
+plot3       BYTE        "-",0
+            .balign 4
+plot3a      BYTE        "l",0
+            .balign 4
+plot3b      BYTE        "r",0
+            .balign 4
+plot3c      BYTE        "m",0
+            .balign 4
+plot4       BYTE        "|",10,0
+            .balign 4
 ring_str    BYTE        "Thread Ring:",10,0
             .balign 4
 ring1       BYTE        "    [",0
@@ -166,7 +180,7 @@ PrintMemory GET         $0,:rJ
 
 
             %
-            % PrintPool - print memory pool
+            % PrintFree - print memory pool
             %
 
 
@@ -207,6 +221,85 @@ PrintFree   GET         $0,:rJ
             LDO         $3,$3,#10
             CMP         $4,$2,$3
             BNZ         $4,2B
+            PUSHJ       t,:MM:__PRINT:Ln
+            PUT         :rJ,$0
+            POP         0
+
+
+            %
+            % PlotMemory - Show a graphical layout of the memory region:
+            %
+
+
+            .global     :MM:__DEBUG:PlotMemory
+PlotMemory  GET         $0,:rJ
+            GETA        t,STRS:memory_str
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        $2,:MM:__RAW_POOL:Memory
+            LDO         $2,$2     % first sentinel
+            LDO         $3,$2,#8  % last sentinel
+            LDO         $2,$2     % first block
+            LDO         $3,$3,#8  % last block (almost™ always free)
+            SUBU        $3,$3,$2
+            SET         $4,$2     % first memory chunk
+            LDO         $5,$4     % next memory chunk
+            LDO         $4,$4,#10 % status of first memory region
+            GETA        $16,STRS:pool1
+            GETA        $6,STRS:plot1
+            GETA        $7,STRS:plot4
+            GETA        $8,STRS:plot2
+            GETA        $9,STRS:plot3
+            GETA        $12,STRS:plot3a
+            GETA        $13,STRS:plot3b
+            GETA        $14,STRS:plot3c
+            SET         $15,$12
+
+            % $2 running memory address
+            % $3 size of memory pool
+            % $4 status of current memory region
+            % $5 next memory block
+            SET         $10,#0
+            SET         $11,#0
+1H          SWYM
+            % print address if divisible by #4000
+            BNZ         $11,2F
+            SET         t,$16
+            PUSHJ       t,:MM:__PRINT:StrG
+            SET         t,$2
+            PUSHJ       t,:MM:__PRINT:RegG
+            SET         t,$6
+            PUSHJ       t,:MM:__PRINT:StrG
+2H          SET         t,$8 % ' '
+            BNZ         $4,3F
+            SET         t,$15
+            SET         $15,$9
+3H          PUSHJ       t,:MM:__PRINT:StrG
+            ADDU        $2,$2,#80
+            SUBU        $3,$3,#80
+            ADDU        $10,$10,#80
+            SET         $11,$10
+            SLU         $11,$11,51 % TODO
+            % print newline every #4000:
+            BNZ         $11,4F
+            SET         t,$7
+            PUSHJ       t,:MM:__PRINT:StrG
+            % check if we are in a new memory region:
+4H          CMPU        t,$2,$5
+            BN          t,6F
+            LDO         $4,$5,#10 % status memory region
+            LDO         $5,$5 % new memory region
+            SET         $15,$12 % 'l'
+            ADDU        t,$2,#80
+            CMPU        t,t,$5
+            BN          t,5F
+            SET         $15,$14 % 'm'
+            JMP         5F
+6H          ADDU        t,$2,#80
+            CMPU        t,t,$5
+            BN          t,5F
+            SET         $15,$13 % 'r'
+5H          BP          $3,1B
+
             PUSHJ       t,:MM:__PRINT:Ln
             PUT         :rJ,$0
             POP         0
