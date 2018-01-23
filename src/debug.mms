@@ -79,13 +79,13 @@ str_stack   BYTE        "    Stack segment:             [ ",0
             .balign 4
 str_main    BYTE        "    Address of Main:           [ ",0
             .balign 4
-str_tramp   BYTE        "    :MM:__Init:__trampoline    [ ",0
+str_tramp   BYTE        "    :MM:__INIT:__trampoline    [ ",0
             .balign 4
-str_entry1  BYTE        "    :MM:__Init:__entry         [ ",0
+str_entry1  BYTE        "    :MM:__INIT:__entry         [ ",0
             .balign 4
-str_entry2  BYTE        "    :MM:__Init:__init          [ ",0
+str_entry2  BYTE        "    :MM:__INIT:__init          [ ",0
             .balign 4
-str_entry3  BYTE        "    :MM:__Init:__guard         [ ",0
+str_entry3  BYTE        "    :MM:__INTERNAL:Guard       [ ",0
             .balign 4
 str_hndl2   BYTE        "    :MM:__INTERNAL:TripHandler [ ",0
             .balign 4
@@ -336,7 +336,7 @@ PrintLayout SET         $2,$255
             GETA        $5,:MM:__INIT:__trampoline
             GETA        $4,STRS:str_tramp
             PUSHJ       $3,AddressOf
-            GETA        $5,:MM:__INIT:__guard
+            GETA        $5,:MM:__INTERNAL:Guard
             GETA        $4,STRS:str_entry3
             PUSHJ       $3,AddressOf
             GETA        $5,:MM:__INIT:__init

@@ -39,10 +39,9 @@ GuardMessa  BYTE        "I'm sorry Dave. I'm afraid I can't do that. ",10
             BYTE        "terminate correctly.",10,0
 
             .section .text,"ax",@progbits
-            .global :MM:__INTERNAL:__guard
+            .global :MM:__INTERNAL:Guard
             PREFIX      :MM:__INTERNAL:
 t           IS          :MM:t
-__guard     GETA        t,__guard
-            ADD         t,t,4
+Guard       GETA        t,Guard
             GETA        $1,:MM:__INTERNAL:STRS:GuardMessa
             PUSHJ       $0,:MM:__ERROR:Error1

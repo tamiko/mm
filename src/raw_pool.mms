@@ -134,108 +134,6 @@ OCT         IS          #8
 
 
 %%
-% :MM:__RAW_POOL:Dealloc
-%   Deallocate a previously allocated bunch of memory. arg1 is
-%   aligned to 2*OCT and set to at least 2*OCT.
-%
-% PUSHJ:
-%   arg0 - starting address of memory block to deallocate
-%   arg1 - size of memory block (in bytes)
-%   no return value
-%
-% Preconditions:
-%   - The memory block defined by arg0, arg1 must have been
-%     allocated via :MM:__RAW_POOL:Alloc
-%
-            .global :MM:__RAW_POOL:Dealloc
-ptr         IS          $2
-prev_ptr    IS          $3
-Dealloc     GET         $2,:rJ
-            PUSHJ       t,:MM:__INTERNAL:EnterCritical
-            INCREMENT_COUNTER :MM:__STATISTICS:HeapDealloc
-            % Add the header:
-            SUBU        $0,$0,#20
-            ADDU        $1,$1,#20
-            % Sanity checks:
-            GETA        $3,Pool_Segment
-            GETA        $4,Stack_Segment
-            CMPU        $5,$3,$0
-            BNN         $5,9F
-            CMPU        $5,$4,$0
-            BNP         $5,9F
-            LDO         $3,$0,0
-            SUBU        $3,$3,$0 % size
-            CMPU        $5,$1,$3
-            BP          $5,9F
-            LDO         $3,$0,2*OCT % status
-            BNZ         $3,9F
-            LDO         $3,$0,3*OCT % status
-            BNZ         $3,9F
-            % Merge left:
-            LDO         $3,$0,OCT   % previous
-            LDO         $5,$3,2*OCT % status
-            BZ          $5,1F
-            LDO         $5,$3,3*OCT % status
-            BZ          $5,1F
-            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
-            % Update pointer:
-            LDO         $5,$0,0     % next
-            STO         $3,$5,OCT
-            STO         $5,$3,0
-            % Update free list:
-            LDO         $5,$3,2*OCT % next
-            LDO         $6,$3,3*OCT % previous
-            STO         $5,$6,2*OCT
-            STO         $6,$5,3*OCT
-            SET         $0,$3
-            % Merge right:
-1H          LDO         $3,$0,0     % next
-            LDO         $5,$3,2*OCT % status
-            BZ          $5,1F
-            LDO         $5,$3,3*OCT % status
-            BZ          $5,1F
-            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
-            % Update pointer:
-            LDO         $5,$3,0     % next
-            STO         $0,$5,OCT
-            STO         $5,$0,0
-            % Update free list:
-            LDO         $5,$3,2*OCT % next
-            LDO         $6,$3,3*OCT % previous
-            STO         $5,$6,2*OCT
-            STO         $6,$5,3*OCT
-            % Add entry to free list:
-1H          LDO         $4,$0,0
-            SUBU        $4,$4,$0
-            SRU         $5,$4,spread_shft
-            INCL        $5,#1
-            SET         $6,no_entries-1
-            CMP         $6,$6,$5
-            CSN         $5,$6,#0
-            SLU         $5,$5,5
-            GETA        $6,:MM:__RAW_POOL:Pool
-            ADDU        $6,$6,$5
-            % Sort by size:
-2H          LDO         $6,$6,3*OCT
-            LDO         $7,$6,0
-            SUBU        $7,$7,$6
-            CMP         $5,$7,$4
-            BP          $5,2B
-            % Put into list:
-            LDO         $5,$6,2*OCT % next
-            STO         $5,$0,2*OCT
-            STO         $6,$0,3*OCT
-            STO         $0,$5,3*OCT
-            STO         $0,$6,2*OCT
-            % Return:
-            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
-            PUT         :rJ,$2
-            POP         0
-9H          GETA        $1,:MM:__RAW_POOL:STRS:Deallo1
-            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
-
-
-%%
 % :MM:__RAW_POOL:Initialize
 %   Initialize the memory pool. Generously allocate three quarters of the
 %   Pool segment and create two sentinel entries at the beginning and end.
@@ -250,9 +148,10 @@ Dealloc     GET         $2,:rJ
 Initialize  SWYM
             GETA        $1,Pool_Segment
             LDO         $2,$1
-            % Align to OCTA:
-            ADDU        $2,$2,#7
-            ANDN        $2,$2,#7
+            % Align to spread:
+            SET         $3,spread_mask
+            ADDU        $2,$2,$3
+            ANDN        $2,$2,$3
             % We need 4 OCTAs (sentinel):
             SET         $3,#20
             ADDU        $3,$2,$3
@@ -442,5 +341,107 @@ __out       SWYM
             PUT         :rJ,$1
             POP         1,0
 __fatal     GETA        $1,:MM:__RAW_POOL:STRS:Alloc1
+            PUSHJ       $0,:MM:__ERROR:IError1 % does not return
+
+
+%%
+% :MM:__RAW_POOL:Dealloc
+%   Deallocate a previously allocated bunch of memory. arg1 is
+%   aligned to 2*OCT and set to at least 2*OCT.
+%
+% PUSHJ:
+%   arg0 - starting address of memory block to deallocate
+%   arg1 - size of memory block (in bytes)
+%   no return value
+%
+% Preconditions:
+%   - The memory block defined by arg0, arg1 must have been
+%     allocated via :MM:__RAW_POOL:Alloc
+%
+            .global :MM:__RAW_POOL:Dealloc
+ptr         IS          $2
+prev_ptr    IS          $3
+Dealloc     GET         $2,:rJ
+            PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            INCREMENT_COUNTER :MM:__STATISTICS:HeapDealloc
+            % Add the header:
+            SUBU        $0,$0,#20
+            ADDU        $1,$1,#20
+            % Sanity checks:
+            GETA        $3,Pool_Segment
+            GETA        $4,Stack_Segment
+            CMPU        $5,$3,$0
+            BNN         $5,9F
+            CMPU        $5,$4,$0
+            BNP         $5,9F
+            LDO         $3,$0,0
+            SUBU        $3,$3,$0 % size
+            CMPU        $5,$1,$3
+            BP          $5,9F
+            LDO         $3,$0,2*OCT % status
+            BNZ         $3,9F
+            LDO         $3,$0,3*OCT % status
+            BNZ         $3,9F
+            % Merge left:
+            LDO         $3,$0,OCT   % previous
+            LDO         $5,$3,2*OCT % status
+            BZ          $5,1F
+            LDO         $5,$3,3*OCT % status
+            BZ          $5,1F
+            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
+            % Update pointer:
+            LDO         $5,$0,0     % next
+            STO         $3,$5,OCT
+            STO         $5,$3,0
+            % Update free list:
+            LDO         $5,$3,2*OCT % next
+            LDO         $6,$3,3*OCT % previous
+            STO         $5,$6,2*OCT
+            STO         $6,$5,3*OCT
+            SET         $0,$3
+            % Merge right:
+1H          LDO         $3,$0,0     % next
+            LDO         $5,$3,2*OCT % status
+            BZ          $5,1F
+            LDO         $5,$3,3*OCT % status
+            BZ          $5,1F
+            DECREMENT_COUNTER :MM:__STATISTICS:HeapChunks,0,1
+            % Update pointer:
+            LDO         $5,$3,0     % next
+            STO         $0,$5,OCT
+            STO         $5,$0,0
+            % Update free list:
+            LDO         $5,$3,2*OCT % next
+            LDO         $6,$3,3*OCT % previous
+            STO         $5,$6,2*OCT
+            STO         $6,$5,3*OCT
+            % Add entry to free list:
+1H          LDO         $4,$0,0
+            SUBU        $4,$4,$0
+            SRU         $5,$4,spread_shft
+            INCL        $5,#1
+            SET         $6,no_entries-1
+            CMP         $6,$6,$5
+            CSN         $5,$6,#0
+            SLU         $5,$5,5
+            GETA        $6,:MM:__RAW_POOL:Pool
+            ADDU        $6,$6,$5
+            % Sort by size:
+2H          LDO         $6,$6,3*OCT
+            LDO         $7,$6,0
+            SUBU        $7,$7,$6
+            CMP         $5,$7,$4
+            BP          $5,2B
+            % Put into list:
+            LDO         $5,$6,2*OCT % next
+            STO         $5,$0,2*OCT
+            STO         $6,$0,3*OCT
+            STO         $0,$5,3*OCT
+            STO         $0,$6,2*OCT
+            % Return:
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+            PUT         :rJ,$2
+            POP         0
+9H          GETA        $1,:MM:__RAW_POOL:STRS:Deallo1
             PUSHJ       $0,:MM:__ERROR:IError1 % does not return
 
