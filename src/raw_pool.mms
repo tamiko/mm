@@ -107,7 +107,7 @@
 % Always allocate from last entry in last bin, i.e. largest memory region.
 %
 
-#define __ALLOCATE_FROM_LAST_BIN
+% #define __ALLOCATE_FROM_LAST_BIN
 
 %
 % If defined, allocations (including header) are rounded up to a multiple
