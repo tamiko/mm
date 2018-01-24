@@ -120,7 +120,7 @@ heap_deallo BYTE        "    Number of deallocations:                 ",0
             .balign 4
 heap_nonc   BYTE        "    Maximal free space fragmentation:        ",0
             .balign 4
-heap_searc  BYTE        "    Total searches (best fit):               ",0
+heap_searc  BYTE        "    Total searches (allocation):             ",0
             .balign 4
 heap_place  BYTE        "    Total searches (free-list placement):    ",0
             .balign 4
