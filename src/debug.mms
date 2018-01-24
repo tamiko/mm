@@ -47,19 +47,19 @@ pool3c      BYTE        "] SENT --> [next = ",0
             .balign 4
 pool4       BYTE        "]",10,0
             .balign 4
-plot1       BYTE        "] |",0
+plot1       BYTE        "] ",#E2,#94,#8A,0
             .balign 4
 plot2       BYTE        " ",0
             .balign 4
-plot3       BYTE        "-",0
+plot3       BYTE        #E2,#94,#81,0
             .balign 4
-plot3a      BYTE        "l",0
+plot3a      BYTE        #E2,#94,#97,0
             .balign 4
-plot3b      BYTE        "r",0
+plot3b      BYTE        #E2,#94,#9B,0
             .balign 4
-plot3c      BYTE        "m",0
+plot3c      BYTE        #E2,#95,#B9,0
             .balign 4
-plot4       BYTE        "|",10,0
+plot4       BYTE        #E2,#94,#8A,10,0
             .balign 4
 ring_str    BYTE        "Thread Ring:",10,0
             .balign 4
