@@ -82,6 +82,8 @@
 %
 % Deque:PushF front, back, size
 % Deque:PushB front, back, size
+% Deque:PushF_fast front, back
+% Deque:PushB_fast front, back
 %
 %  - Push an element to the deque. size is either a register or an
 %    immediate expression specifying the size of the memory region that
@@ -95,6 +97,8 @@
 %
 % Deque:PopF  front, back
 % Deque:PopB  front, back
+% Deque:PopF_fast front, back
+% Deque:PopB_fast front, back
 %
 %  - Pop the top (or bottom) most element by deallocating the memory region
 %    in question and updating the front and/or back register.
@@ -102,17 +106,19 @@
 %    Execution continues at @+#8 if successful and at @+#4 on failure.
 %
 %
-% Deque:adv   front, back
-% Deque:rew   front, back
+% Deque:Adv   front, back
+% Deque:Rew   front, back
+% Deque:Adv_fast front, back
+% Deque:Rew_fast front, back
 %
 %  Internally, the deque is organized as a closed, doubly-linked list
 %  (meaning that the next pointer of the last element points to the first
 %  elements and vice versa.)
 %
 %  - Rotate the deque "clockwise" or "counter-clockwise":
-%    Deque:adv advances "front" to the next element (that would have been
+%    Deque:Adv advances "front" to the next element (that would have been
 %    accessible after a PopF) and sets "back" to "front".
-%    Deque:rew rewinds by setting "front" to "back" and setting "back" to
+%    Deque:Rew rewinds by setting "front" to "back" and setting "back" to
 %    the penultimate element (that would have been accessible after a
 %    PopB).
 %

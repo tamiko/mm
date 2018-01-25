@@ -55,7 +55,7 @@
             % The push operation:
             %
 
-            .macro      Deque:__PUSH front back size side=0
+            .macro      Deque:__PUSH front back size side=1 checks=1
             Deque:__SAVE_REGISTERS
             BNZ         \front,__1h_dpu\@
             % sanity check: both registers must be #0:
@@ -77,7 +77,9 @@
             SET         $255,#0 % successful return
             JMP         __er_dpu\@+#4
             % sanity check: both registers must hold a valid memory address:
-__1h_dpu\@  SET         :MM:t,\front
+__1h_dpu\@  SWYM
+            .if \checks
+            SET         :MM:t,\front
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\back
@@ -85,6 +87,10 @@ __1h_dpu\@  SET         :MM:t,\front
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\size
             PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            .else
+            SET         :MM:t,\size
+            PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            .endif
             % lock memory region
             SUBU        :MM:t,:MM:t,#18
             NEGU        $255,0,1
@@ -117,19 +123,29 @@ __er_dpu\@  NEG         $255,0,1
             Deque:__PUSH \front,\back,\size,0
             .endm
 
+            .macro      Deque:PushF_fast front back size
+            Deque:__PUSH \front,\back,\size,1,0
+            .endm
+
+            .macro      Deque:PushB_fast front back size
+            Deque:__PUSH \front,\back,\size,0,0
+            .endm
+
             %
             % The pop operation:
             %
 
-            .macro      Deque:__POP front back side=0
+            .macro      Deque:__POP front back side=1 checks=1
             Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
+            .if \checks
             SET         :MM:t,\front
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpo\@
             SET         :MM:t,\back
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dpo\@
+            .endif
             % special case: last element
             CMP         :MM:t,\front,\back
             BNZ         :MM:t,__1h_dpo\@
@@ -177,6 +193,14 @@ __er_dpo\@  NEG         $255,0,1
 
             .macro      Deque:PopB front back
             Deque:__POP \front,\back,0
+            .endm
+
+            .macro      Deque:PopF_fast front back
+            Deque:__POP \front,\back,0,0
+            .endm
+
+            .macro      Deque:PopB_fast front back
+            Deque:__POP \front,\back,0,0
             .endm
 
             %
@@ -257,36 +281,54 @@ __er_dch\@  NEG         $255,0,1
             % The adv/rew operations:
             %
 
-            .macro      Deque:__ADVANCE front back side=0
-            Deque:__SAVE_REGISTERS
+            .macro      Deque:__ADVANCE front back side=1 checks=1
             .if \side
+            .if \checks
+            Deque:__SAVE_REGISTERS
             SET         :MM:t,\front
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dav\@
+            .endif
             SET         \back,\front
             SUBU        \front,\front,#10
             LDO         \front,\front,#0 % next
             ADDU        \front,\front,#10
             .else
+            .if \checks
+            Deque:__SAVE_REGISTERS
             SET         :MM:t,\back
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dav\@
+            .endif
             SET         \front,\back
             SUBU        \back,\back,#10
             LDO         \back,\back,#8 % previous
             ADDU        \back,\back,#10
             .endif
+__er_dav\@  SWYM
+            .if \checks
             SET         $255,#0
             JMP         @+#8
-__er_dav\@  NEG         $255,0,1
+            NEG         $255,0,1
             Deque:__RESTORE_REGISTERS
+            .else
+            JMP         @+#8
+            .endif
             .endm
 
-            .macro      Deque:adv front back
+            .macro      Deque:Adv front back
             Deque:__ADVANCE \front,\back,1
             .endm
 
-            .macro      Deque:rew front back
+            .macro      Deque:Rew front back
             Deque:__ADVANCE \front,\back,0
+            .endm
+
+            .macro      Deque:Adv_fast front back
+            Deque:__ADVANCE \front,\back,1,0
+            .endm
+
+            .macro      Deque:Rew_fast front back
+            Deque:__ADVANCE \front,\back,0,0
             .endm
 
