@@ -108,7 +108,7 @@ Main        SWYM
             % probability distribution. We store the time in the first octa
             % of the allocated memory region.
             %
-            % Let's push a small sentinel first (the only entry with a
+            % Let us push a small sentinel first (the only entry with a
             % negative tics count)
             %
 
