@@ -259,20 +259,18 @@ __er_dch\@  NEG         $255,0,1
 
             .macro      Deque:__ADVANCE front back side=0
             Deque:__SAVE_REGISTERS
-            % sanity check: both registers must hold a valid memory address:
+            .if \side
             SET         :MM:t,\front
             PUSHJ       :MM:t,:MM:__HEAP:ValidG
             BN          :MM:t,__er_dav\@
-            SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
-            BN          :MM:t,__er_dav\@
-            % save front element at label:
-            .if \side
             SET         \back,\front
             SUBU        \front,\front,#10
             LDO         \front,\front,#0 % next
             ADDU        \front,\front,#10
             .else
+            SET         :MM:t,\back
+            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            BN          :MM:t,__er_dav\@
             SET         \front,\back
             SUBU        \back,\back,#10
             LDO         \back,\back,#8 % previous

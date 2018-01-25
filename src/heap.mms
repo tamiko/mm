@@ -468,15 +468,18 @@ Valid       SET         $3,arg0
             SET         ret0,0
             POP         1,0
 1H          PUT         :rJ,$1
-            SET         ret0,1
-            NEG         ret0,ret0
+            NEGU        ret0,0,1
             POP         1,0
 ValidG      GET         $0,:rJ
             SET         $2,t
-            PUSHJ       $1,Valid
+            PUSHJ       $1,ValidJ
+            JMP         1F
             PUT         :rJ,$0
-            SET         t,$1
-            POP         0,0
+            SET         t,0
+            POP         1,0
+1H          PUT         :rJ,$0
+            NEGU        t,0,1
+            POP         1,0
 
 
 %%
