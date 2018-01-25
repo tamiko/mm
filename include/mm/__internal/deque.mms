@@ -196,7 +196,7 @@ __er_dpo\@  NEG         $255,0,1
             .endm
 
             .macro      Deque:PopF_fast front back
-            Deque:__POP \front,\back,0,0
+            Deque:__POP \front,\back,1,0
             .endm
 
             .macro      Deque:PopB_fast front back
