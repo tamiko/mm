@@ -86,21 +86,19 @@ DrawExponen GET         $2,:rJ
             POP         2,0
 
 
-            .section .data,"wa",@progbits
-            .balign 4
-ErrorStr    BYTE "Something went horribly wrong :-(",10,0
+            %%
+            %
+            % Main:
+            %
 
-
-            .section .text,"ax",@progbits
+Main        SWYM
 
             %
             % Choose a distribution:
             %
 
-Draw        IS          DrawExponen
-%Draw        IS          DrawUniform
-
-Main        SWYM
+%Draw        IS          DrawExponen
+Draw        IS          DrawUniform
 
             %
             % We use a deque for allocating an maintaining pool data.
@@ -118,6 +116,11 @@ Main        SWYM
             JMP         __fatal
             NEG         $3,0,1
             STO         $3,$1
+
+            %
+            % Enable threading such that statistics for critical sections
+            % are available.
+            %
 
             SETH        t,#7000
             PUSHJ       t,MM:Thread:EnableG
@@ -167,6 +170,18 @@ Main        SWYM
             PUSHJ       t,MM:__DEBUG:PlotMemory
             PUSHJ       t,MM:Sys:Exit
 
+
+            %%
+            %
+            % Print an error and exit:
+            %
+
+            .section .data,"wa",@progbits
+            .balign 4
+ErrorStr    BYTE "Something went horribly wrong :-(",10,0
+
+            .section .text,"ax",@progbits
 __fatal     GETA        t,ErrorStr
             PUSHJ       t,MM:Print:StrG
             PUSHJ       t,MM:Sys:Abort
+
