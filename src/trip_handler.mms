@@ -42,7 +42,7 @@
             .global     :MM:__INTERNAL:ThreadTmpl
             PREFIX      :MM:__INTERNAL:
 __buffer    OCTA        #0000000000000000
-NextID      OCTA        #0000000000000001
+__next_id   OCTA        #0000000000000001
 ThreadRing  OCTA        #0000000000000000 % pointer to active thread
 ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
             OCTA        #0000000000000000 % UNSAVE address
@@ -97,13 +97,13 @@ TripHandler SAVE        $255,0
             SRU         $3,$3,8
             AND         $3,$3,#FF
             CMP         $4,$3,Yield
-            BZ          $4,DoYield
+            BZ          $4,__yield
             CMP         $4,$3,Create
-            BZ          $4,DoCreate
+            BZ          $4,__create
             CMP         $4,$3,Clone
-            BZ          $4,DoClone
+            BZ          $4,__clone
             CMP         $4,$3,Exit
-            BZ          $4,DoExit
+            BZ          $4,__exit
             GETA        $1,:MM:__INTERNAL:STRS:Unhandled
             PUSHJ       $0,:MM:__ERROR:IError1
 
@@ -111,7 +111,7 @@ TripHandler SAVE        $255,0
             % Exit:
             %
 
-DoExit      GETA        $1,Stack_Segment
+__exit      GETA        $1,Stack_Segment
             GETA        $4,:MM:__INTERNAL:ThreadRing
             LDO         $4,$4
             LDO         $5,$4,#10 % previous
@@ -126,13 +126,13 @@ DoExit      GETA        $1,Stack_Segment
             STO         $5,$6,#10
             STO         $6,$5,#18
             SET         $4,$6
-1H          JMP         DoUnsave
+1H          JMP         __unsave
 
             %
             % Yield:
             %
 
-DoYield     GETA        $1,Stack_Segment
+__yield     GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
@@ -155,7 +155,7 @@ DoYield     GETA        $1,Stack_Segment
             STO         $0,$4,#28 % UNSAVE address
             LDO         $4,$4,#18
 
-DoUnsave    SWYM
+__unsave    SWYM
             INCREMENT_COUNTER :MM:__STATISTICS:ThreadSwitc
             GETA        $5,:MM:__INTERNAL:ThreadRing
             STO         $4,$5
@@ -198,13 +198,13 @@ DoUnsave    SWYM
             % Create:
             %
 
-DoCreate    GET         $3,:rZ
+__create    GET         $3,:rZ
             % Create new list entry:
             SET         $5,#30
             PUSHJ       $4,:MM:__HEAP:AllocJ
             JMP         __fatal
             % Thread ID:
-            GETA        $5,:MM:__INTERNAL:NextID
+            GETA        $5,:MM:__INTERNAL:__next_id
             LDO         $6,$5
             STO         $6,$4,#00
             ADDU        $6,$6,1
@@ -237,7 +237,7 @@ DoCreate    GET         $3,:rZ
             % Clone:
             %
 
-DoClone     GETA        $1,Stack_Segment
+__clone     GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
@@ -253,7 +253,7 @@ DoClone     GETA        $1,Stack_Segment
             PUSHJ       $4,:MM:__HEAP:AllocJ
             JMP         __fatal
             % Thread ID:
-            GETA        $5,:MM:__INTERNAL:NextID
+            GETA        $5,:MM:__INTERNAL:__next_id
             LDO         $6,$5
             STO         $6,$4,#00
             ADDU        $6,$6,1
