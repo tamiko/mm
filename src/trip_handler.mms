@@ -355,8 +355,8 @@ __new       SWYM
             BN          $255,1F
             ADDU        $255,$255,#0005
             PUT         :rI,$255
-            GET         $255,:rW
-1H          RESUME
+1H          GET         $255,:rW
+            RESUME
 
 __fatal     GETA        $1,:MM:__INTERNAL:STRS:SwitchError
             PUSHJ       $0,:MM:__ERROR:IError1
