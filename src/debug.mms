@@ -397,7 +397,14 @@ AddressOf2  GET         $2,:rJ
             POP         0,0
 
             .global     :MM:__DEBUG:PrintLayout
-PrintLayout SET         $2,$255
+PrintLayout GET         $0,:rJ
+            GETA        t,PrintThread
+            PUSHJ       t,:MM:__THREAD:CreateG
+            PUSHJ       t,:MM:__THREAD:WaitG
+            PUT         :rJ,$0
+            POP         0,0
+
+PrintThread SET         $2,$255
             GETA        t,STRS:str_header
             PUSHJ       t,:MM:__PRINT:StrG
 

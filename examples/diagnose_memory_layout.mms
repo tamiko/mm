@@ -4,4 +4,6 @@
 
             .section .text,"ax",@progbits
 
-Main        JMP         :MM:__DEBUG:PrintLayout
+Main        PUSHJ       $255,:MM:__DEBUG:PrintMemory
+            PUSHJ       $255,:MM:__DEBUG:PrintLayout
+            PUSHJ       $255,:MM:__SYS:Exit
