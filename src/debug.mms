@@ -404,7 +404,7 @@ PrintLayout GET         $0,:rJ
             PUT         :rJ,$0
             POP         0,0
 
-PrintThread SET         $2,$255
+PrintThread GET         $2,:rJ
             GETA        t,STRS:str_header
             PUSHJ       t,:MM:__PRINT:StrG
 

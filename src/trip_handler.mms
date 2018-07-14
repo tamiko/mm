@@ -337,11 +337,14 @@ __new       SWYM
             % UNSAVE to get a valid context:
             UNSAVE      0,$0
             %
+            % Store old entry address in :rJ
+            %
+            GET         $255,:rW
+            PUT         :rJ,$255
+            %
             % Set new entry address (make sure to not use a local register
             % for that...)
             %
-            SET         $255,#0
-            PUT         :rJ,$255
             GETA        $255,:MM:__INTERNAL:__buffer
             LDO         $255,$255
             PUT         :rW,$255
