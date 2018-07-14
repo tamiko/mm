@@ -195,22 +195,20 @@ OCT         IS          #8
 Initialize  SWYM
             GETA        $1,Pool_Segment
             LDO         $2,$1
-            % Align to #4000, subtract #20 for first sentinel:
+            % Align to #4000, add and subtract #20 for first sentinel:
+            SUBU        $2,$2,#20
             SETL        $3,#3FFF
             ADDU        $2,$2,$3
             ANDN        $2,$2,$3
-
-
             SUBU        $2,$2,#20
             % We need 4 OCTAs (sentinel):
-            SET         $3,#20
-            ADDU        $3,$2,$3
+            ADDU        $3,$2,#20
             % Generously allocate three quarters of the Pool segment:
             SETH        $4,#1800
             ADDU        $4,$1,$4
+            SUBU        $4,$4,#20
             % We need another 4 OCTAs (sentinel):
-            SET         $5,#20
-            ADDU        $5,$4,$5
+            ADDU        $5,$4,#20
             % $2 ptr to sentinel
             % $3 ptr to free
             % $4 ptr to sentinel
