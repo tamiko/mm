@@ -54,11 +54,11 @@ ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
             .section .data,"wa",@progbits
             PREFIX      :MM:__INTERNAL:STRS:
             .balign 4
-Unhandled   BYTE        "Unhandled TRIP.\n",0
+Unhandled   BYTE        "Unhandled TRIP. :-(\n",0
             .balign 4
 DoubleTrip  BYTE        "Double TRIP detected! Lost return context :-(\n",0
             .balign 4
-SwitchError BYTE        "Fatal error during context switch.",10,0
+SwitchError BYTE        "Fatal error during context switch. :-(\n",0
 
             .section .text,"ax",@progbits
             .global :MM:__INTERNAL:TripHandler

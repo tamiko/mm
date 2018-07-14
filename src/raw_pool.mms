@@ -35,7 +35,7 @@
 %
 % By convention M_8[:Pool_Segment] points to the first unallocated OCTA in
 % the :PoolSegment and all memory including and above the address is
-% assumed to be available for allocation.
+% assumed to be available for allocation. We will generously
 %
 % User programs utilizing address space from the pool segment manually must
 % obey this rule by 'allocating' memory by modifying M_8[:Pool_Segment]

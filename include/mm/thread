@@ -117,7 +117,7 @@ Thread:CloneG IS    :MM:__THREAD:CloneG
 %%
 % :MM:Thread:Create
 %
-%   Create a new thread by creating a ne execution context with main
+%   Create a new thread by creating a new execution context with main
 %   address arg0.
 %
 %   PUSHJ:

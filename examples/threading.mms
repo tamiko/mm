@@ -1,7 +1,7 @@
 %
 % A threading example demonstrating preemptive / cooperative multitasking.
 % To switch between the two set/unset the PREEMPTIVE preprocessor
-% definition. Note that preemptive mode needs a patches mmix-sim
+% definition. Note that preemptive mode needs a patched mmix-sim
 % interpreter that allows setting :rI and traps when the timer runs out.
 %
 
