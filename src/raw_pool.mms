@@ -93,28 +93,18 @@
 % case __ALIGN_TO_SPREAD is set and the allocation is less or equal to
 % spread * no_entries.
 %
-
 #define __SORT_FREELIST
 
 %
 % __ENABLE_BINNING
 % if defined binning is disabled.
 %
-
 #define __ENABLE_BINNING
-
-%
-% __ALLOCATE_FROM_LAST_BIN
-% Always allocate from last entry in last bin, i.e. largest memory region.
-%
-
-% #define __ALLOCATE_FROM_LAST_BIN
 
 %
 % If defined, allocations (including header) are rounded up to a multiple
 % of spread
 %
-
 #define __ALIGN_TO_SPREAD
 
 
@@ -300,7 +290,6 @@ Alloc       GET         $1,:rJ
 #endif
 #endif
             GETA        $2,:MM:__RAW_POOL:Pool
-#ifndef __ALLOCATE_FROM_LAST_BIN
             %
             % Rotate free list to correct bin:
             %
@@ -310,7 +299,6 @@ Alloc       GET         $1,:rJ
             CSN         $4,$5,#0
             SLU         $4,$4,5
             ADDU        $2,$2,$4
-#endif
             SET         $3,$2
             %
             % Go through free list and use the first chunk that is
