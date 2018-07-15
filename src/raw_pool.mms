@@ -97,11 +97,11 @@
 #define __SORT_FREELIST
 
 %
-% __DISABLE_BINNING
+% __ENABLE_BINNING
 % if defined binning is disabled.
 %
 
-% #define __DISABLE_BINNING
+#define __ENABLE_BINNING
 
 %
 % __ALLOCATE_FROM_LAST_BIN
@@ -127,7 +127,7 @@
 spread      IS          #80
 spread_mask IS          #7F
 spread_shft IS          7
-#ifndef __DISABLE_BINNING
+#ifdef __ENABLE_BINNING
 no_entries  IS          32
 #else
 no_entries  IS          1

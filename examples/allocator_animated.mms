@@ -160,7 +160,7 @@ Draw        IS          DrawExponen
             PUSHJ       t,MM:Print:StrG
             PUSHJ       t,MM:__DEBUG:PlotMemory
 
-            SETML       $10,#2
+            SETML        $10,#3
 9H          SUBU        $10,$10,1
             BNZ         $10,9B % main loop
 
