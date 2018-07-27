@@ -43,7 +43,7 @@ Open1       BYTE        "File:Open failed. Invalid file mode [arg1=",0
             .balign 4
 Open2       BYTE        "] specified.",10,0
             .balign 4
-Open3       BYTE        "File:Open failed. No free file handler "
+Open3       BYTE        "File:Open failed. No free file handle "
             BYTE        "available.",10,0
             .balign 4
 Open4       BYTE        "File:Open failed. Could not open file with "
@@ -751,16 +751,17 @@ ReadJ       BN          arg2,9F % invalid size
             POP         1,1
 9H          PUT         :rJ,$3
             POP         0,0
-Read        SET         $4,arg2
-            SET         $3,arg1
-            SET         $2,arg0
-            GET         $0,:rJ
-            PUSHJ       $1,ReadJ
+Read        SET         $5,arg2
+            SET         $4,arg1
+            SET         $3,arg0
+            GET         $1,:rJ
+            PUSHJ       $2,ReadJ
             JMP         9F
-            PUT         :rJ,$0
-            SET         ret0,$1
+            PUT         :rJ,$1
+            SET         ret0,$2
             POP         1,0
-9H          SET         t,$0 % :rJ
+9H          SET         $2,arg0
+            SET         t,$1 % :rJ
             GETA        $1,:MM:__FILE:STRS:Read1
             GETA        $3,:MM:__FILE:STRS:Read2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
