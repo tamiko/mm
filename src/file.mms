@@ -94,7 +94,6 @@ Gets2       BYTE        "].",10,0
 %   #00        - not in use
 %   #08 - #C   - in use (by us) and opened with the respective mode
 %                +#8.
-%   #EE        - marked as 'controlled by the system' (e.g. fh 0 - 2)
 %   #FF        - marked as 'manually controlled by the user'
 %
             .section .data,"wa",@progbits
@@ -102,7 +101,7 @@ Gets2       BYTE        "].",10,0
             .global :MM:__FILE:Pool
             PREFIX      :MM:__FILE:
 PoolMutex   OCTA        #0000000000000000
-Pool        BYTE        #EE,#EE,#EE
+Pool        BYTE        #08,#09,#09
             .fill 253*1
 
 
@@ -533,9 +532,9 @@ pool        IS          $2
 IsWritableJ AND         arg0,arg0,#FF
             GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
-            CMPU        t,$1,#9 % :TextRead
+            CMPU        t,$1,#9 % :TextWrite
             BZ          t,1F
-            CMPU        t,$1,#B % :BinaryRead
+            CMPU        t,$1,#B % :BinaryWrite
             BZ          t,1F
             CMPU        t,$1,#C % :BinaryReadWrite
             BZ          t,1F

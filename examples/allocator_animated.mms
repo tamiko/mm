@@ -85,9 +85,9 @@ Main        SWYM
             PUSHJ       t,MM:Print:StrG
             PUSHJ       t,MM:__DEBUG:PlotMemory
 
-            SETML        $10,#1
+            SETML       $10,#1
 9H          SUBU        $10,$10,1
-            BNZ         $10,9B % main loop
+            BNZ         $10,9B % loop
 
             JMP         1B
 
