@@ -311,7 +311,7 @@ Alloc       GET         $1,:rJ
             LDO         $4,$3,0
             SUBU        $4,$4,$3 % size
             CMP         $5,$0,$4
-            BNP         $5,__out
+            BNP         $5,3F
             % chunk too small, go to next
             JMP         2B
             %
@@ -320,7 +320,7 @@ Alloc       GET         $1,:rJ
             % $0 - size requested
             % $3 - ptr
             % $4 - size of chunk
-__out       SWYM
+3H          SWYM
             % Update free list:
             LDO         $5,$3,2*OCT % next
             LDO         $6,$3,3*OCT % previous
@@ -330,6 +330,7 @@ __out       SWYM
             SET         $5,#0
             STO         $5,$3,2*OCT
             STO         $5,$3,3*OCT
+
             %
             % Split chunk if beneficial. Let us require at least 'spread'
             % bytes:
