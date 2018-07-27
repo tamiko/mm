@@ -1,104 +1,29 @@
 %
-% A small allocator stress test
+% A small allocator animation
 %
 
 #include <mm/adt>
 #include <mm/heap>
 #include <mm/print>
-#include <mm/rand>
 #include <mm/sys>
 #include <mm/thread>
 
+#include "random.mmh"
+
+            .section .data,"wa",@progbits
+            .balign 4
+ClearStr    BYTE "\033[2J\033[0;0H",0
+
+            .section .text,"ax",@progbits
 t           IS          :MM:t
-
-
-            %%
-            % DrawUniform
-            %
-            % A uniform distribution that selects between a memory chunk
-            % with a lifetime between [1,TMax) and a size of [0,SizeMax).
-            %
-            % No arguments
-            % Returns:
-            %   ret0 - time
-            %   ret1 - size
-            %
-
-            .section .text,"ax",@progbits
-TMax        IS          100
-TShift      IS          9
-SizeMax     IS          #0FE0
-SizeShift   IS          3
-DrawUniform GET         $3,:rJ
-1H          PUSHJ       $4,MM:Rand:Octa
-            SET         $1,$4
-            SRU         $1,$1,48
-            SRU         $1,$1,TShift
-            BZ          $1,1B % want > 0
-            SET         $4,TMax
-            CMP         $4,$1,$4
-            BP          $4,1B % want <= TMax, retry
-1H          PUSHJ       $4,MM:Rand:Octa
-            SET         $0,$4
-            SRU         $0,$0,48
-            SRU         $0,$0,SizeShift
-            BZ          $0,1B % want > 0
-            SET         $4,SizeMax
-            CMP         $4,$0,$4
-            BP          $4,1B % want <= SizeMax
-            PUT         :rJ,$3
-            POP         2,0
-
-
-            %%
-            % DrawExponen
-            %
-            % An exponential distribution: From the left, advancing to the
-            % next bin (+SizeStep and +TimeStep) has a probability of
-            % Advance / 16
-            %
-            % No arguments
-            % Returns:
-            %   ret0 - time
-            %   ret1 - size
-            %
-
-            .section .text,"ax",@progbits
-Advance     IS          13
-SizeStep    IS          #80
-TimeStep    IS          20
-DrawExponen GET         $2,:rJ
-            SET         $0,SizeStep
-            SET         $1,TimeStep
-2H          PUSHJ       $4,MM:Rand:Octa
-            SET         $6,4
-3H          AND         $5,$4,#F
-            SUBU        $5,$5,Advance
-            BNN         $5,1F
-            INCL        $0,SizeStep
-            INCL        $1,TimeStep
-            SRU         $4,$4,#10
-            SUBU        $6,$6,1
-            BNZ         $6,3B
-            JMP         2B
-1H          SUBU        $0,$0,#20 % subtract payload
-            PUT         :rJ,$2
-            POP         2,0
-
-
-            %%
-            %
-            % Main:
-            %
-
-Main        SWYM
 
             %
             % Choose a distribution:
             %
-
 Draw        IS          DrawExponen
 %Draw        IS          DrawUniform
+
+Main        SWYM
 
             %
             % We use a deque for allocating an maintaining pool data.
@@ -158,7 +83,6 @@ Draw        IS          DrawExponen
 
             GETA        t,ClearStr
             PUSHJ       t,MM:Print:StrG
-            %PUSHJ       t,MM:__DEBUG:PrintFree
             PUSHJ       t,MM:__DEBUG:PlotMemory
 
             SETML        $10,#1
@@ -166,13 +90,6 @@ Draw        IS          DrawExponen
             BNZ         $10,9B % main loop
 
             JMP         1B
-
-            %
-            % Print statistics and exit:
-            %
-
-            PUSHJ       t,MM:Sys:Exit
-
 
             %%
             %
@@ -182,8 +99,6 @@ Draw        IS          DrawExponen
             .section .data,"wa",@progbits
             .balign 4
 ErrorStr    BYTE "Something went horribly wrong :-(",10,0
-            .balign 4
-ClearStr    BYTE "\033[2J\033[0;0H",0
 
             .section .text,"ax",@progbits
 __fatal     GETA        t,ErrorStr
