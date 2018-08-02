@@ -226,6 +226,7 @@ Initialize  SWYM
             STO         $2,$5
             INCREMENT_COUNTER :MM:__STATISTICS:HeapChunks
             STORE_MAX :MM:__STATISTICS:HeapChunks,:MM:__STATISTICS:HeapMaxNonC
+
             % Create free list sentinels:
             GETA        $0,:MM:__RAW_POOL:Pool
             SET         $1,no_entries

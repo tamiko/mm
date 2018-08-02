@@ -121,8 +121,8 @@ __trampoline SWYM
             %   GET $255,:rW
             %   RESUME
             %
-            PUT         :rW,$255      % RESUME at Main
-            PUT         :rB,$255      % keep address of Main in $255
+            PUT         :rW,$255   % RESUME at Main
+            PUT         :rB,$255   % keep address of Main in $255
             SETML       $255,#F700
             PUT         :rX,$255
             SET         $255,#0
@@ -154,15 +154,22 @@ InitError   BYTE        "Fatal initialization error.",10,0
             PREFIX      :MM:__INIT:
 Stack_Segment IS        :Stack_Segment
 __init      SWYM
+
             %
-            % Initialize the memory pool:
+            % Initialize the memory pool.
             %
+
             PUSHJ       :MM:t,:MM:__RAW_POOL:Initialize
+
             %
-            % Initialize the ThreadRing and create a single entry for the
-            % main thread that will eventually start executing at the Main
-            % label. Further, save a pristine thread image at ThreadTmpl
-            % for the Thread:Create call. Layout:
+            % Initialize the ThreadRing:
+            %
+            % Create a single entry for the main thread that will
+            % eventually start executing at the Main label. Further, save a
+            % pristine thread image at ThreadTmpl for the Thread:Create
+            % call.
+            %
+            % Layout:
             %    ptr -> OCTA  Thread ID
             %           OCTA  State (#0..00 running, #0..FF sleeping)
             %           OCTA  pointer to previous
@@ -170,6 +177,7 @@ __init      SWYM
             %           OCTA  pointer to stack image
             %           OCTA  UNSAVE address
             %
+
             GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
@@ -197,9 +205,11 @@ __init      SWYM
             STO         $5,$4,#28
             GETA        $6,:MM:__INTERNAL:ThreadRing
             STO         $4,$6
+
             %
             % Now, hide $0 with a PUSHJ
             %
+
             PUSHJ       $1,1F
 1H          SET         $255,#0
             SET         :MM:t,#0
