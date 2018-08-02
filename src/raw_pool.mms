@@ -38,8 +38,8 @@
 % assumed to be available for allocation. User programs utilizing address
 % space from the pool segment manually must obey this rule by 'allocating'
 % memory by modifying M_8[:Pool_Segment] appropriately. We generously
-% allocate three quarters of the Pool segment and leave a quarter
-% unallocated for manual allocations.
+% allocate half of the Pool segment and leave the rest unallocated for
+% manual allocations.
 %
 %
 % We maintain a doubly-linked list of used/free memory regions:
@@ -172,8 +172,8 @@ OCT         IS          #8
 
 %%
 % :MM:__RAW_POOL:Initialize
-%   Initialize the memory pool. Generously allocate three quarters of the
-%   Pool segment and create two sentinel entries at the beginning and end.
+%   Initialize the memory pool. Generously allocate half of the Pool
+%   segment and create two sentinel entries at the beginning and end.
 %   (And set up a doubly-linked list.)
 %
 % PUSHJ:
@@ -193,8 +193,8 @@ Initialize  SWYM
             SUBU        $2,$2,#20
             % We need 4 OCTAs (sentinel):
             ADDU        $3,$2,#20
-            % Generously allocate three quarters of the Pool segment:
-            SETH        $4,#1800
+            % Generously allocate half of the Pool segment:
+            SETH        $4,#1000
             ADDU        $4,$1,$4
             SUBU        $4,$4,#20
             % We need another 4 OCTAs (sentinel):
