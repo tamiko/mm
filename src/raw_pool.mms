@@ -186,7 +186,7 @@ Initialize  SWYM
             GETA        $1,Pool_Segment
             LDO         $2,$1
             % Align to #4000, add and subtract #20 for first sentinel:
-            SUBU        $2,$2,#20
+            ADDU        $2,$2,#20
             SETL        $3,#3FFF
             ADDU        $2,$2,$3
             ANDN        $2,$2,$3
