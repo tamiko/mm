@@ -301,6 +301,7 @@ PlotMemory  GET         $0,:rJ
 5H          BP          $3,1B
 
             PUSHJ       t,:MM:__PRINT:Ln
+            PUSHJ       t,:MM:__PRINT:Ln
             PUT         :rJ,$0
             POP         0
 
