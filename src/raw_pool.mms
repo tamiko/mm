@@ -148,6 +148,7 @@ Deallo1     BYTE        "__RAW_POOL::Dealloc called with invalid "
             .section .data,"wa",@progbits
             PREFIX      :MM:__RAW_POOL:
             .global     :MM:__RAW_POOL:Memory
+            .balign     8
 Memory      OCTA        #0000000000000000
 
             %
