@@ -953,6 +953,8 @@ Puts        SET         $5,arg2
 
             .section .text,"ax",@progbits
             .global :MM:__FILE:ReadInJ
+            .global :MM:__FILE:ReadIn
+            .global :MM:__FILE:ReadInG
 ReadInJ     SWYM
             GET         $1,:rJ
             SET         $3,arg0
