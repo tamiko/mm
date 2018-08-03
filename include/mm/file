@@ -32,23 +32,24 @@
 %
 % :MM:File:
 %
-% TODO: Necessary cooperation, file handler and stuff...
-%       fh - an OCTA storing a byte interpreted as fh
-%
 % This header file provides subroutines for file handling
 %
 % This header file defines:
 %   :MM:File:Lock (LockJ, LockG)
-%   :MM:File:Read (ReadJ)
+%   :MM:File:Unlock (UnlockJ, UnlockG)
+%   :MM:File:Open (OpenJ)
+%   :MM:File:Close (CloseJ, CloseG)
 %   :MM:File:IsOpen (IsOpenJ, IsOpenG)
 %   :MM:File:IsReadable (IsReadableJ, IsReadableG)
 %   :MM:File:IsWritable (IsWritableJ, IsWritableG)
-%   :MM:File:Close (CloseJ, CloseG)
-%   :MM:File:Open (OpenJ)
-%   :MM:File:Unlock (UnlockJ, UnlockG)
 %   :MM:File:Tell (TellJ, TellG)
 %   :MM:File:Seek (SeekJ, SeekG)
+%   :MM:File:Read (ReadJ)
+%   :MM:File:Gets (GetsJ)
 %   :MM:File:Write (WriteJ)
+%   :MM:File:Puts (PutsJ)
+%   :MM:File:ReadIn (ReadInJ, ReadInG)
+%   :MM:File:WriteOut (WriteOutJ)
 %
 
 
@@ -57,7 +58,7 @@
 %   Lock the file handle arg0 manually.
 %
 % PUSHJ
-%   arg0 - lowest byte define the file handle to lock
+%   arg0 - lowest byte defines the file handle to lock
 %   no return value
 %
 % Precondition:
@@ -247,24 +248,10 @@ File:SeekJ IS           :MM:__FILE:SeekJ
 %   retm - (n - arg2), where n is the number of bytes that have been read
 %
 % :MM:File:ReadJ
-%   :rJ if an error occured, :rJ+#4 otherwise
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
 File:Read   IS          :MM:__FILE:Read
 File:ReadJ  IS          :MM:__FILE:ReadJ
-
-
-%%
-% :MM:File:Write
-%   arg0 - file handle
-%   arg1 - pointer to buffer
-%   arg2 - number of bytes to write
-%   retm - (n - arg2), where n is the number of bytes actually written
-%
-% :MM:File:WriteJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
-%
-File:Write  IS          :MM:__FILE:Write
-File:WriteJ IS          :MM:__FILE:WRiteJ
 
 
 %%
@@ -279,10 +266,24 @@ File:WriteJ IS          :MM:__FILE:WRiteJ
 %          (excluding terminating null byte for string)
 %
 % :MM:File:GetsJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
 File:GetsJ  IS          :MM:__FILE:GetsJ
 File:Gets   IS          :MM:__FILE:Gets
+
+
+%%
+% :MM:File:Write
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to write
+%   retm - (n - arg2), where n is the number of bytes actually written
+%
+% :MM:File:WriteJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+File:Write  IS          :MM:__FILE:Write
+File:WriteJ IS          :MM:__FILE:WRiteJ
 
 
 %%
@@ -296,7 +297,7 @@ File:Gets   IS          :MM:__FILE:Gets
 %          (excluding terminating null byte for string)
 %
 % :MM:File:PutsJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
 %
 File:PutsJ  IS          :MM:__FILE:PutsJ
 File:Puts   IS          :MM:__FILE:Puts
@@ -307,9 +308,16 @@ File:Puts   IS          :MM:__FILE:Puts
 %   arg0 - pointer to string containing filename
 %   retm - memory containing file content
 %
-% :MM:File:ReadInJ
 % :MM:File:ReadInG
+%   Variant of above function that passes arg0 and retm in the global
+%   register :MM:t.
 %
+% :MM:File:ReadInJ
+%   This variant returns to :rJ+#4 on success and to :rJ+#0 on error.
+%
+:MM:File:ReadIn  IS     :MM:__FILE:ReadIn
+:MM:File:ReadInJ IS     :MM:__FILE:ReadInJ
+:MM:File:ReadInG IS     :MM:__FILE:ReadInG
 
 
 %%
