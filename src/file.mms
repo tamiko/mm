@@ -90,6 +90,8 @@ Puts1       BYTE        "File:Puts failed. Could not write to file handle [arg0=
             .balign 4
 Puts2       BYTE        "].",10,0
             .balign 4
+ReadIn1     BYTE        "File:ReadIn failed. Could not open file for reading. ",10,0
+            .balign 4
 
 
 %
@@ -940,4 +942,63 @@ Puts        SET         $5,arg2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
 
 
+%%
+% :MM:File:ReadInJ
+%   arg0 - pointer to string containing filename
+%   retm - memory containing file content
+%
+% :MM:File:ReadIn
+% :MM:File:ReadInG
+%
 
+            .section .text,"ax",@progbits
+            .global :MM:__FILE:ReadInJ
+ReadInJ     SWYM
+            GET         $1,:rJ
+            SET         $3,arg0
+            SET         $4,BinaryRead
+            PUSHJ       $2,OpenJ
+            JMP         9F
+            % $2 - file handle
+            SET         $4,$2
+            NEG         $5,0,1   % seek all the way to the end
+            PUSHJ       $3,SeekJ
+            JMP         9F
+            SET         $4,$2
+            PUSHJ       $3,TellJ
+            JMP         9F
+            % $3 - file size
+            SET         $5,$3
+            PUSHJ       $4,:MM:__HEAP:AllocJ
+            JMP         9F
+            % $4 - buffer address
+            NEG         $7,0     % seek all the way to the beginning
+            SET         $6,$2
+            PUSHJ       $5,SeekJ
+            JMP         9F
+            SET         $6,$2
+            SET         $7,$4
+            SET         $8,$3
+            PUSHJ       $5,ReadJ
+            JMP         9F
+            SET         ret0,$4
+            PUT         :rJ,$1
+            POP         1,1
+9H          PUT         :rJ,$1
+            POP         0,0
+ReadIn      GET         $1,:rJ
+            SET         $3,arg0
+            PUSHJ       $2,ReadInJ
+            JMP         9F
+            PUT         :rJ,$1
+            SET         ret0,$2
+            POP         1,0
+9H          SET         t,$1 % :rJ
+            GETA        $1,:MM:__FILE:STRS:ReadIn1
+            PUSHJ       $0,:MM:__ERROR:Error1
+ReadInG     GET         $0,:rJ
+            SET         $2,t
+            PUSHJ       $1,ReadIn
+            SET         t,$1
+            PUT         :rJ,$0
+            POP         1,0
