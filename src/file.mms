@@ -86,6 +86,10 @@ Gets1       BYTE        "File:Gets failed. Could not read from file handle [arg0
             .balign 4
 Gets2       BYTE        "].",10,0
             .balign 4
+Puts1       BYTE        "File:Puts failed. Could not write to file handle [arg0=",0
+            .balign 4
+Puts2       BYTE        "].",10,0
+            .balign 4
 
 
 %
@@ -759,72 +763,11 @@ Read        SET         $5,arg2
             PUT         :rJ,$1
             SET         ret0,$2
             POP         1,0
-9H          SET         $2,arg0
-            SET         t,$1 % :rJ
+9H          SET         t,$1 % :rJ
             GETA        $1,:MM:__FILE:STRS:Read1
+            SET         $2,$0
             GETA        $3,:MM:__FILE:STRS:Read2
             PUSHJ       $0,:MM:__ERROR:Error3RB2
-
-
-%%
-% :MM:__FILE:WriteJ
-%
-% PUSHJ:
-%   arg0 - lowest byte defines the file handle
-%   no return value
-%
-% :MM:__FILE:Write
-%
-
-            .section .data,"wa",@progbits
-WriteBuffer OCTA        #0,#0,#0
-
-            .section .text,"ax",@progbits
-            .global :MM:__FILE:WriteTable
-            .global :MM:__FILE:WriteJ
-            .global :MM:__FILE:Write
-WriteTable
-            build_table Fwrite
-WriteJ      BN          arg2,9F % invalid size
-            AND         arg0,arg0,#FF
-            GET         $3,:rJ
-            SET         $5,arg0
-            PUSHJ       $4,IsWritableJ
-            JMP         9F % not writable
-            SLU         arg0,arg0,3 % *8
-            GETA        $4,WriteTable
-            GETA        t,WriteBuffer
-            PUSHJ       t,:MM:__THREAD:LockMutexG
-            ADDU        $255,t,#8
-            STO         arg1,$255,#0
-            STO         arg2,$255,#8
-            GO          $4,$4,arg0
-7H          SET         ret0,$255
-            GETA        t,WriteBuffer
-            PUSHJ       t,:MM:__THREAD:UnlockMutexG
-            % check that ret0 != - size - 1
-            NEG         $1,0,$1
-            SUB         $1,$1,1
-            CMP         $1,$1,$0
-            BZ          $1,9F
-            PUT         :rJ,$3
-            POP         1,1
-9H          PUT         :rJ,$3
-            POP         0,0
-Write       SET         $4,arg2
-            SET         $3,arg1
-            SET         $2,arg0
-            GET         $0,:rJ
-            PUSHJ       $1,WriteJ
-            JMP         9F
-            PUT         :rJ,$0
-            SET         ret0,$1
-            POP         1,0
-9H          SET         t,$0 % :rJ
-            GETA        $1,:MM:__FILE:STRS:Write1
-            GETA        $3,:MM:__FILE:STRS:Write2
-            PUSHJ       $0,:MM:__ERROR:Error3RB2
-
 
 
 %%
@@ -833,7 +776,7 @@ Write       SET         $4,arg2
 % PUSHJ:
 %   arg0 - file handle
 %   arg1 - pointer to buffer
-%   arg2 - number of bytes to Gets
+%   arg2 - number of bytes to read
 %   retm - n is the number of string characters that have been read
 %          (excluding terminating null byte for string)
 %
@@ -872,16 +815,126 @@ GetsJ       BN          arg2,9F % invalid size
             POP         1,1
 9H          PUT         :rJ,$3
             POP         0,0
-Gets        SET         $4,arg2
-            SET         $3,arg1
-            SET         $2,arg0
-            GET         $0,:rJ
-            PUSHJ       $1,GetsJ
+Gets        SET         $5,arg2
+            SET         $4,arg1
+            SET         $3,arg0
+            GET         $1,:rJ
+            PUSHJ       $2,GetsJ
             JMP         9F
-            PUT         :rJ,$0
-            SET         ret0,$1
+            PUT         :rJ,$1
+            SET         ret0,$2
             POP         1,0
-9H          SET         t,$0 % :rJ
+9H          SET         t,$1 % :rJ
             GETA        $1,:MM:__FILE:STRS:Gets1
+            SET         $2,$0
             GETA        $3,:MM:__FILE:STRS:Gets2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
+
+
+%%
+% :MM:File:WriteJ
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to write
+%   retm - (n - arg2), where n is the number of bytes actually written
+%
+% :MM:File:Write
+%
+
+            .section .data,"wa",@progbits
+WriteBuffer OCTA        #0,#0,#0
+
+            .section .text,"ax",@progbits
+            .global :MM:__FILE:WriteTable
+            .global :MM:__FILE:WriteJ
+            .global :MM:__FILE:Write
+WriteTable
+            build_table Fwrite
+WriteJ      BN          arg2,9F % invalid size
+            AND         arg0,arg0,#FF
+            GET         $3,:rJ
+            SET         $5,arg0
+            PUSHJ       $4,IsWritableJ
+            JMP         9F % not writable
+            SLU         arg0,arg0,3 % *8
+            GETA        $4,WriteTable
+            GETA        t,WriteBuffer
+            PUSHJ       t,:MM:__THREAD:LockMutexG
+            ADDU        $255,t,#8
+            STO         arg1,$255,#0
+            STO         arg2,$255,#8
+            GO          $4,$4,arg0
+7H          SET         ret0,$255
+            GETA        t,WriteBuffer
+            PUSHJ       t,:MM:__THREAD:UnlockMutexG
+            % check that ret0 != - size - 1
+            NEG         $1,0,$1
+            SUB         $1,$1,1
+            CMP         $1,$1,$0
+            BZ          $1,9F
+            PUT         :rJ,$3
+            POP         1,1
+9H          PUT         :rJ,$3
+            POP         0,0
+Write       SET         $5,arg2
+            SET         $4,arg1
+            SET         $3,arg0
+            GET         $1,:rJ
+            PUSHJ       $2,WriteJ
+            JMP         9F
+            PUT         :rJ,$1
+            SET         ret0,$2
+            POP         1,0
+9H          SET         t,$1 % :rJ
+            GETA        $1,:MM:__FILE:STRS:Write1
+            SET         $2,$0
+            GETA        $3,:MM:__FILE:STRS:Write2
+            PUSHJ       $0,:MM:__ERROR:Error3RB2
+
+
+%%
+% :MM:File:PutsJ
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   retm - (n - arg2), where n is the number of bytes actually written
+%
+% :MM:File:Puts
+%
+
+            .section .text,"ax",@progbits
+            .global :MM:__FILE:PutsTable
+            .global :MM:__FILE:PutsJ
+            .global :MM:__FILE:Puts
+PutsTable
+            build_table Fputs
+PutsJ       BN          arg2,9F % invalid size
+            AND         arg0,arg0,#FF
+            GET         $3,:rJ
+            SET         $5,arg0
+            PUSHJ       $4,IsWritableJ
+            JMP         9F % not writable
+            SLU         arg0,arg0,3 % *8
+            GETA        $4,PutsTable
+            SET         $255,arg1
+            GO          $4,$4,arg0
+7H          SET         ret0,$255
+            % check that ret0 >= 0
+            BN          $0,9F
+            PUT         :rJ,$3
+            POP         1,1
+9H          PUT         :rJ,$3
+            POP         0,0
+Puts        SET         $5,arg2
+            SET         $4,arg1
+            SET         $3,arg0
+            GET         $1,:rJ
+            PUSHJ       $2,PutsJ
+            JMP         9F
+            PUT         :rJ,$1
+            SET         ret0,$2
+            POP         1,0
+9H          SET         t,$1 % :rJ
+            GETA        $1,:MM:__FILE:STRS:Puts1
+            SET         $2,$0
+            GETA        $3,:MM:__FILE:STRS:Puts2
             PUSHJ       $0,:MM:__ERROR:Error3RB2

@@ -268,7 +268,42 @@ File:WriteJ IS          :MM:__FILE:WRiteJ
 
 
 %%
-% :MM:File:ReadIn TODO
+% :MM:File:Gets
+%   read until arg1 char or newline is encountered and stored, store
+%   null terminated
+%
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   arg2 - number of bytes to read
+%   retm - n is the number of string characters that have been read
+%          (excluding terminating null byte for string)
+%
+% :MM:File:GetsJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+File:GetsJ  IS          :MM:__FILE:GetsJ
+File:Gets   IS          :MM:__FILE:Gets
+
+
+%%
+% :MM:File:Puts
+%   write until a null character is encountered, does not store the
+%   terminating null.
+%
+%   arg0 - file handle
+%   arg1 - pointer to buffer
+%   retm - n is the number of string characters that have been written
+%          (excluding terminating null byte for string)
+%
+% :MM:File:PutsJ
+%   :rJ if retm < arg0, :rJ+#4 otherwise
+%
+File:PutsJ  IS          :MM:__FILE:PutsJ
+File:Puts   IS          :MM:__FILE:Puts
+
+
+%%
+% :MM:File:ReadIn
 %   arg0 - pointer to string containing filename
 %   retm - memory containing file content
 %
@@ -284,40 +319,6 @@ File:WriteJ IS          :MM:__FILE:WRiteJ
 %
 % :MM:File:WriteOutJ
 % :MM:File:WriteOutG
-%
-
-
-%
-% TODO: Some ideas:
-%
-
-
-%%
-% :MM:File:Gets
-%   read until arg1 char or newline is encountered and stored, store
-%   null terminated
-%
-%   arg0 - pointer to string
-%   arg1 - number of characters to read
-%   arg2 - file handle
-%   retm - number of characters actually read
-%
-% :MM:File:GetsJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
-%
-
-%%
-% :MM:File:Puts
-%   write until arg1 char are written or null is encountered, does not
-%   store are terminating null.
-%
-%   arg0 - pointer to string
-%   arg1 - number of characters to read
-%   arg2 - file handle
-%   retm - number of characters actually read
-%
-% :MM:File:PutsJ
-%   :rJ if retm < arg0, :rJ+#4 otherwise
 %
 
             PREFIX      :
