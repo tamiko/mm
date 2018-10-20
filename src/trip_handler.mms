@@ -73,7 +73,6 @@ Initialize  GET         $0,:rJ
             SET         $4,$2
             PUSHJ       $3,:MM:__HEAP:AllocJ
             JMP         9F
-            PUSHJ       :MM:t,:MM:__PRINT:RegLnG
             SET         $5,$1
             SET         $6,$3
             SET         $7,$2
