@@ -47,6 +47,63 @@ ThreadRing  OCTA        #0000000000000000 % pointer to active thread
 ThreadTmpl  OCTA        #0000000000000000 % pointer to stack image
             OCTA        #0000000000000000 % UNSAVE address
 
+            %%
+            % Initialize thread structures
+            %
+            % Create a single entry for the main thread that will
+            % eventually start executing at the Main label. Further, save a
+            % pristine thread image at ThreadTmpl for the Thread:Create
+            % call.
+            %
+
+            .section .data,"wa",@progbits
+            PREFIX :MM:__INTERNAL:STRS:
+InitError   BYTE        "Fatal initialization error.",10,0
+
+            .section .text,"ax",@progbits
+            .global :MM:__INTERNAL:Initialize
+            PREFIX      :MM:__INTERNAL:
+Stack_Segment IS        :Stack_Segment
+
+            % :MM:t contains the address of the initial SAVE
+Initialize  GET         $0,:rJ
+            GETA        $1,Stack_Segment
+            SUBU        $2,:MM:t,$1
+            ADDU        $2,$2,#8
+            SET         $4,$2
+            PUSHJ       $3,:MM:__HEAP:AllocJ
+            JMP         9F
+            PUSHJ       :MM:t,:MM:__PRINT:RegLnG
+            SET         $5,$1
+            SET         $6,$3
+            SET         $7,$2
+            SET         $1,:MM:t % __MEM:CopyJ globbers t
+            PUSHJ       $4,:MM:__MEM:CopyJ
+            JMP         9F
+            GETA        $255,:MM:__INTERNAL:ThreadTmpl
+            STO         $3,$255,#0
+            STO         $1,$255,#8
+            SET         $5,#30
+            PUSHJ       $4,:MM:__HEAP:AllocJ
+            JMP         9F
+            XOR         $5,$5,$5
+            STO         $5,$4,#00 % Thread ID: 0
+            STO         $5,$4,#08 % State: running
+            STO         $4,$4,#10
+            STO         $4,$4,#18
+            NEG         $5,0,1
+            STO         $5,$4,#20
+            STO         $5,$4,#28
+            GETA        $6,:MM:__INTERNAL:ThreadRing
+            STO         $4,$6
+            PUT         :rJ,$0
+            POP         0,0
+9H          GETA        $1,:MM:__INTERNAL:STRS:InitError
+            PUSHJ       $0,:MM:__ERROR:IError1
+
+
+
+            %%
             %
             % The glorious trip handler
             %
@@ -64,7 +121,6 @@ SwitchError BYTE        "Fatal error during context switch. :-(\n",0
             .global :MM:__INTERNAL:TripHandler
             PREFIX      :MM:__INTERNAL:
 
-Stack_Segment IS        :Stack_Segment
 Yield       IS          #00
 Create      IS          #D0
 Clone       IS          #E0

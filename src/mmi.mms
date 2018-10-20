@@ -145,10 +145,6 @@ __trampoline SWYM
             % called.
             %
 
-            .section .data,"wa",@progbits
-            PREFIX :MM:__INIT:STRS:
-InitError   BYTE        "Fatal initialization error.",10,0
-
             .section .init,"ax",@progbits
             .global :MM:__INIT:__init
             PREFIX      :MM:__INIT:
@@ -164,47 +160,9 @@ __init      SWYM
             %
             % Initialize the ThreadRing:
             %
-            % Create a single entry for the main thread that will
-            % eventually start executing at the Main label. Further, save a
-            % pristine thread image at ThreadTmpl for the Thread:Create
-            % call.
-            %
-            % Layout:
-            %    ptr -> OCTA  Thread ID
-            %           OCTA  State (#0..00 running, #0..FF sleeping)
-            %           OCTA  pointer to previous
-            %           OCTA  pointer to next
-            %           OCTA  pointer to stack image
-            %           OCTA  UNSAVE address
-            %
 
-            GETA        $1,Stack_Segment
-            SUBU        $2,$0,$1
-            ADDU        $2,$2,#8
-            SET         $4,$2
-            PUSHJ       $3,:MM:__HEAP:AllocJ
-            JMP         __fatal
-            SET         $5,$1
-            SET         $6,$3
-            SET         $7,$2
-            PUSHJ       $4,:MM:__MEM:CopyJ
-            JMP         __fatal
-            GETA        $255,:MM:__INTERNAL:ThreadTmpl
-            STO         $3,$255,#0
-            STO         $0,$255,#8
-            SET         $5,#30
-            PUSHJ       $4,:MM:__HEAP:AllocJ
-            JMP         __fatal
-            XOR         $5,$5,$5
-            STO         $5,$4,#00 % Thread ID: 0
-            STO         $5,$4,#08 % State: running
-            STO         $4,$4,#10
-            STO         $4,$4,#18
-            NEG         $5,0,1
-            STO         $5,$4,#20
-            STO         $5,$4,#28
-            GETA        $6,:MM:__INTERNAL:ThreadRing
-            STO         $4,$6
+            SET         :MM:t,$0
+            PUSHJ       :MM:t,:MM:__INTERNAL:Initialize
 
             %
             % Now, hide $0 with a PUSHJ
@@ -213,8 +171,4 @@ __init      SWYM
             PUSHJ       $1,1F
 1H          SET         $255,#0
             SET         :MM:t,#0
-            JMP         3F
-__fatal     GETA        $1,:MM:__INIT:STRS:InitError
-            PUSHJ       $0,:MM:__ERROR:IError1
-3H          SWYM
 
