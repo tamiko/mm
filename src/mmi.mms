@@ -158,14 +158,14 @@ __init      SWYM
             PUSHJ       :MM:t,:MM:__RAW_POOL:Initialize
 
             %
-            % Initialize the ThreadRing:
+            % Initialize the thread ring:
             %
 
             SET         :MM:t,$0
             PUSHJ       :MM:t,:MM:__INTERNAL:Initialize
 
             %
-            % Now, hide $0 with a PUSHJ
+            % Now, hide $0 with a PUSHJ:
             %
 
             PUSHJ       $1,1F
