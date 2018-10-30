@@ -25,7 +25,7 @@
 %%
 
 %
-% :MM:__HEAP:
+% :MM:__POOL:
 %
 % General memory layout of an allocated block of memory is:
 %           OCTA  size      (data + payload + 3 OCTS)
@@ -42,7 +42,7 @@
 %
 
             .section .data,"wa",@progbits
-            PREFIX      :MM:__HEAP:STRS:
+            PREFIX      :MM:__POOL:STRS:
             .balign 4
 Alloc1      BYTE        "Heap:Alloc failed. Could not request a memory "
             BYTE        "block of size [arg0=",0
@@ -102,7 +102,7 @@ Rand3       BYTE        "Heap:Rand failed. Something went horribly "
 
 
             .section .text,"ax",@progbits
-            PREFIX      :MM:__HEAP:
+            PREFIX      :MM:__POOL:
 Pool_Segment IS         :Pool_Segment
 Stack_Segment IS        :Stack_Segment
 t           IS          :MM:t
@@ -119,26 +119,26 @@ payload     IS          #30
 
 
 %%
-% :MM:__HEAP:AllocJ
+% :MM:__POOL:AllocJ
 %
 % PUSHJ:
 %   arg0 - requested size
 %   retm - pointer to allocated memory, [0 in case of error condition]
 %
-% :MM:__HEAP:Alloc
+% :MM:__POOL:Alloc
 %
 % PUSHJ:
 %   arg0 - requested size
 %   retm - pointer to allocated memory
 %
-% :MM:__HEAP:AllocG
+% :MM:__POOL:AllocG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Alloc
-            .global :MM:__HEAP:AllocJ
-            .global :MM:__HEAP:AllocG
+            .global :MM:__POOL:Alloc
+            .global :MM:__POOL:AllocJ
+            .global :MM:__POOL:AllocG
 AllocJ      GET         $1,:rJ
             SET         $3,t
             ADDU        $0,arg0,#7 % round up to next OCTA
@@ -182,32 +182,32 @@ AllocG      SET         $3,t
             POP         0,0
 1H          GET         t,:rJ % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Alloc1
-            GETA        $3,:MM:__HEAP:STRS:Alloc2
+            GETA        $1,:MM:__POOL:STRS:Alloc1
+            GETA        $3,:MM:__POOL:STRS:Alloc2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
 %%
-% :MM:__HEAP:DeallocJ
+% :MM:__POOL:DeallocJ
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
 %   no return value
 %
-% :MM:__HEAP:Dealloc
+% :MM:__POOL:Dealloc
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
 %   no return value
 %
-% :MM:__HEAP:DeallocG
+% :MM:__POOL:DeallocG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Dealloc
-            .global :MM:__HEAP:DeallocJ
-            .global :MM:__HEAP:DeallocG
+            .global :MM:__POOL:Dealloc
+            .global :MM:__POOL:DeallocJ
+            .global :MM:__POOL:DeallocG
 DeallocJ    GET         $1,:rJ
             SET         $5,t
             SET         $7,arg0
@@ -254,18 +254,18 @@ Dealloc     SET         $3,arg0
             BZ          t,1F
             SET         t,$1 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Free1
-            GETA        $3,:MM:__HEAP:STRS:Free3
+            GETA        $1,:MM:__POOL:STRS:Free1
+            GETA        $3,:MM:__POOL:STRS:Free3
             PUSHJ       $0,:MM:__ERROR:Error3R2
 1H          SET         t,$1 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Free1
-            GETA        $3,:MM:__HEAP:STRS:Free2
+            GETA        $1,:MM:__POOL:STRS:Free1
+            GETA        $3,:MM:__POOL:STRS:Free2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
 %%
-% :MM:__HEAP:ReallocJ
+% :MM:__POOL:ReallocJ
 %
 % PUSHJ:
 %   arg0 - pointer to  memory region
@@ -273,7 +273,7 @@ Dealloc     SET         $3,arg0
 %   retm - pointer to allocated memory [0 in case of error condition]
 %
 
-            .global :MM:__HEAP:ReallocJ
+            .global :MM:__POOL:ReallocJ
             % validate first to avoid space leaks
 ReallocJ    GET         $2,:rJ
             SET         $4,arg0
@@ -298,12 +298,12 @@ ReallocJ    GET         $2,:rJ
             POP         1,1
 1H          PUT         :rJ,$2
             POP         0,0
-2H          GETA        $1,:MM:__HEAP:STRS:Reallo5
+2H          GETA        $1,:MM:__POOL:STRS:Reallo5
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
-% :MM:__HEAP:Realloc
+% :MM:__POOL:Realloc
 %
 % PUSHJ:
 %   arg0 - pointer to  memory region
@@ -311,7 +311,7 @@ ReallocJ    GET         $2,:rJ
 %   retm - pointer to allocated memory [0 in case of error condition]
 %
 
-            .global :MM:__HEAP:Realloc
+            .global :MM:__POOL:Realloc
 Realloc     GET         $2,:rJ
             SET         $4,arg0
             PUSHJ       $3,ValidJ
@@ -335,31 +335,31 @@ Realloc     GET         $2,:rJ
             POP         1,0
 1H          SET         t,$2 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Reallo1
-            GETA        $3,:MM:__HEAP:STRS:Reallo2
+            GETA        $1,:MM:__POOL:STRS:Reallo1
+            GETA        $3,:MM:__POOL:STRS:Reallo2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 8H          SET         t,$2 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Reallo1
-            GETA        $3,:MM:__HEAP:STRS:Reallo2b
+            GETA        $1,:MM:__POOL:STRS:Reallo1
+            GETA        $3,:MM:__POOL:STRS:Reallo2b
             PUSHJ       $0,:MM:__ERROR:Error3R2
 2H          SET         t,$2 % :rJ
             SET         $2,arg1
-            GETA        $1,:MM:__HEAP:STRS:Reallo3
-            GETA        $3,:MM:__HEAP:STRS:Reallo4
+            GETA        $1,:MM:__POOL:STRS:Reallo3
+            GETA        $3,:MM:__POOL:STRS:Reallo4
             PUSHJ       $0,:MM:__ERROR:Error3R2
-3H          GETA        $1,:MM:__HEAP:STRS:Reallo5
+3H          GETA        $1,:MM:__POOL:STRS:Reallo5
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
-% :MM:__HEAP:ValidJ
+% :MM:__POOL:ValidJ
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
 %   no return value
 %
-% :MM:__HEAP:SizeJ
+% :MM:__POOL:SizeJ
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
@@ -367,8 +367,8 @@ Realloc     GET         $2,:rJ
 %          [0 in case of error condition]
 %
 
-            .global :MM:__HEAP:ValidJ
-            .global :MM:__HEAP:SizeJ
+            .global :MM:__POOL:ValidJ
+            .global :MM:__POOL:SizeJ
 ValidJ      SET         $5,0
             JMP         1F
 SizeJ       SET         $5,1
@@ -407,19 +407,19 @@ SizeJ       SET         $5,1
 
 
 %%
-% :MM:__HEAP:Size
+% :MM:__POOL:Size
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
 %   retm - size of the allocated memory
 %
-% :MM:__HEAP:SizeG
+% :MM:__POOL:SizeG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Size
-            .global :MM:__HEAP:SizeG
+            .global :MM:__POOL:Size
+            .global :MM:__POOL:SizeG
 Size        SET         $3,arg0
             GET         $1,:rJ
             PUSHJ       $2,SizeJ
@@ -429,8 +429,8 @@ Size        SET         $3,arg0
             POP         1,0
 1H          SET         t,$1 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Size1
-            GETA        $3,:MM:__HEAP:STRS:Size2
+            GETA        $1,:MM:__POOL:STRS:Size1
+            GETA        $3,:MM:__POOL:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 SizeG       SET         $3,t
             GET         $1,:rJ
@@ -441,25 +441,25 @@ SizeG       SET         $3,t
             POP         0,0
 1H          SET         t,$1 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Size1
-            GETA        $3,:MM:__HEAP:STRS:Size2
+            GETA        $1,:MM:__POOL:STRS:Size1
+            GETA        $3,:MM:__POOL:STRS:Size2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
 %%
-% :MM:__HEAP:Valid
+% :MM:__POOL:Valid
 %
 % PUSHJ:
 %   arg0 - pointer to allocated memory
 %   retm - 0 indicating a valid pointer, -1 otherwise
 %
-% :MM:__HEAP:ValidG
+% :MM:__POOL:ValidG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Valid
-            .global :MM:__HEAP:ValidG
+            .global :MM:__POOL:Valid
+            .global :MM:__POOL:ValidG
 Valid       SET         $3,arg0
             GET         $1,:rJ
             PUSHJ       $2,ValidJ
@@ -483,7 +483,7 @@ ValidG      GET         $0,:rJ
 
 
 %%
-% :MM:__HEAP:CopyJ
+% :MM:__POOL:CopyJ
 %
 % PUSHJ:
 %   arg0 - pointer to source memory
@@ -491,7 +491,7 @@ ValidG      GET         $0,:rJ
 %   no return value
 %
 
-            .global :MM:__HEAP:CopyJ
+            .global :MM:__POOL:CopyJ
 CopyJ       GET         $2,:rJ
             SET         $6,arg0
             PUSHJ       $5,SizeJ % size of arg0
@@ -509,11 +509,11 @@ CopyJ       GET         $2,:rJ
             POP         0,1
 1H          PUT         :rJ,$2
             POP         0,0
-3H          GETA        $1,:MM:__HEAP:STRS:Move4
+3H          GETA        $1,:MM:__POOL:STRS:Move4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 %%
-% :MM:__HEAP:Copy
+% :MM:__POOL:Copy
 %
 % PUSHJ:
 %   arg0 - pointer to source memory
@@ -521,7 +521,7 @@ CopyJ       GET         $2,:rJ
 %   no return value
 %
 
-            .global :MM:__HEAP:Copy
+            .global :MM:__POOL:Copy
 Copy        GET         $2,:rJ
             SET         $6,arg0
             PUSHJ       $5,SizeJ % size of arg0
@@ -540,26 +540,26 @@ Copy        GET         $2,:rJ
             POP         0,0
 1H          SET         t,$2 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Move1
-            GETA        $3,:MM:__HEAP:STRS:Move3
+            GETA        $1,:MM:__POOL:STRS:Move1
+            GETA        $3,:MM:__POOL:STRS:Move3
             PUSHJ       $0,:MM:__ERROR:Error3R2
 2H          SET         t,$2 % :rJ
             SET         $2,arg1
-            GETA        $1,:MM:__HEAP:STRS:Move2
-            GETA        $3,:MM:__HEAP:STRS:Move3
+            GETA        $1,:MM:__POOL:STRS:Move2
+            GETA        $3,:MM:__POOL:STRS:Move3
             PUSHJ       $0,:MM:__ERROR:Error3R2
-3H          GETA        $1,:MM:__HEAP:STRS:Move4
+3H          GETA        $1,:MM:__POOL:STRS:Move4
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
-% :MM:__HEAP:ZeroJ
+% :MM:__POOL:ZeroJ
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
 %   no return value
 %
-% :MM:__HEAP:SetJ
+% :MM:__POOL:SetJ
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
@@ -567,8 +567,8 @@ Copy        GET         $2,:rJ
 %   no return value
 %
 
-            .global :MM:__HEAP:ZeroJ
-            .global :MM:__HEAP:SetJ
+            .global :MM:__POOL:ZeroJ
+            .global :MM:__POOL:SetJ
 ZeroJ       SET         $1,0
 SetJ        GET         $2,:rJ
             SET         $7,arg0
@@ -582,12 +582,12 @@ SetJ        GET         $2,:rJ
             POP         0,1
 1H          PUT         :rJ,$2
             POP         0,0
-2H          GETA        $1,:MM:__HEAP:STRS:SetZero
+2H          GETA        $1,:MM:__POOL:STRS:SetZero
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
-% :MM:__HEAP:Set
+% :MM:__POOL:Set
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
@@ -595,7 +595,7 @@ SetJ        GET         $2,:rJ
 %   no return value
 %
 
-            .global :MM:__HEAP:Set
+            .global :MM:__POOL:Set
 Set         GET         $2,:rJ
             SET         $5,arg1
             SET         $4,arg0
@@ -605,25 +605,25 @@ Set         GET         $2,:rJ
             POP         0,0
 1H          SET         t,$2 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Set1
-            GETA        $3,:MM:__HEAP:STRS:Set2
+            GETA        $1,:MM:__POOL:STRS:Set1
+            GETA        $3,:MM:__POOL:STRS:Set2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
 %%
-% :MM:__HEAP:Zero
+% :MM:__POOL:Zero
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
 %   no return value
 %
-% :MM:__HEAP:ZeroG
+% :MM:__POOL:ZeroG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Zero
-            .global :MM:__HEAP:ZeroG
+            .global :MM:__POOL:Zero
+            .global :MM:__POOL:ZeroG
 ZeroG       SET         $0,t
 Zero        GET         $1,:rJ
             SET         $3,arg0
@@ -633,20 +633,20 @@ Zero        GET         $1,:rJ
             POP         0,0
 1H          SET         t,$1 %:rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Zero1
-            GETA        $3,:MM:__HEAP:STRS:Zero2
+            GETA        $1,:MM:__POOL:STRS:Zero1
+            GETA        $3,:MM:__POOL:STRS:Zero2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 
 
 %%
-% :MM:__HEAP:RandJ
+% :MM:__POOL:RandJ
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
 %   no return value
 %
 
-            .global :MM:__HEAP:RandJ
+            .global :MM:__POOL:RandJ
 RandJ       GET         $1,:rJ
             SET         $5,arg0
             PUSHJ       $4,SizeJ
@@ -658,24 +658,24 @@ RandJ       GET         $1,:rJ
             POP         0,1
 1H          PUT         :rJ,$1
             POP         0,0
-2H          GETA        $1,:MM:__HEAP:STRS:Rand3
+2H          GETA        $1,:MM:__POOL:STRS:Rand3
             PUSHJ       $0,:MM:__ERROR:IError1
 
 
 %%
-% :MM:__HEAP:Rand
+% :MM:__POOL:Rand
 %
 % PUSHJ:
 %   arg0 - pointer to memory block
 %   no return value
 %
-% :MM:__HEAP:RandG
+% :MM:__POOL:RandG
 %
 % PUSHJ
 %
 
-            .global :MM:__HEAP:Rand
-            .global :MM:__HEAP:RandG
+            .global :MM:__POOL:Rand
+            .global :MM:__POOL:RandG
 RandG       SET         $0,t
 Rand        GET         $1,:rJ
             SET         $3,arg0
@@ -685,7 +685,7 @@ Rand        GET         $1,:rJ
             POP         0,0
 1H          SET         t,$1 % :rJ
             SET         $2,arg0
-            GETA        $1,:MM:__HEAP:STRS:Rand1
-            GETA        $3,:MM:__HEAP:STRS:Rand2
+            GETA        $1,:MM:__POOL:STRS:Rand1
+            GETA        $3,:MM:__POOL:STRS:Rand2
             PUSHJ       $0,:MM:__ERROR:Error3R2
 

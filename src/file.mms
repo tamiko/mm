@@ -971,7 +971,7 @@ ReadInJ     SWYM
             JMP         9F
             % $3 - file size
             SET         $5,$3
-            PUSHJ       $4,:MM:__HEAP:AllocJ
+            PUSHJ       $4,:MM:__POOL:AllocJ
             JMP         9F
             % $4 - buffer address
             NEG         $7,0     % seek all the way to the beginning

@@ -71,7 +71,7 @@ Initialize  GET         $0,:rJ
             SUBU        $2,:MM:t,$1
             ADDU        $2,$2,#8
             SET         $4,$2
-            PUSHJ       $3,:MM:__HEAP:AllocJ
+            PUSHJ       $3,:MM:__POOL:AllocJ
             JMP         9F
             SET         $5,$1
             SET         $6,$3
@@ -83,7 +83,7 @@ Initialize  GET         $0,:rJ
             STO         $3,$255,#0
             STO         $1,$255,#8
             SET         $5,#30
-            PUSHJ       $4,:MM:__HEAP:AllocJ
+            PUSHJ       $4,:MM:__POOL:AllocJ
             JMP         9F
             XOR         $5,$5,$5
             STO         $5,$4,#00 % Thread ID: 0
@@ -176,7 +176,7 @@ __exit      GETA        $1,Stack_Segment
             BNZ         $7,1F
             PUSHJ       $255,:MM:__SYS:Exit
 1H          SET         $8,$4
-            PUSHJ       $7,:MM:__HEAP:DeallocJ
+            PUSHJ       $7,:MM:__POOL:DeallocJ
             JMP         __fatal
             STO         $5,$6,#10
             STO         $6,$5,#18
@@ -191,7 +191,7 @@ __yield     GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
-            PUSHJ       $3,:MM:__HEAP:AllocJ
+            PUSHJ       $3,:MM:__POOL:AllocJ
             JMP         __fatal
             SET         $5,$1
             SET         $6,$3
@@ -239,7 +239,7 @@ __unsave    SWYM
             LDO         $3,$3
             LDO         $5,$3,#20
             GET         $3,:rJ
-            PUSHJ       $4,:MM:__HEAP:DeallocJ
+            PUSHJ       $4,:MM:__POOL:DeallocJ
             JMP         __fatal
             PUT         :rJ,$3
             NEG         $4,0,1
@@ -256,7 +256,7 @@ __unsave    SWYM
 __create    GET         $3,:rZ
             % Create new list entry:
             SET         $5,#30
-            PUSHJ       $4,:MM:__HEAP:AllocJ
+            PUSHJ       $4,:MM:__POOL:AllocJ
             JMP         __fatal
             % Thread ID:
             GETA        $5,:MM:__INTERNAL:__next_id
@@ -296,7 +296,7 @@ __clone     GETA        $1,Stack_Segment
             SUBU        $2,$0,$1
             ADDU        $2,$2,#8
             SET         $4,$2
-            PUSHJ       $3,:MM:__HEAP:AllocJ
+            PUSHJ       $3,:MM:__POOL:AllocJ
             JMP         __fatal
             SET         $5,$1
             SET         $6,$3
@@ -305,7 +305,7 @@ __clone     GETA        $1,Stack_Segment
             JMP         __fatal
             % Create new list entry:
             SET         $5,#30
-            PUSHJ       $4,:MM:__HEAP:AllocJ
+            PUSHJ       $4,:MM:__POOL:AllocJ
             JMP         __fatal
             % Thread ID:
             GETA        $5,:MM:__INTERNAL:__next_id

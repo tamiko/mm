@@ -62,7 +62,7 @@
             BNZ         \back,__er_dpu\@
             % initialize:
             SET         :MM:t,\size
-            PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            PUSHJ       :MM:t,:MM:__POOL:AllocG
             % lock memory region
             SUBU        :MM:t,:MM:t,#18
             NEGU        $255,0,1
@@ -80,16 +80,16 @@
 __1h_dpu\@  SWYM
             .if \checks
             SET         :MM:t,\front
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dpu\@
             SET         :MM:t,\size
-            PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            PUSHJ       :MM:t,:MM:__POOL:AllocG
             .else
             SET         :MM:t,\size
-            PUSHJ       :MM:t,:MM:__HEAP:AllocG
+            PUSHJ       :MM:t,:MM:__POOL:AllocG
             .endif
             % lock memory region
             SUBU        :MM:t,:MM:t,#18
@@ -140,10 +140,10 @@ __er_dpu\@  NEG         $255,0,1
             % sanity check: both registers must hold a valid memory address:
             .if \checks
             SET         :MM:t,\front
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dpo\@
             SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dpo\@
             .endif
             % special case: last element
@@ -156,7 +156,7 @@ __er_dpu\@  NEG         $255,0,1
             STO         $255,:MM:t,0
             ADDU        :MM:t,:MM:t,#18
             % Deallocate:
-            PUSHJ       :MM:t,:MM:__HEAP:DeallocG
+            PUSHJ       :MM:t,:MM:__POOL:DeallocG
             SET         \front,#0
             SET         \back,#0
             SET         $255,#0
@@ -176,7 +176,7 @@ __1h_dpo\@  SUBU        \front,\front,#10
             STO         $255,:MM:t,0
             ADDU        :MM:t,:MM:t,#18
             % Deallocate:
-            PUSHJ       :MM:t,:MM:__HEAP:DeallocG
+            PUSHJ       :MM:t,:MM:__POOL:DeallocG
             STO         \front,\back,#00
             STO         \back,\front,#08
             ADDU        \front,\front,#10
@@ -211,10 +211,10 @@ __er_dpo\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % sanity check: both registers must hold a valid memory address:
             SET         :MM:t,\front
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dst\@
             SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dst\@
             % save front element at label:
             SUBU        \front,\front,#10
@@ -238,13 +238,13 @@ __er_dst\@  NEG         $255,0,1
             GETA        :MM:t,\label
             LDO         :MM:t,:MM:t,#0
             ADDU        :MM:t,:MM:t,#10
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dlo\@
             GETA        :MM:t,\label
             LDO         :MM:t,:MM:t,#0
             LDO         :MM:t,:MM:t,#8 % back element
             ADDU        :MM:t,:MM:t,#10
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dlo\@
             % save deque structure in front and back registers:
             GETA        :MM:t,\label
@@ -266,10 +266,10 @@ __er_dlo\@  NEG         $255,0,1
             Deque:__SAVE_REGISTERS
             % Check that both registers hold a valid memory address
             SET         :MM:t,\front
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dch\@
             SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dch\@
             SET         $255,#0
             JMP         @+#8
@@ -286,7 +286,7 @@ __er_dch\@  NEG         $255,0,1
             .if \checks
             Deque:__SAVE_REGISTERS
             SET         :MM:t,\front
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dav\@
             .endif
             SET         \back,\front
@@ -297,7 +297,7 @@ __er_dch\@  NEG         $255,0,1
             .if \checks
             Deque:__SAVE_REGISTERS
             SET         :MM:t,\back
-            PUSHJ       :MM:t,:MM:__HEAP:ValidG
+            PUSHJ       :MM:t,:MM:__POOL:ValidG
             BN          :MM:t,__er_dav\@
             .endif
             SET         \front,\back

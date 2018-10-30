@@ -67,9 +67,9 @@
 % :MM:Heap:AllocG
 %   This variant passes arg0 and retm through the global register :MM:t.
 %
-Heap:Alloc  IS          :MM:__HEAP:Alloc
-Heap:AllocJ IS          :MM:__HEAP:AllocJ
-Heap:AllocG IS          :MM:__HEAP:AllocG
+Heap:Alloc  IS          :MM:__POOL:Alloc
+Heap:AllocJ IS          :MM:__POOL:AllocJ
+Heap:AllocG IS          :MM:__POOL:AllocG
 
 %%
 % :MM:Heap:Dealloc
@@ -95,9 +95,9 @@ Heap:AllocG IS          :MM:__HEAP:AllocG
 %   This variant passes arg0 through the global register :MM:t. :MM:t will
 %   be set to #0 on return
 %
-Heap:Dealloc  IS        :MM:__HEAP:Dealloc
-Heap:DeallocJ IS        :MM:__HEAP:DeallocJ
-Heap:DeallocG IS        :MM:__HEAP:DeallocG
+Heap:Dealloc  IS        :MM:__POOL:Dealloc
+Heap:DeallocJ IS        :MM:__POOL:DeallocJ
+Heap:DeallocG IS        :MM:__POOL:DeallocG
 
 %%
 % :MM:Heap:Realloc
@@ -121,8 +121,8 @@ Heap:DeallocG IS        :MM:__HEAP:DeallocG
 %   Same calling sequence as above. In case of error, the memory block
 %   at arg0 is guaranteed to be still allocated.
 %
-Heap:Realloc  IS        :MM:__HEAP:Realloc
-Heap:ReallocJ IS        :MM:__HEAP:ReallocJ
+Heap:Realloc  IS        :MM:__POOL:Realloc
+Heap:ReallocJ IS        :MM:__POOL:ReallocJ
 
 %%
 % :MM:Heap:Valid
@@ -144,9 +144,9 @@ Heap:ReallocJ IS        :MM:__HEAP:ReallocJ
 % :MM:Heap:ValidG
 %   This variant passes retm through the global register :MM:t.
 %
-Heap:Valid  IS          :MM:__HEAP:Valid
-Heap:ValidJ IS          :MM:__HEAP:ValidJ
-Heap:ValidG IS          :MM:__HEAP:ValidG
+Heap:Valid  IS          :MM:__POOL:Valid
+Heap:ValidJ IS          :MM:__POOL:ValidJ
+Heap:ValidG IS          :MM:__POOL:ValidG
 
 %%
 % :MM:Heap:Size
@@ -170,9 +170,9 @@ Heap:ValidG IS          :MM:__HEAP:ValidG
 % :MM:Heap:SizeG
 %   This variant passes arg0 and retm through the global register :MM:t.
 %
-Heap:Size   IS          :MM:__HEAP:Size
-Heap:SizeJ  IS          :MM:__HEAP:SizeJ
-Heap:SizeG  IS          :MM:__HEAP:SizeG
+Heap:Size   IS          :MM:__POOL:Size
+Heap:SizeJ  IS          :MM:__POOL:SizeJ
+Heap:SizeG  IS          :MM:__POOL:SizeG
 
 %%
 % :MM:Heap:Copy
@@ -197,8 +197,8 @@ Heap:SizeG  IS          :MM:__HEAP:SizeG
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-Heap:Copy   IS          :MM:__HEAP:Copy
-Heap:CopyJ  IS          :MM:__HEAP:CopyJ
+Heap:Copy   IS          :MM:__POOL:Copy
+Heap:CopyJ  IS          :MM:__POOL:CopyJ
 
 %%
 % :MM:Heap:Set
@@ -222,8 +222,8 @@ Heap:CopyJ  IS          :MM:__HEAP:CopyJ
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-Heap:Set    IS          :MM:__HEAP:Set
-Heap:SetJ   IS          :MM:__HEAP:SetJ
+Heap:Set    IS          :MM:__POOL:Set
+Heap:SetJ   IS          :MM:__POOL:SetJ
 
 %%
 % :MM:Heap:Zero
@@ -249,9 +249,9 @@ Heap:SetJ   IS          :MM:__HEAP:SetJ
 % :MM:Heap:ZeroG
 %   This variant passes arg0 through the global register :MM:t.
 %
-Heap:Zero   IS          :MM:__HEAP:Zero
-Heap:ZeroJ  IS          :MM:__HEAP:ZeroJ
-Heap:ZeroG  IS          :MM:__HEAP:ZeroG
+Heap:Zero   IS          :MM:__POOL:Zero
+Heap:ZeroJ  IS          :MM:__POOL:ZeroJ
+Heap:ZeroG  IS          :MM:__POOL:ZeroG
 
 %%
 % :MM:Heap:Rand
@@ -281,9 +281,9 @@ Heap:ZeroG  IS          :MM:__HEAP:ZeroG
 % :MM:Heap:RandG
 %   This variant passes arg0 through the global register :MM:t.
 %
-Heap:Rand   IS          :MM:__HEAP:Rand
-Heap:RandJ  IS          :MM:__HEAP:RandJ
-Heap:RandG  IS          :MM:__HEAP:RandG
+Heap:Rand   IS          :MM:__POOL:Rand
+Heap:RandJ  IS          :MM:__POOL:RandJ
+Heap:RandG  IS          :MM:__POOL:RandG
 
             PREFIX      :
 
