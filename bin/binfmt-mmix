@@ -21,18 +21,18 @@ set -eu
 saved_state="$(stty -g)"
 
 until [[ "$@" == "" ]]; do
-  if [[ "$1" == "-raw-mode" ]]; then
-
-    stty raw -echo
-
-  elif [[ "$1" == "-raw-mode-noblock" ]]; then
-
-    stty raw -echo min 0
-
-  elif [[ "$1" == "-mmix" ]]; then
+  if [[ "$1" == "-mmix" ]]; then
 
     shift
-    interpret+=( "$1" )
+    if [[ "$1" == "-raw-mode" ]]; then
+      stty raw -echo
+    elif [[ "$1" == "-raw-mode-noblock" ]]; then
+      stty raw -echo min 0
+    elif [[ "$1" == "-spawn-worker" ]]; then
+      echo "not implemented"
+    else
+      interpret+=( "$1" )
+    fi
 
   else
 

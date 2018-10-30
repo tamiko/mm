@@ -2,7 +2,7 @@
 % A small example demonstrating "RAW" terminal mode handling. Invoke this
 % program with "-raw-mode" or "-raw-mode-noblock" parameters:
 %
-%  ./raw_mode.mmo -raw-mode
+%  ./raw_mode.mmo -mmix -raw-mode
 %
 
 #include <mm/file>
