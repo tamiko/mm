@@ -30,7 +30,7 @@
             PREFIX      :MM:
 
 %
-% :MM:Heap:
+% :MM:Pool:
 %
 % Routines for dynamic memory allocation/deallocation and related
 % tasks on the heap. The implementation of the heap is platfrom
@@ -39,18 +39,18 @@
 % - Stable ABI, fully implemented -
 %
 % This header file defines:
-%   :MM:Heap:Alloc (AllocJ, AllocG)
-%   :MM:Heap:Dealloc (DeallocJ, DeallocG)
-%   :MM:Heap:Realloc (ReallocJ)
-%   :MM:Heap:Valid (ValidJ, ValidG)
-%   :MM:Heap:Size (SizeJ, SizeG)
-%   :MM:Heap:Copy (CopyJ)
-%   :MM:Heap:Set (SetJ, SetG)
-%   :MM:Heap:Zero (ZeroJ, ZeroG)
+%   :MM:Pool:Alloc (AllocJ, AllocG)
+%   :MM:Pool:Dealloc (DeallocJ, DeallocG)
+%   :MM:Pool:Realloc (ReallocJ)
+%   :MM:Pool:Valid (ValidJ, ValidG)
+%   :MM:Pool:Size (SizeJ, SizeG)
+%   :MM:Pool:Copy (CopyJ)
+%   :MM:Pool:Set (SetJ, SetG)
+%   :MM:Pool:Zero (ZeroJ, ZeroG)
 %
 
 %%
-% :MM:Heap:Alloc
+% :MM:Pool:Alloc
 %   Allocate a continuous block of memory of size arg0. The returned
 %   address is octa aligned (and != #0). If allocation fails, the
 %   program is terminated with an error message.
@@ -59,23 +59,23 @@
 %   arg0 - requested size (in bytes)
 %   retm - pointer to allocated memory
 %
-% :MM:Heap:AllocJ
+% :MM:Pool:AllocJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 (with no
 %   return value) on failure instead of throwing an error message.
 %   Same calling sequence as above.
 %
-% :MM:Heap:AllocG
+% :MM:Pool:AllocG
 %   This variant passes arg0 and retm through the global register :MM:t.
 %
-Heap:Alloc  IS          :MM:__POOL:Alloc
-Heap:AllocJ IS          :MM:__POOL:AllocJ
-Heap:AllocG IS          :MM:__POOL:AllocG
+Pool:Alloc  IS          :MM:__POOL:Alloc
+Pool:AllocJ IS          :MM:__POOL:AllocJ
+Pool:AllocG IS          :MM:__POOL:AllocG
 
 %%
-% :MM:Heap:Dealloc
+% :MM:Pool:Dealloc
 %   Deallocate a previously allocated block of memory pointed to by
 %   pointer arg0. The memory region must be previously allocated with
-%   :MM:Heap:Alloc, and must not be already freed. If arg0 is an
+%   :MM:Pool:Alloc, and must not be already freed. If arg0 is an
 %   invalid pointer the program is terminated with an error message.
 %
 %   PUSHJ:
@@ -84,23 +84,23 @@ Heap:AllocG IS          :MM:__POOL:AllocG
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc
+%   allocated with :MM:Pool:Alloc
 %
-% :MM:Heap:DeallocJ
+% :MM:Pool:DeallocJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-% :MM:Heap:AllocG
+% :MM:Pool:AllocG
 %   This variant passes arg0 through the global register :MM:t. :MM:t will
 %   be set to #0 on return
 %
-Heap:Dealloc  IS        :MM:__POOL:Dealloc
-Heap:DeallocJ IS        :MM:__POOL:DeallocJ
-Heap:DeallocG IS        :MM:__POOL:DeallocG
+Pool:Dealloc  IS        :MM:__POOL:Dealloc
+Pool:DeallocJ IS        :MM:__POOL:DeallocJ
+Pool:DeallocG IS        :MM:__POOL:DeallocG
 
 %%
-% :MM:Heap:Realloc
+% :MM:Pool:Realloc
 %   Allocate a new block of memory of arg1 bytes, copy the memory
 %   pointed to by arg0 into it up to min(size(arg0),arg1) bytes.
 %   Deallocate the memory region pointed to by arg0 and return the
@@ -113,19 +113,19 @@ Heap:DeallocG IS        :MM:__POOL:DeallocG
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc.
+%   allocated with :MM:Pool:Alloc.
 %
-% :MM:Heap:ReallocJ
+% :MM:Pool:ReallocJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 (with no
 %   return value) on failure instead of throwing an error message.
 %   Same calling sequence as above. In case of error, the memory block
 %   at arg0 is guaranteed to be still allocated.
 %
-Heap:Realloc  IS        :MM:__POOL:Realloc
-Heap:ReallocJ IS        :MM:__POOL:ReallocJ
+Pool:Realloc  IS        :MM:__POOL:Realloc
+Pool:ReallocJ IS        :MM:__POOL:ReallocJ
 
 %%
-% :MM:Heap:Valid
+% :MM:Pool:Valid
 %   Return whether arg0 points to a bunch of allocated memory. 0
 %   indicates a valid pointer, -1 an invalid one.
 %
@@ -133,7 +133,7 @@ Heap:ReallocJ IS        :MM:__POOL:ReallocJ
 %   arg0 - pointer to allocated memory
 %   retm - 0 indicating a valid pointer, -1 otherwise
 %
-% :MM:Heap:ValidJ
+% :MM:Pool:ValidJ
 %   This variant returns to :rJ+#4 if arg0 is a valid pointer and to
 %   :rJ+#0 on failure. No return value.
 %
@@ -141,15 +141,15 @@ Heap:ReallocJ IS        :MM:__POOL:ReallocJ
 %   arg0 - pointer to allocated memory
 %   no return value
 %
-% :MM:Heap:ValidG
+% :MM:Pool:ValidG
 %   This variant passes retm through the global register :MM:t.
 %
-Heap:Valid  IS          :MM:__POOL:Valid
-Heap:ValidJ IS          :MM:__POOL:ValidJ
-Heap:ValidG IS          :MM:__POOL:ValidG
+Pool:Valid  IS          :MM:__POOL:Valid
+Pool:ValidJ IS          :MM:__POOL:ValidJ
+Pool:ValidG IS          :MM:__POOL:ValidG
 
 %%
-% :MM:Heap:Size
+% :MM:Pool:Size
 %   Return the size of the allocated memory pointed to by arg0. If
 %   arg0 is an invalid pointer the program is terminated with an error
 %   message.
@@ -160,28 +160,28 @@ Heap:ValidG IS          :MM:__POOL:ValidG
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc
+%   allocated with :MM:Pool:Alloc
 %
-% :MM:Heap:SizeJ
+% :MM:Pool:SizeJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-% :MM:Heap:SizeG
+% :MM:Pool:SizeG
 %   This variant passes arg0 and retm through the global register :MM:t.
 %
-Heap:Size   IS          :MM:__POOL:Size
-Heap:SizeJ  IS          :MM:__POOL:SizeJ
-Heap:SizeG  IS          :MM:__POOL:SizeG
+Pool:Size   IS          :MM:__POOL:Size
+Pool:SizeJ  IS          :MM:__POOL:SizeJ
+Pool:SizeG  IS          :MM:__POOL:SizeG
 
 %%
-% :MM:Heap:Copy
+% :MM:Pool:Copy
 %   Does an octawise copy of the memory region pointed to by arg0 to
 %   the memory region pointed to by arg1 of exactly
 %   min(size(arg0),size(arg1)) bytes. arg0 and arg1 must point to the
 %   beginning of valid, not yet freed memory regions previously
-%   allocated with :MM:Heap:Alloc. For raw memory regions use
-%   :MM:Heap:Copy instead.
+%   allocated with :MM:Pool:Alloc. For raw memory regions use
+%   :MM:Pool:Copy instead.
 %
 %   PUSHJ:
 %   arg0 - pointer to source memory
@@ -190,22 +190,22 @@ Heap:SizeG  IS          :MM:__POOL:SizeG
 %
 %   Precondition:
 %   arg0 and arg1 must point to valid, not yet freed memory regions
-%   previously allocated with :MM:Heap:Alloc.
+%   previously allocated with :MM:Pool:Alloc.
 %
-% :MM:Heap:CopyJ
+% :MM:Pool:CopyJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-Heap:Copy   IS          :MM:__POOL:Copy
-Heap:CopyJ  IS          :MM:__POOL:CopyJ
+Pool:Copy   IS          :MM:__POOL:Copy
+Pool:CopyJ  IS          :MM:__POOL:CopyJ
 
 %%
-% :MM:Heap:Set
+% :MM:Pool:Set
 %   Sets the entire contents of the memory block pointed to by arg0 to
 %   the least significant bit of arg1. arg0 must point to the
 %   beginning of valid, not yet freed memory regions previously
-%   allocated with :MM:Heap:Alloc. For raw memory regions use
+%   allocated with :MM:Pool:Alloc. For raw memory regions use
 %   :MM:Mem:Set (SetJ) instead.
 %
 %   PUSHJ:
@@ -215,22 +215,22 @@ Heap:CopyJ  IS          :MM:__POOL:CopyJ
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc.
+%   allocated with :MM:Pool:Alloc.
 %
-% :MM:Heap:SetJ
+% :MM:Pool:SetJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-Heap:Set    IS          :MM:__POOL:Set
-Heap:SetJ   IS          :MM:__POOL:SetJ
+Pool:Set    IS          :MM:__POOL:Set
+Pool:SetJ   IS          :MM:__POOL:SetJ
 
 %%
-% :MM:Heap:Zero
-%   This subroutine works on memory regions allocated by Heap:Alloc.
+% :MM:Pool:Zero
+%   This subroutine works on memory regions allocated by Pool:Alloc.
 %   It sets the entire contents of the memory block pointed to by arg0
 %   to zero. arg0 must point to the beginning of a valid, not yet
-%   freed memory regions previously allocated with :MM:Heap:Alloc. For
+%   freed memory regions previously allocated with :MM:Pool:Alloc. For
 %   raw memory regions use :MM:Mem:Zero (ZeroJ) instead.
 %
 %   PUSHJ:
@@ -239,27 +239,27 @@ Heap:SetJ   IS          :MM:__POOL:SetJ
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc.
+%   allocated with :MM:Pool:Alloc.
 %
-% :MM:Heap:ZeroJ
+% :MM:Pool:ZeroJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-% :MM:Heap:ZeroG
+% :MM:Pool:ZeroG
 %   This variant passes arg0 through the global register :MM:t.
 %
-Heap:Zero   IS          :MM:__POOL:Zero
-Heap:ZeroJ  IS          :MM:__POOL:ZeroJ
-Heap:ZeroG  IS          :MM:__POOL:ZeroG
+Pool:Zero   IS          :MM:__POOL:Zero
+Pool:ZeroJ  IS          :MM:__POOL:ZeroJ
+Pool:ZeroG  IS          :MM:__POOL:ZeroG
 
 %%
-% :MM:Heap:Rand
-%   This subroutine works on memory regions allocated by Heap:Alloc.
+% :MM:Pool:Rand
+%   This subroutine works on memory regions allocated by Pool:Alloc.
 %   It overwrites the entire contents of the memory block pointed to
 %   by arg0 with random data. arg0 must point to the beginning of a
 %   valid, not yet freed memory regions previously allocated with
-%   :MM:Heap:Alloc. For raw memory regions use :MM:Mem:Rand (RandJ)
+%   :MM:Pool:Alloc. For raw memory regions use :MM:Mem:Rand (RandJ)
 %   instead.
 %
 %   This subroutine uses the prng implementation described in
@@ -271,19 +271,19 @@ Heap:ZeroG  IS          :MM:__POOL:ZeroG
 %
 %   Precondition:
 %   arg0 must point to a valid, not yet freed memory region previously
-%   allocated with :MM:Heap:Alloc.
+%   allocated with :MM:Pool:Alloc.
 %
-% :MM:Heap:RandJ
+% :MM:Pool:RandJ
 %   This variant returns to :rJ+#4 on success and to :rJ+#0 on failure
 %   instead of throwing an error message. Same calling sequence as
 %   above.
 %
-% :MM:Heap:RandG
+% :MM:Pool:RandG
 %   This variant passes arg0 through the global register :MM:t.
 %
-Heap:Rand   IS          :MM:__POOL:Rand
-Heap:RandJ  IS          :MM:__POOL:RandJ
-Heap:RandG  IS          :MM:__POOL:RandG
+Pool:Rand   IS          :MM:__POOL:Rand
+Pool:RandJ  IS          :MM:__POOL:RandJ
+Pool:RandG  IS          :MM:__POOL:RandG
 
             PREFIX      :
 

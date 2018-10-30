@@ -26,7 +26,7 @@ Main        SWYM
             SET         $4,$2
             PUSHJ       $3,:MM:Print:Str
             SET         $4,$2
-            PUSHJ       $3,:MM:Heap:Dealloc
+            PUSHJ       $3,:MM:Pool:Dealloc
             JMP         1B
 
 2H          PUSHJ       t,MM:Sys:Exit

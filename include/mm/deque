@@ -52,7 +52,7 @@
 %    "front" and "back" must neither be the temporary register $255, nor
 %    the (library internal) register :MM:t.
 %
-%    Note: :MM:Heap:Dealloc and :MM:Heap:Realloc will destory the deque
+%    Note: :MM:Pool:Dealloc and :MM:Pool:Realloc will destory the deque
 %    structure - you have to pop the old memory region and push a new one
 %    to the deque instead.
 %
