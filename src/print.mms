@@ -192,7 +192,6 @@ Byte        GET         $10,:rJ
             ADDU        $2,$2,7
 1H          ADD         $2,$2,48
             STB         $2,buffer,2
-            GET         $10,:rJ
             SRU         $2,arg0,4
             AND         $2,$2,#F
             CMP         t,$2,10
