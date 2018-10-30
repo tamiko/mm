@@ -1,4 +1,21 @@
 #!/bin/bash
+
+#
+# A small wrapper script that can be used as interpreter for .mmo files
+# with the binfmt facility. Simply register this file to the binfmt service
+# with a string of the form
+#
+#   :mmix:E::mmo::<path to binfmt-mmix>:
+#
+# either by piping this string directly to /proc/sys/fs/binfmt_misc/register:
+#
+#   echo ":mmix:E::mmo::<path to binfmt-mmix>:" >
+#     /proc/sys/fs/binfmt_misc/register
+#
+# or by creating an entry in a configuration file /etc/binfmt.d/mmix.conf
+# (or whatever name you choose).
+#
+
 set -eu
 
 until [[ "$@" == "" ]]; do
@@ -10,4 +27,4 @@ until [[ "$@" == "" ]]; do
   fi
   shift
 done
-exec /usr/bin/mmix "${interpret[@]:+${interpret[@]}}" "${args[@]:+${args[@]}}"
+exec mmix "${interpret[@]:+${interpret[@]}}" "${args[@]:+${args[@]}}"
