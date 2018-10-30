@@ -20,9 +20,9 @@ Buffer      .fill 100
             .balign 4
 FileString  BYTE        "/dev/stdin",0
             .balign 4
-Msg1        BYTE        "Byte read: >",0
+Msg1        BYTE        "Byte read: ",0
             .balign 4
-Msg2        BYTE        "<   (press 'q' to exit)",13,10,0
+Msg2        BYTE        "   (press 'q' to exit)",13,10,0
             .balign 4
 Bye         BYTE        "Key 'q' pressed - goodbye!",13,10,0
 
