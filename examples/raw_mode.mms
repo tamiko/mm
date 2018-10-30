@@ -1,13 +1,18 @@
 %
-% A small example demonstrating "RAW" terminal mode handling. Invoke this
-% program with "-raw-mode" or "-raw-mode-noblock" parameters:
-%
-%  ./raw_mode.mmo -mmix -raw-mode
+% A small example demonstrating "RAW" terminal mode handling.
 %
 
 #include <mm/file>
 #include <mm/print>
 #include <mm/sys>
+
+            %
+            % Instruct the binfmt handler to use RAW mode. This requires
+            % mmix-objdump to be in path. Alternatively, invoke the .mmo
+            % file with options "-mmix -tty-raw-mode"
+            %
+
+            .global MM:Interpreter:TTY_RAW_MODE
 
             .data
             .balign 8

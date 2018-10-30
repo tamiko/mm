@@ -19,17 +19,25 @@
 set -eu
 
 saved_state="$(stty -g)"
+tty_raw_mode=false
+tty_noblock=false
+spawn_worker=false
+
+
+#
+# Query command line parameters:
+#
 
 until [[ "$@" == "" ]]; do
   if [[ "$1" == "-mmix" ]]; then
-
     shift
-    if [[ "$1" == "-raw-mode" ]]; then
-      stty raw -echo
-    elif [[ "$1" == "-raw-mode-noblock" ]]; then
-      stty raw -echo min 0
+    if [[ "$1" == "-tty-raw-mode" ]]; then
+      tty_raw_mode=true
+    elif [[ "$1" == "-tty-noblock" ]]; then
+      tty_raw_mode=true
+      tty_noblock=true
     elif [[ "$1" == "-spawn-worker" ]]; then
-      echo "not implemented"
+      spawn_worker=true
     else
       interpret+=( "$1" )
     fi
@@ -42,5 +50,49 @@ until [[ "$@" == "" ]]; do
   shift
 done
 
+
+#
+# If possible, query binary for configuration options:
+#
+
+if command -v mmix-objdump >/dev/null 2>&1; then
+
+  if mmix-objdump -t "${args}" | grep -q "MM:Interpreter:TTY_RAW_MODE"; then
+    tty_raw_mode=true
+  fi
+
+  if mmix-objdump -t "${args}" | grep -q "MM:Interpreter:TTY_NOBLOCK"; then
+    tty_noblock=true
+  fi
+
+fi
+
+
+#
+# Cleanup:
+#
+
+function cleanup {
+  stty "${saved_state}"
+}
+trap cleanup EXIT
+
+
+#
+# Set up environment and call interpreter:
+#
+
+if $tty_raw_mode; then
+  stty raw -echo
+fi
+
+if $tty_noblock; then
+  stty -icanon min 0 time 0
+fi
+
+if $spawn_worker; then
+  echo "not implemented"
+  exit 1
+fi
+
 mmix "${interpret[@]:+${interpret[@]}}" "${args[@]:+${args[@]}}"
-stty "${saved_state}"
