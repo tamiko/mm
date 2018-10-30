@@ -27,13 +27,21 @@
 %
 % :MM:__SYS:
 %
-% Facilities for error handling, and program termination.
+% Facilities for system, environment, error handling, and program
+% termination.
+%
+
+
+%
+% Error handling and program termination:
 %
 
             .section .data,"wa",@progbits
             .balign 8
-            PREFIX      :MM:__SYS:
+            .global :MM:__SYS:WorkerDirec
             .global :MM:__SYS:AtErrorAddr
+            PREFIX      :MM:__SYS:
+WorkerDirec OCTA        #0000000000000000
 AtErrorAddr OCTA        #0000000000000000
 
             .section .text,"ax",@progbits
@@ -95,3 +103,11 @@ AtError     GETA        $1,:MM:__SYS:AtErrorAddr
             SET         t,arg0
             POP         0
 
+
+%
+% Set up worker:
+%
+
+            .section .init,"ax",@progbits
+            PREFIX      :MM:__SYS:
+            SWYM

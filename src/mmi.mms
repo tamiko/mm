@@ -47,6 +47,11 @@
             % very convenient for setting breakpoints.
             %
 
+            .section .data,"wa",@progbits
+            .align 4
+            PREFIX      :MM:__INIT:
+InitString  BYTE "__mm_init_worker",0
+
             .section .text,"ax",@progbits
             .global :MM:__INIT:__entry
             .global :MM:__INIT:__trampoline
@@ -99,6 +104,9 @@ __entry     PUSHJ       $255,1F
             .org #0F0    % entry point
             JMP         3F
 
+__t1        IS     :MM:__INTERNAL:__t1
+__t2        IS     :MM:__INTERNAL:__t2
+__t3        IS     :MM:__INTERNAL:__t3
             .org #100
 __trampoline SWYM
             % Prepare (possible) far jump:
@@ -127,8 +135,41 @@ __trampoline SWYM
             PUT         :rX,$255
             SET         $255,#0
             %
-            % Save initial state, store stack address in $0
+            % Hide __mm_init_worker parameter if supplied. This is a bit
+            % tricky - let us use only :MM:t, and the internal registers for
+            % this purpose:
             %
+            SET         __t1,#1
+            CMP         __t1,$0,__t1
+            BZ          __t1,4F % only one parameter, nothing to do
+            GETA        __t3,InitString
+            % Compare first 8 bytes:
+            LDO         __t2,__t3,0
+            LDO         __t1,$1,#8
+            LDO         __t1,__t1,0
+            CMP         __t1,__t1,__t2
+            BNZ         __t1,4F % first OCTA is different from "__mm_ini"
+            % Compare next 8 bytes:
+            LDO         __t2,__t3,#8
+            LDO         __t3,$1,#8
+            LDO         __t1,__t3,#8
+            CMP         __t1,__t1,__t2
+            BNZ         __t1,4F % second OCTA is different from "t_worker"
+            % store special parameter at :MM:__SYS_:WorkerDirec
+            GETA        __t2,:MM:__SYS:WorkerDirec
+            STO         __t3,__t2,0
+            % Hide first command line argument:
+            SUBU        $0,$0,1
+            % Clean up addresses:
+            LDO         __t1,$1,#0
+            STO         __t1,$1,#8
+            ADDU        $1,$1,#8
+            %
+            % Clean up, save initial state, and store stack address in $0
+            %
+4H          SET         __t1,#0
+            SET         __t2,#0
+            SET         __t3,#0
             SAVE        $255,0
             SET         $0,$255
             %

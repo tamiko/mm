@@ -107,6 +107,8 @@ str_hndl3   BYTE        "    :MM:__INTERNAL:ExcHandler  [ ",0
             .balign 4
 str_aterror BYTE        "    :MM:__SYS:AtErrorAddr      [ ",0
             .balign 4
+str_directo BYTE        "    :MM:__SYS:WorkerDirec      [ ",0
+            .balign 4
 str_between BYTE        " ]    -->    [ ",0
             .balign 4
 str_argc    BYTE        "    argc:                      [ ",0
@@ -456,6 +458,24 @@ PrintThread GET         $2,:rJ
             GETA        $5,:MM:__SYS:AtErrorAddr
             GETA        $4,STRS:str_aterror
             PUSHJ       $3,AddressOf2
+            PUSHJ       t,:MM:__PRINT:Ln
+
+            GETA        $5,:MM:__SYS:WorkerDirec
+            GETA        $4,STRS:str_directo
+            PUSHJ       $3,AddressOf2
+
+            GETA        t,STRS:str_argv2
+            PUSHJ       t,:MM:__PRINT:StrG
+            GETA        $5,:MM:__SYS:WorkerDirec
+            LDOU        t,$5,0
+            PUSHJ       t,:MM:__PRINT:RegG
+            GETA        t,STRS:str_str
+            PUSHJ       t,:MM:__PRINT:StrG
+            LDOU        t,$5,0
+            BZ          t,1F
+            PUSHJ       t,:MM:__PRINT:StrG
+1H          GETA        t,STRS:str_str2
+            PUSHJ       t,:MM:__PRINT:StrG
             PUSHJ       t,:MM:__PRINT:Ln
 
             GETA        t,STRS:str_header3
