@@ -16,17 +16,33 @@
 # (or whatever name you choose).
 #
 
-set -eu
+set -e
+set -u
+
+
+#
+# Cleanup:
+#
 
 saved_state="$(stty -g)"
-tty_raw_mode=false
-tty_noblock=false
-spawn_worker=false
+temporary="$(mktemp -d "/dev/shm/$(basename $1).XXXXXXXX")"
+
+function cleanup {
+  stty "${saved_state}"
+  rm -r "${temporary}"
+}
+trap cleanup EXIT
 
 
 #
 # Query command line parameters:
 #
+
+tty_raw_mode=false
+tty_noblock=false
+spawn_worker=false
+declare -a args
+declare -a interpret
 
 until [[ "$@" == "" ]]; do
   if [[ "$1" == "-mmix" ]]; then
@@ -57,25 +73,19 @@ done
 
 if command -v mmix-objdump >/dev/null 2>&1; then
 
-  if mmix-objdump -t "${args}" | grep -q "MM:Interpreter:TTY_RAW_MODE"; then
+  if mmix-objdump -t "${args[0]}" | grep -q "MM:Interpreter:TTY_RAW_MODE"; then
     tty_raw_mode=true
   fi
 
-  if mmix-objdump -t "${args}" | grep -q "MM:Interpreter:TTY_NOBLOCK"; then
+  if mmix-objdump -t "${args[0]}" | grep -q "MM:Interpreter:TTY_NOBLOCK"; then
     tty_noblock=true
   fi
 
+  if mmix-objdump -t "${args[0]}" | grep -q "MM:Interpreter:SPAWN_WORKER"; then
+    spawn_worker=true
+  fi
+
 fi
-
-
-#
-# Cleanup:
-#
-
-function cleanup {
-  stty "${saved_state}"
-}
-trap cleanup EXIT
 
 
 #
@@ -90,9 +100,19 @@ if $tty_noblock; then
   stty -icanon min 0 time 0
 fi
 
+function worker {
+  while true; do
+    if read line < "$temporary/worker.stdin.fifo"; then
+      bash -c "$line" > "$temporary/worker.stdout.fifo" 2> /dev/null
+    fi
+  done
+}
+
 if $spawn_worker; then
-  echo "not implemented"
-  exit 1
+  mkfifo "$temporary/worker.stdin.fifo"
+  mkfifo "$temporary/worker.stdout.fifo"
+  worker &
+  args=( "${args[0]}" "__mm_init_worker=$temporary" "${args[@]:1}" )
 fi
 
-mmix "${interpret[@]:+${interpret[@]}}" "${args[@]:+${args[@]}}"
+mmix "${interpret[@]}" "${args[@]}"
