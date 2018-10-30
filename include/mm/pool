@@ -24,8 +24,8 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_HEAP
-#define MM_HEAP
+#ifndef MM_POOL
+#define MM_POOL
 
             PREFIX      :MM:
 
@@ -287,4 +287,4 @@ Heap:RandG  IS          :MM:__HEAP:RandG
 
             PREFIX      :
 
-#endif /* MM_HEAP */
+#endif /* MM_POOL */

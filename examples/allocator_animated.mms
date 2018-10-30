@@ -3,7 +3,7 @@
 %
 
 #include <mm/deque>
-#include <mm/heap>
+#include <mm/pool>
 #include <mm/print>
 #include <mm/sys>
 #include <mm/thread>
