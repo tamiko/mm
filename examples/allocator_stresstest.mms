@@ -2,7 +2,7 @@
 % A small allocator stress test
 %
 
-#include <mm/adt>
+#include <mm/deque>
 #include <mm/heap>
 #include <mm/print>
 #include <mm/sys>
