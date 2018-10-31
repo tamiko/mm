@@ -155,7 +155,7 @@ BinaryWrite IS          :BinaryWrite
             GETA        $3,:MM:__SYS:STRS:OutputFIFO
             GETA        $4,:MM:__INTERNAL:Buffer
             ADDU        $4,$4,$1
-            SET         $5,19
+            SET         $5,20
             PUSHJ       $2,:MM:__MEM:Copy
 
             GETA        $3,:MM:__INTERNAL:Buffer
