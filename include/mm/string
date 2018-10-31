@@ -24,8 +24,8 @@
 % SOFTWARE.
 %%
 
-#ifndef MM_STR
-#define MM_STR
+#ifndef MM_STRING
+#define MM_STRING
 
             PREFIX      :MM:
 
@@ -60,4 +60,4 @@
 
             PREFIX      :
 
-#endif /* MM_STR */
+#endif /* MM_STRING */
