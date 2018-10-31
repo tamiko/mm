@@ -124,8 +124,7 @@ Init2       BYTE        "'",10,0
 
             .section .init,"ax",@progbits
             PREFIX      :MM:__SYS:
-BinaryRead  IS          :BinaryRead
-BinaryWrite IS          :BinaryWrite
+BinaryReadWrite IS      :BinaryReadWrite
 
             GETA        $0,:MM:__SYS:WorkerDirec
             LDO         $0,$0,0
@@ -146,7 +145,7 @@ BinaryWrite IS          :BinaryWrite
             PUSHJ       $2,:MM:__MEM:Copy
 
             GETA        $3,:MM:__INTERNAL:Buffer
-            SET         $4,BinaryWrite
+            SET         $4,BinaryReadWrite
             PUSHJ       $2,:MM:__FILE:OpenJ
             JMP         4F
             GETA        $3,:MM:__SYS:HandleWrite
@@ -159,7 +158,7 @@ BinaryWrite IS          :BinaryWrite
             PUSHJ       $2,:MM:__MEM:Copy
 
             GETA        $3,:MM:__INTERNAL:Buffer
-            SET         $4,BinaryRead
+            SET         $4,BinaryReadWrite
             PUSHJ       $2,:MM:__FILE:OpenJ
             JMP         4F
             GETA        $3,:MM:__SYS:HandleRead
