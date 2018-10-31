@@ -258,7 +258,10 @@ Unlock      SET         $3,arg0
 %   arg1 - mode
 %   retm - file handle on success / 0 on error
 %
+            .section .data,"wa",@progbits
+OpenBuffer  OCTA        #0,#0
 
+            .section .text,"ax",@progbits
             .global :MM:__FILE:OpenTable
             .global :MM:__FILE:OpenJ
             % A lot of table...
@@ -284,7 +287,7 @@ OpenJ       GET         $6,:rJ
 1H          ORL         arg1,#8
             STB         arg1,pool,fh
             ANDNL       arg1,#8
-            GETA        $4,:MM:__INTERNAL:Buffer
+            GETA        $4,OpenBuffer % we already hold the PoolMutex
             STO         arg0,$4,0
             STO         arg1,$4,8
             SLU         $3,fh,3 % *8
