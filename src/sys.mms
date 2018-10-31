@@ -39,9 +39,13 @@
             .section .data,"wa",@progbits
             .balign 8
             .global :MM:__SYS:WorkerDirec
+            .global :MM:__SYS:HandleWrite
+            .global :MM:__SYS:HandleRead
             .global :MM:__SYS:AtErrorAddr
             PREFIX      :MM:__SYS:
 WorkerDirec OCTA        #0000000000000000
+HandleWrite OCTA        #FFFFFFFFFFFFFFFF
+HandleRead  OCTA        #FFFFFFFFFFFFFFFF
 AtErrorAddr OCTA        #0000000000000000
 
             .section .text,"ax",@progbits
@@ -107,7 +111,63 @@ AtError     GETA        $1,:MM:__SYS:AtErrorAddr
 %
 % Set up worker:
 %
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__SYS:STRS:
+            .balign 4
+InputFIFO   BYTE "/worker.stdin.fifo",0
+            .balign 4
+OutputFIFO  BYTE "/worker.stdout.fifo",0
+            .balign 4
+Init1       BYTE        "__SYS:Init failed. Unable to open '"
+            .balign 4
+Init2       BYTE        "'",10,0
 
             .section .init,"ax",@progbits
             PREFIX      :MM:__SYS:
-            SWYM
+BinaryRead  IS          :BinaryRead
+BinaryWrite IS          :BinaryWrite
+
+            GETA        $0,:MM:__SYS:WorkerDirec
+            LDO         $0,$0,0
+            BZ          $0,1F
+            ADDU        $0,$0,17
+            SET         $2,$0
+            PUSHJ       $1,:MM:__STRING:Size
+
+            SET         $3,$0
+            GETA        $4,:MM:__INTERNAL:Buffer
+            ADDU        $5,$1,1
+            PUSHJ       $2,:MM:__MEM:Copy
+
+            GETA        $3,:MM:__SYS:STRS:InputFIFO
+            GETA        $4,:MM:__INTERNAL:Buffer
+            ADDU        $4,$4,$1
+            SET         $5,19
+            PUSHJ       $2,:MM:__MEM:Copy
+
+            GETA        $3,:MM:__INTERNAL:Buffer
+            SET         $4,BinaryWrite
+            PUSHJ       $2,:MM:__FILE:OpenJ
+            JMP         4F
+            GETA        $3,:MM:__SYS:HandleWrite
+            STO         $2,$3
+
+            GETA        $3,:MM:__SYS:STRS:OutputFIFO
+            GETA        $4,:MM:__INTERNAL:Buffer
+            ADDU        $4,$4,$1
+            SET         $5,19
+            PUSHJ       $2,:MM:__MEM:Copy
+
+            GETA        $3,:MM:__INTERNAL:Buffer
+            SET         $4,BinaryRead
+            PUSHJ       $2,:MM:__FILE:OpenJ
+            JMP         4F
+            GETA        $3,:MM:__SYS:HandleRead
+            STO         $2,$3
+
+            JMP         1F
+4H          GETA        $2,:MM:__SYS:STRS:Init1
+            GETA        $3,:MM:__INTERNAL:Buffer
+            GETA        $4,:MM:__SYS:STRS:Init2
+            PUSHJ       $1,:MM:__ERROR:IError3 % does not return
+1H          SWYM

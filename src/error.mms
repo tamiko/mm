@@ -228,6 +228,28 @@ IError2     PUSHJ       t,:MM:__INTERNAL:EnterCritical
 
 
 %%
+% :MM:__ERROR:IError3
+%   Print an internal error message and terminate the program.
+%
+% PUSHJ, JMP:
+%   arg0 - address of an error string
+%   arg1 - address of an error string
+%   - routine does not return -
+%
+            .global :MM:__ERROR:IError3
+IError3     PUSHJ       t,:MM:__INTERNAL:EnterCritical
+            GETA        $255,:MM:__ERROR:STRS:InternErro
+            TRAP        0,Fputs,StdErr
+            SET         $255,arg0
+            TRAP        0,Fputs,StdErr
+            SET         $255,arg1
+            TRAP        0,Fputs,StdErr
+            SET         $255,arg2
+            TRAP        0,Fputs,StdErr
+            PUSHJ       t,:MM:__SYS:Abort
+
+
+%%
 % :MM:__ERROR:IError4R3
 %   Print an internal error message and terminate the program.
 %
