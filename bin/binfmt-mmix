@@ -26,10 +26,14 @@ set -u
 
 saved_state="$(stty -g)"
 temporary="$(mktemp -d "/dev/shm/$(basename $1).XXXXXXXX")"
+worker_pid=
 
 function cleanup {
   stty "${saved_state}"
   rm -r "${temporary}"
+  if [ -n "${worker_pid}" ]; then
+    kill -9 ${worker_pid}
+  fi
 }
 trap cleanup EXIT
 
@@ -112,7 +116,9 @@ if $spawn_worker; then
   mkfifo "$temporary/worker.stdin.fifo"
   mkfifo "$temporary/worker.stdout.fifo"
   worker &
+  worker_pid=$!
   args=( "${args[0]}" "__mm_init_worker=$temporary" "${args[@]:1}" )
 fi
 
 mmix "${interpret[@]}" "${args[@]}"
+exit $?
