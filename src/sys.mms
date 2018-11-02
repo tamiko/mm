@@ -197,7 +197,10 @@ BinaryReadWrite IS      :BinaryReadWrite
             PREFIX      :MM:__SYS:STRS:
             .balign 4
 Command1    BYTE        "Sys:Command failed. Worker not connected.'",10,0
+            PREFIX      :MM:__SYS:
             .balign 4
+end_cmd     BYTE        10,"echo __mm_end_of_output=4MCyxzd0",10,0
+
 
             .section .text,"ax",@progbits
             .global     :MM:__SYS:Command
@@ -219,17 +222,27 @@ CommandJ    GETA        $1,HandleWrite
             GETA        t,HandleMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
             %
-            % Now execute the command:
+            % Now execute the command followed by "echo 4MCyxzd0" that we
+            % will use to determine whether we reached the end of the
+            % output:
             %
             SET         $5,$1
             SET         $6,$0
             PUSHJ       $4,:MM:__FILE:Puts
+            SET         $5,$1
+            GETA        $6,end_cmd
+            PUSHJ       $4,:MM:__FILE:Puts
             %
             % We are in a bit of a pickle here: We do not know the final
             % size of the program output before reading it from the FIFO in
-            % its entirety. So let us allocate a generous temporary 1MiB
-            % buffer that we (iteratively) realloc to 8 times its size if
-            % it becomes necessary:
+            % its entirety. We also do not know whether we will short read,
+            % or try to read past the end (which will block the program).
+            % As a heuristic we wait to read exactly 1C bytes and check
+            % whether this is the guard message.
+            %
+            % We allocate a generous temporary 1MiB buffer
+            % that we (iteratively) realloc to 8 times its size if it
+            % becomes necessary:
             %
             SETML       $6,#10
             PUSHJ       $5,:MM:__POOL:Alloc
@@ -243,19 +256,34 @@ CommandJ    GETA        $1,HandleWrite
             SUBU        $10,$6,$4
             PUSHJ       $7,:MM:__FILE:Gets
             ADDU        $4,$4,$7
+            SUBU        $8,$7,#1C
+            BZ          $8,1F % We might have read the guard message
             ADDU        $7,$4,1
             CMP         $7,$6,$7
-            BNZ         $7,1F
-            % We have exhausted the buffer.
-            SLU         $6,$6,1
+            BNZ         $7,2B
+            % We have exhausted the buffer, increase it by a factor of 4:
+            SLU         $6,$6,2
             SET         $8,$5
             SET         $9,$6
             PUSHJ       $7,:MM:__POOL:Realloc
             SET         $5,$7
             JMP         2B
+            % Check that we actually read the guard:
+1H          GETA        $8,end_cmd
+            INCL        $8,6
+            ADDU        $9,$5,$4
+            SUBU        $9,$9,#1C
+            SET         $10,#1C
+            PUSHJ       $7,:MM:__MEM:Cmp
+            BNZ         $7,2B
+            % Remove the guard message and fix up the string:
+            SUBU        $4,$4,#1C
+            ADDU        $7,$5,$4
+            SET         $8,#0
+            STB         $8,$7
             % Do a final allocation with the actual string size and copy
             % over:
-1H          ADDU        $7,$4,1
+            ADDU        $7,$4,1
             PUSHJ       $6,:MM:__POOL:Alloc
             SET         $8,$5
             SET         $9,$6

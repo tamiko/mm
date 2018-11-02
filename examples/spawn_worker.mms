@@ -10,7 +10,7 @@
 
             .data
             .align 4
-cmd_str     BYTE "uname -a",10,0
+cmd_str     BYTE "free -m",10,0
 
             .text
             .global Main
