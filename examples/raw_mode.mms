@@ -64,13 +64,8 @@ Main        SWYM
 
             BN          $0,1B
 
-            %
-            % Right shift the byte into least significant position:
-            %
-
             GETA        $0,Buffer
-            LDO         $0,$0,0
-            SRU         $0,$0,56
+            LDB         $0,$0,0
 
             %
             % Check whether 'q' was pressed:
