@@ -228,8 +228,8 @@ CommandJ    GETA        $1,HandleWrite
             % We are in a bit of a pickle here: We do not know the final
             % size of the program output before reading it from the FIFO in
             % its entirety. So let us allocate a generous temporary 1MiB
-            % buffer that we realloc to 8 times the size if it becomes
-            % necessary:
+            % buffer that we (iteratively) realloc to 8 times its size if
+            % it becomes necessary:
             %
             SETML       $6,#10
             PUSHJ       $5,:MM:__POOL:Alloc
@@ -246,25 +246,25 @@ CommandJ    GETA        $1,HandleWrite
             ADDU        $7,$4,1
             CMP         $7,$6,$7
             BNZ         $7,1F
-            % we have exhausted the buffer
+            % We have exhausted the buffer.
             SLU         $6,$6,1
             SET         $8,$5
             SET         $9,$6
             PUSHJ       $7,:MM:__POOL:Realloc
             SET         $5,$7
             JMP         2B
-            % do a final allocation with the actual string size, and
-            % deallocate the scratch area:
+            % Do a final allocation with the actual string size and copy
+            % over:
 1H          ADDU        $7,$4,1
             PUSHJ       $6,:MM:__POOL:Alloc
-            % $6 now contains our future return value
             SET         $8,$5
             SET         $9,$6
             ADDU        $10,$4,1
             PUSHJ       $7,:MM:__MEM:Copy
+            % Deallocate the scratch area:
             SET         $8,$5
             PUSHJ       $7,:MM:__POOL:Dealloc
-            SET         $0,$6
+            SET         $0,$6 % retm
             %
             % Release the HandleMutex and return:
             %
