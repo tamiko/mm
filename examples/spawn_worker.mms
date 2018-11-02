@@ -10,15 +10,16 @@
 
             .data
             .align 4
-command     BYTE "date",10,0
+cmd_str     BYTE "uname -a",10,0
 
             .text
             .global Main
 t           IS          :MM:t
 Main        SWYM
 
-            GETA        t,command
+            GETA        t,cmd_str
             PUSHJ       t,:MM:__SYS:CommandG
             PUSHJ       t,:MM:Print:StrG
 
+            SET         t,#0
             PUSHJ       t,MM:Sys:Exit
