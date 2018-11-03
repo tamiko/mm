@@ -46,7 +46,7 @@ Global register usage
 
 The library avoids unnecessary allocation of global registers by not using
 `LDA` instructions at the expense of a slight runtime overhead. The library
-allocated 3 global registers (`GREG`s) for internal use and an additional
+allocates 3 global registers (`GREG`s) for internal use and an additional
 global register `:MM:t` for calling library routines (see next section).
 
 
@@ -64,14 +64,14 @@ Suroutines come in a number of different variants.
 ```
             % Try to allocate a block of memory:
             SET         $1,[...]
-            PUSHJ       $0,:MM:Heap:AllocJ
+            PUSHJ       $0,:MM:Pool:AllocJ
             JMP         1F
             ... % Allocation was successful, continue normally.
 
      1H     ... % Allocation failed, error handling.
 ```
 
-* Subroutines that have at most one argument and at moste one return
+* Subroutines that have at most one argument and at most one return
   parameter come also in a variant with a trailing `G` which indicates that
   values are passed through the library specific temporary global register
   `:MM:t`. An example:
@@ -79,7 +79,7 @@ Suroutines come in a number of different variants.
             % Try to allocate a block of memory:
 t           IS          :MM:t
             SET         t,[...]
-            PUSHJ       t,:MM:Heap:AllocG
+            PUSHJ       t,:MM:Pool:AllocG
                         % Address of allocated memory in t
 ```
 
