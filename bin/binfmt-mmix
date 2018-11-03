@@ -16,9 +16,7 @@
 # (or whatever name you choose).
 #
 
-set -e
 set -u
-
 
 #
 # Cleanup:

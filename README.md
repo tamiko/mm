@@ -36,9 +36,9 @@ The temporary registers `$255` and `:MM:t`
   preserved.
 
 * Similarly, the library might use `:MM:t` internally.
-  Thus, when calling a library subroutine - even a non `G`-variant` - the
-  contents of `:MM:t` might not be preserved. (Subroutines try to preserve
-  the contents of `:MM:t`, though).
+  Thus, when calling a library subroutine - even a non `G`-variant - the
+  contents of `:MM:t` might not be preserved. (Subroutines generally try to
+  preserve the contents of `:MM:t`, though).
 
 
 Global register usage
