@@ -464,21 +464,30 @@ Dealloc     GET         $2,:rJ
 1H          LDO         $4,$0,0
             SUBU        $4,$4,$0
             SRU         $5,$4,spread_shft
+#ifdef __SORT_FREELIST
+            % We sort the element into the free list by starting at the
+            % *end* of the corresponding bin. Thus find the next higher bin
+            % and "LDO ...,...,3*OCT" to move backwards.
             INCL        $5,#1
+#endif
             SET         $6,no_entries-1
             CMP         $6,$6,$5
             CSN         $5,$6,#0
             SLU         $5,$5,5
             GETA        $6,:MM:__RAW_POOL:Pool
             ADDU        $6,$6,$5
+#ifdef __SORT_FREELIST
             % Sort by size:
 2H          LDO         $6,$6,3*OCT
             INCREMENT_COUNTER :MM:__STATISTICS:HeapTotPlac
             LDO         $7,$6,0
             SUBU        $7,$7,$6
             CMP         $5,$7,$4
-#ifdef __SORT_FREELIST
             BP          $5,2B
+#else
+            % In case we do not sort the free list, put the element into
+            % first position of the corresponding bin:
+            LDO         $6,$6,2*OCT
 #endif
             % Put into list:
             LDO         $5,$6,2*OCT % next
