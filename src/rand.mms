@@ -59,6 +59,10 @@ ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             PREFIX      :MM:__RAND:
 FileHandle  OCTA        #FFFFFFFFFFFFFFFF
             .balign 8
+BufferMutex OCTA        #0000000000000000
+            .balign 8
+Buffer      IS          @
+            .fill 16
 
 
             .section .init,"ax",@progbits
@@ -96,8 +100,8 @@ OCT         IS          #8
             % Arguments for Fread:
             .global :MM:__RAND:Octa
 Octa        GET         $0,:rJ
-            GETA        $1,:MM:__INTERNAL:BufferMutex
-            GETA        $2,:MM:__INTERNAL:Buffer
+            GETA        $1,:MM:__RAND:BufferMutex
+            GETA        $2,:MM:__RAND:Buffer
             SET         $4,$1
             PUSHJ       $3,:MM:__THREAD:LockMutex
             GETA        $4,:MM:__RAND:FileHandle
