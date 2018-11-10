@@ -68,6 +68,12 @@ ExcNotImpl  BYTE        "I'm sorry Dave. I'm afraid I can't do that "
             .balign 4
 Generic     BYTE        "Something went horribly wrong...",10,0
 
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__ERROR:
+            .balign 8
+Buffer      IS          @
+            .fill 128*8
+
             .section .text,"ax",@progbits
             PREFIX      :MM:__ERROR:
 Fputs       IS          :Fputs
@@ -92,7 +98,7 @@ arg4        IS          $4
             .global     :MM:__ERROR:ErrByteG
 buffer      IS          $1
 ErrByteG    SET         arg0,t
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__ERROR:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -127,7 +133,7 @@ ErrRegG     SET         $0,t
             SET         $2,8
             ADD         $5,$1,$1
             ADD         $6,$2,$2
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__ERROR:Buffer
             SET         $3,0
             STB         $3,buffer,17
 1H          SET         $4,$0 % save original value
