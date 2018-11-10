@@ -34,6 +34,14 @@
             .balign 4
 Ln          BYTE        10,0
 
+            .section .data,"wa",@progbits
+            PREFIX      :MM:__PRINT:
+            .balign 8
+BufferMutex OCTA        #0000000000000000
+            .balign 8
+Buffer      IS          @
+            .fill 128*8
+
 
             .section .text,"ax",@progbits
             PREFIX      :MM:__PRINT:
@@ -116,9 +124,9 @@ RegLn       SET         $1,0
 RegLnP      ADD         $5,$1,$1
             ADD         $6,$2,$2
             GET         $10,:rJ
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__PRINT:Buffer
             SET         $3,10 % newline
             STB         $3,buffer,17
             SET         $3,0
@@ -130,9 +138,9 @@ Reg         SET         $1,0
 RegP        ADD         $5,$1,$1
             ADD         $6,$2,$2
             GET         $10,:rJ
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__PRINT:Buffer
             SET         $3,0
             STB         $3,buffer,17
 1H          SET         $4,$0 % save original value
@@ -154,7 +162,7 @@ RegP        ADD         $5,$1,$1
             STB         $3,buffer,0
             SET         $255,buffer
             TRAP        0,Fputs,StdOut
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$10
             SET         t,$4 % restore original value
@@ -179,9 +187,9 @@ RegP        ADD         $5,$1,$1
 buffer      IS          $1
 ByteG       SET         arg0,t
 Byte        GET         $10,:rJ
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__PRINT:Buffer
             SET         $2,'#'
             STB         $2,buffer,0
             SET         $2,0
@@ -201,7 +209,7 @@ Byte        GET         $10,:rJ
             STB         $2,buffer,1
             SET         $255,buffer
             TRAP        0,Fputs,StdOut
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$10
             SET         t,$0 % restore original value
@@ -228,9 +236,9 @@ ptr         IS          $2
 carry       IS          $3
 UnsignedG   SET         arg0,t
 Unsigned    GET         $10,:rJ
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__PRINT:Buffer
             SET         ptr,128*8-1
             SET         t,0
             STB         t,buffer,ptr
@@ -252,7 +260,7 @@ Unsigned    GET         $10,:rJ
 2H          ADDU        $255,buffer,ptr
             ADDU        $255,$255,1
             TRAP        0,Fputs,StdOut
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$10
             SET         t,$0 % restore original value
@@ -279,15 +287,15 @@ Signed      GET         $2,:rJ
             BN          arg0,1F
             PUSHJ       t,UnsignedG
             JMP         2F
-1H          GETA        t,:MM:__INTERNAL:BufferMutex
+1H          GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:LockMutexG
-            GETA        buffer,:MM:__INTERNAL:Buffer
+            GETA        buffer,:MM:__PRINT:Buffer
             STCO        0,buffer,0
             SET         t,'-'
             STB         t,buffer,0
             SET         $255,buffer
             TRAP        0,Fputs,StdOut
-            GETA        t,:MM:__INTERNAL:BufferMutex
+            GETA        t,:MM:__PRINT:BufferMutex
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             NEG         t,$0
             PUSHJ       t,UnsignedG

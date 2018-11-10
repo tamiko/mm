@@ -138,17 +138,17 @@ BinaryReadWrite IS      :BinaryReadWrite
             PUSHJ       $1,:MM:__STRING:Size
 
             SET         $3,$0
-            GETA        $4,:MM:__INTERNAL:Buffer
+            GETA        $4,:MM:__SYS:Buffer
             ADDU        $5,$1,1
             PUSHJ       $2,:MM:__MEM:Copy
 
             GETA        $3,:MM:__SYS:STRS:InputFIFO
-            GETA        $4,:MM:__INTERNAL:Buffer
+            GETA        $4,:MM:__SYS:Buffer
             ADDU        $4,$4,$1
             SET         $5,19
             PUSHJ       $2,:MM:__MEM:Copy
 
-            GETA        $3,:MM:__INTERNAL:Buffer
+            GETA        $3,:MM:__SYS:Buffer
             SET         $4,BinaryReadWrite
             PUSHJ       $2,:MM:__FILE:OpenJ
             JMP         4F
@@ -156,12 +156,12 @@ BinaryReadWrite IS      :BinaryReadWrite
             STO         $2,$3
 
             GETA        $3,:MM:__SYS:STRS:OutputFIFO
-            GETA        $4,:MM:__INTERNAL:Buffer
+            GETA        $4,:MM:__SYS:Buffer
             ADDU        $4,$4,$1
             SET         $5,20
             PUSHJ       $2,:MM:__MEM:Copy
 
-            GETA        $3,:MM:__INTERNAL:Buffer
+            GETA        $3,:MM:__SYS:Buffer
             SET         $4,BinaryReadWrite
             PUSHJ       $2,:MM:__FILE:OpenJ
             JMP         4F
@@ -170,7 +170,7 @@ BinaryReadWrite IS      :BinaryReadWrite
 
             JMP         1F
 4H          GETA        $2,:MM:__SYS:STRS:Init1
-            GETA        $3,:MM:__INTERNAL:Buffer
+            GETA        $3,:MM:__SYS:Buffer
             GETA        $4,:MM:__SYS:STRS:Init2
             PUSHJ       $1,:MM:__ERROR:IError3 % does not return
 1H          SWYM
@@ -200,6 +200,10 @@ Command1    BYTE        "Sys:Command failed. Worker not connected.'",10,0
             PREFIX      :MM:__SYS:
             .balign 4
 end_cmd     BYTE        10,"echo __mm_end_of_output=4MCyxzd0",10,0
+            .balign 8
+Buffer      IS          @
+            .fill 128*8
+
 
 
             .section .text,"ax",@progbits

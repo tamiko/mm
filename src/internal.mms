@@ -25,21 +25,6 @@
 %%
 
             %
-            % Set up an internal buffer and associated mutex that can be
-            % used for various purposes.
-            %
-
-            .section .data,"wa",@progbits
-            .global :MM:__INTERNAL:BufferMutex
-            .global :MM:__INTERNAL:Buffer
-            PREFIX      :MM:__INTERNAL:
-            .balign 8
-BufferMutex OCTA        #0000000000000000
-            .balign 8
-Buffer      IS          @
-            .fill 128*8
-
-            %
             % A global register used for passing arguments to G variant
             % subroutines:
             %
