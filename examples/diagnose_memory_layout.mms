@@ -1,6 +1,7 @@
 %
 %
 %
+            .global MM:Interpreter:SPAWN_WORKER
 
             .section .text,"ax",@progbits
 

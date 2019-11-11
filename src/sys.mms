@@ -304,8 +304,7 @@ CommandJ    GETA        $1,HandleWrite
             PUSHJ       t,:MM:__THREAD:UnlockMutexG
             PUT         :rJ,$3
             POP         1,1
-9H          PUT         :rJ,$3
-            POP         0,0
+9H          POP         0,0
 
 
 Command     GET         $1,:rJ
