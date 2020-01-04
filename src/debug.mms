@@ -152,6 +152,7 @@ PrintMemory GET         $0,:rJ
             PUSHJ       t,:MM:__PRINT:StrG
             SET         t,$3
             PUSHJ       t,:MM:__PRINT:RegG
+            SWYM
             GETA        t,STRS:pool2
             PUSHJ       t,:MM:__PRINT:StrG
             LDO         t,$3,0
