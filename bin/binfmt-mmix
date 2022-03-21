@@ -19,11 +19,31 @@
 set -u
 
 #
+# Debug output
+#
+
+debug=false
+
+function debug_print {
+  if ${debug}; then
+    echo "${@}"
+  fi
+}
+
+function debug_print_variable {
+  if ${debug}; then
+    echo "${1}: »${!1}«"
+  fi
+}
+
+#
 # Cleanup:
 #
 
 saved_state="$(stty -g)"
+debug_print_variable saved_state
 temporary="$(mktemp -d "/dev/shm/$(basename $1).XXXXXXXX")"
+debug_print_variable temporary
 worker_pid=
 
 function cleanup {
@@ -68,6 +88,11 @@ until [[ "$@" == "" ]]; do
   shift
 done
 
+debug_print "Options after variable expansion"
+debug_print_variable tty_raw_mode
+debug_print_variable tty_noblock
+debug_print_variable spawn_worker
+
 
 #
 # If possible, query binary for configuration options:
@@ -89,34 +114,46 @@ if command -v mmix-objdump >/dev/null 2>&1; then
 
 fi
 
+debug_print "Options after examining object file"
+debug_print_variable tty_raw_mode
+debug_print_variable tty_noblock
+debug_print_variable spawn_worker
+
 
 #
 # Set up environment and call interpreter:
 #
 
 if $tty_raw_mode; then
+  debug_print "\$ stty raw -echo"
   stty raw -echo
 fi
 
 if $tty_noblock; then
+  debug_print "\$ stty -icanon min 0 time 0"
   stty -icanon min 0 time 0
 fi
 
 function worker {
   while true; do
     if read line < "$temporary/worker.stdin.fifo"; then
+      debug_print "[worker] read line"
       bash -c "$line" > "$temporary/worker.stdout.fifo" 2> /dev/null
     fi
   done
 }
 
 if $spawn_worker; then
+  debug_print "[worker] spawn worker"
   mkfifo "$temporary/worker.stdin.fifo"
   mkfifo "$temporary/worker.stdout.fifo"
   worker &
   worker_pid=$!
   args=( "${args[0]}" "__mm_init_worker=$temporary" "${args[@]:1}" )
 fi
+
+debug_print "Interpreter arguments: " "${interpret[@]}"
+debug_print "Executable arguments:  " "${args[@]}"
 
 mmix "${interpret[@]}" "${args[@]}"
 exit $?
