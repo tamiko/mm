@@ -88,16 +88,14 @@
 %
 
 %
-% __SORT_FREELIST
-% if defined the free list is kept sorted. This is an O(1) operation in
+% If defined the free list is kept sorted. This is an O(1) operation in
 % case __ALIGN_TO_SPREAD is set and the allocation is less or equal to
 % spread * no_entries.
 %
 #define __SORT_FREELIST
 
 %
-% __ENABLE_BINNING
-% if defined binning is disabled.
+% If defined binning is enabled.
 %
 #define __ENABLE_BINNING
 
@@ -109,9 +107,8 @@
 
 
 %
-% The free list pool is organized as a partially ordered,
-% doubly-linked list. Create 'no_entries' sentinels for a
-% spread of 'spread' bytes:
+% The free-list pool is organized as a partially ordered, doubly-linked
+% list. Create 'no_entries' sentinels for a spread of 'spread' bytes:
 %
             PREFIX      :MM:__RAW_POOL:
 spread      IS          #80
