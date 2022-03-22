@@ -77,11 +77,9 @@ ring6       BYTE        "] (ptr image)",10,0
             .balign 4
 ring7       BYTE        "] (UNSAVE address)",10,0
             .balign 4
-str_header  BYTE        "Diagnose startup",10,10,0
+str_header  BYTE        "Memory Layout:",10,0
             .balign 4
-str_header2 BYTE        "Library specific adresses:",10,10,0
-            .balign 4
-str_header3 BYTE        "Program parameters (argc, argv):",10,10,0
+str_header2 BYTE        "Program parameters (argc, argv):",10,0
             .balign 4
 str_text    BYTE        "    Text segment:              [ ",0
             .balign 4
@@ -426,28 +424,26 @@ PrintThread GET         $2,:rJ
             PUSHJ       $3,AddressOf
             PUSHJ       t,:MM:__PRINT:Ln
 
-            SET         $5,$2
-            GETA        $4,STRS:str_main
-            PUSHJ       $3,AddressOf
-            PUSHJ       t,:MM:__PRINT:Ln
-
-            GETA        t,STRS:str_header2
-            PUSHJ       t,:MM:__PRINT:StrG
-
             GETA        $5,:MM:__INIT:__entry
             GETA        $4,STRS:str_entry1
             PUSHJ       $3,AddressOf
             GETA        $5,:MM:__INIT:__trampoline
             GETA        $4,STRS:str_tramp
             PUSHJ       $3,AddressOf
-            GETA        $5,:MM:__INTERNAL:Guard
-            GETA        $4,STRS:str_entry3
-            PUSHJ       $3,AddressOf
             GETA        $5,:MM:__INIT:__init
             GETA        $4,STRS:str_entry2
             PUSHJ       $3,AddressOf
             PUSHJ       t,:MM:__PRINT:Ln
 
+            SET         $5,$2
+            GETA        $4,STRS:str_main
+            PUSHJ       $3,AddressOf
+            PUSHJ       t,:MM:__PRINT:Ln
+
+
+            GETA        $5,:MM:__INTERNAL:Guard
+            GETA        $4,STRS:str_entry3
+            PUSHJ       $3,AddressOf
             GETA        $5,:MM:__INTERNAL:TripHandler
             GETA        $4,STRS:str_hndl2
             PUSHJ       $3,AddressOf
@@ -479,7 +475,7 @@ PrintThread GET         $2,:rJ
             PUSHJ       t,:MM:__PRINT:StrG
             PUSHJ       t,:MM:__PRINT:Ln
 
-            GETA        t,STRS:str_header3
+            GETA        t,STRS:str_header2
             PUSHJ       t,:MM:__PRINT:StrG
 
             % argc:
@@ -504,5 +500,6 @@ PrintThread GET         $2,:rJ
             ADDU        $1,$1,#8
             BNZ         $0,1B
 
+            PUSHJ       t,:MM:__PRINT:Ln
             PUSHJ       t,:MM:__THREAD:Exit
 

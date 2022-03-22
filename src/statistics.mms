@@ -288,7 +288,8 @@ PrintStatistics SWYM
             PRINT_HIST  $4,$2,STRS:heap_hist4,64,1
             ADD         $1,$1,#0008
             JMP         1B
-9H          PUSHJ       t,:MM:__INTERNAL:LeaveCritical
+9H          PUSHJ       t,:MM:__PRINT:Ln
+            PUSHJ       t,:MM:__INTERNAL:LeaveCritical
             PUT         :rJ,$0
 #endif
             POP         0
