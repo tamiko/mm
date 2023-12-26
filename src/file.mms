@@ -198,7 +198,7 @@ Lock        SET         $3,arg0
             .global :MM:__FILE:UnlockG
             .global :MM:__FILE:Unlock
             % Select lowest byte:
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
 UnlockJ     CMPU        arg0,arg0,#FF
             GET         $5,:rJ
             GETA        t,:MM:__FILE:PoolMutex
@@ -267,7 +267,7 @@ OpenBuffer  OCTA        #0,#0
             % A lot of table...
 OpenTable
             build_table Fopen
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
 fh          IS          $3
 OpenJ       GET         $6,:rJ
             GETA        t,:MM:__FILE:PoolMutex
@@ -365,7 +365,7 @@ Open        CMPU        t,arg1,4
             .global :MM:__FILE:CloseJ
 CloseTable
             build_table Fclose
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
             % sanitize arg0:
 CloseJ      AND         arg0,arg0,#FF
             GET         $5,:rJ
@@ -454,7 +454,7 @@ Close       AND         $3,arg0,#FF
             .global :MM:__FILE:IsOpenJ
             .global :MM:__FILE:IsOpenG
             .global :MM:__FILE:IsOpen
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
 IsOpenJ     AND         arg0,arg0,#FF
             GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
@@ -495,7 +495,7 @@ IsOpen      GET         $1,:rJ
             .global :MM:__FILE:IsReadableJ
             .global :MM:__FILE:IsReadableG
             .global :MM:__FILE:IsReadable
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
 IsReadableJ AND         arg0,arg0,#FF
             GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0
@@ -537,7 +537,7 @@ IsReadable  GET         $1,:rJ
             .global :MM:__FILE:IsWritableJ
             .global :MM:__FILE:IsWritableG
             .global :MM:__FILE:IsWritable
-pool        IS          $2
+%pool        IS          $2 - redefinition with GNU AS
 IsWritableJ AND         arg0,arg0,#FF
             GETA        pool,:MM:__FILE:Pool
             LDBU        $1,pool,arg0

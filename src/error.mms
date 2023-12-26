@@ -126,7 +126,7 @@ ErrByteG    SET         arg0,t
 % ErrRegG - internally used
 %
             .global     :MM:__ERROR:ErrRegG
-buffer      IS          $1
+%buffer      IS          $1 - redefinition with GNU AS
 ptr         IS          $2
 ErrRegG     SET         $0,t
             SET         $1,0

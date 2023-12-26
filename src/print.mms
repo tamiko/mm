@@ -184,7 +184,7 @@ RegP        ADD         $5,$1,$1
 %
             .global :MM:__PRINT:Byte
             .global :MM:__PRINT:ByteG
-buffer      IS          $1
+%buffer      IS          $1 - redefinition with GNU AS
 ByteG       SET         arg0,t
 Byte        GET         $10,:rJ
             GETA        t,:MM:__PRINT:BufferMutex
@@ -231,8 +231,8 @@ Byte        GET         $10,:rJ
 %
             .global :MM:__PRINT:Unsigned
             .global :MM:__PRINT:UnsignedG
-buffer      IS          $1
-ptr         IS          $2
+%buffer      IS          $1 - redefinition with GNU AS
+%ptr         IS          $2 - redefinition with GNU AS
 carry       IS          $3
 UnsignedG   SET         arg0,t
 Unsigned    GET         $10,:rJ
