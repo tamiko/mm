@@ -43,8 +43,8 @@
             % we have to do the following PUSHJ/JMP dance with the help of
             % a (near) trampoline section.
             %
-            % Further let us explicitly assemble all returns here - this is
-            % very convenient for setting breakpoints.
+            % Furthermore, let us explicitly assemble all returns here -
+            % this is very convenient for setting breakpoints.
             %
 
             .section .data,"wa",@progbits
