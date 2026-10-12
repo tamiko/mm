@@ -5,12 +5,86 @@
 How to compile and run mmix programs
 ------------------------------------
 
-* TODO: mmix-ld
-* TODO: Compilation pipeline
+### Requirements
 
-* TODO: bin/
+* GNU binutils built for the `mmix` target (`mmix-as`, `mmix-ld`,
+  `mmix-ar`, `mmix-ranlib`, and optionally `mmix-objdump`)
+* The C preprocessor `cpp`
+* The `mmix` simulator from Knuth's MMIXware
+* `bash` for the scripts in `bin/`
 
-* TODO: binfmt
+### Building the library
+
+```
+cd lib && make
+```
+
+This compiles the library into `lib/libmm.a` and creates a number of
+special object files (`entry.o`, `mmi.o`, `guard.o` and `mmo.o`) that are
+used by the compiler/linker script for linking a final executable.
+
+### Compiling a program
+
+`bin/mmixc` is a small gcc-style driver around `cpp`, `mmix-as` and
+`mmix-ld`. It assumes to find `include/` and `lib/` relative to its own
+location.
+
+```
+export PATH="<path to this repository>/bin:$PATH"
+mmixc hello_world.mms -o hello_world.mmo
+mmix hello_world.mmo
+```
+
+Programs include the headers as `#include <mm/print>` and define a `Main`
+label. Run `mmixc -h` for the full list of options. The commonly used ones
+are `-c` (stop after assembling), `-E` (stop after preprocessing), `-v`
+(print each command), `-keep-tmp` (keep the intermediate files), and
+`-Wa,<opt>` / `-Wl,<opt>` to pass options to the assembler or linker.
+
+`mmixc` links in this order:
+
+```
+entry.o mmi.o <your objects> guard.o -lmm mmo.o
+```
+
+* `entry.o` puts the trip and exception vectors at `#00` and the program
+  entry point at `#F0`.
+* `mmi.o` and `mmo.o` open and close the `.init` section. Initialization
+  code that library units assemble into `.init` (the memory pool and the
+  thread ring) ends up between them and runs before `Main`.
+* `guard.o` follows the user code. A program that runs past its last
+  instruction instead of calling `:MM:Sys:Exit` hits the guard and aborts
+  with an error message, rather than falling into library code.
+
+To build all examples, run `make` in `examples/` (requires `mmixc` in
+`PATH`).
+
+### Running programs with `binfmt-mmix`
+
+`bin/binfmt-mmix` wraps the `mmix` simulator. It configures the terminal
+before the program starts and restores it afterwards. It recognizes three
+options, each written as `-mmix <option>` on its command line:
+
+* `-tty-raw-mode` puts the terminal in raw mode without echo.
+* `-tty-noblock` implies `-tty-raw-mode` and makes reads non-blocking.
+* `-spawn-worker` starts a helper process that runs shell commands for
+  `:MM:__SYS:Command` (see `examples/spawn_worker.mms` for an example).
+
+Any other `-mmix <option>` is passed through to the simulator. A program
+can also request these modes itself by declaring one of the global symbols
+`MM:Interpreter:TTY_RAW_MODE`, `MM:Interpreter:TTY_NOBLOCK` or
+`MM:Interpreter:SPAWN_WORKER` (see `examples/raw_mode.mms`). The wrapper
+looks for these symbols with `mmix-objdump`, so this only works if
+`mmix-objdump` is available in `PATH`.
+
+On Linux, `binfmt-mmix` can be registered with `binfmt_misc` so that
+`.mmo` files run directly:
+
+```
+echo ":mmix:E::mmo::<path to binfmt-mmix>:" > /proc/sys/fs/binfmt_misc/register
+```
+
+or permanently by putting the same line into `/etc/binfmt.d/mmix.conf`.
 
 
 Dynamic memory allocation in `:PoolSegment`
