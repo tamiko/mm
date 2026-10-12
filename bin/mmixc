@@ -32,14 +32,14 @@ lib_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../lib"
 cpp=cpp
 cpp_args=( "-D__GNU_AS" "-D__MMIXWARE" "-I$include_dir" )
 as=mmix-as
-as_args=( "-g" "-x" "-linker-allocated-gregs" )
+as_args=( "-g" "-x" "--linker-allocated-gregs" )
 ld=mmix-ld
 ld_args=( "-g" )
 ld_args_pre=( "$lib_dir/entry.o" "$lib_dir/mmi.o" )
 ld_args_post=( "$lib_dir/guard.o" "-L$lib_dir" "-lmm" "$lib_dir/mmo.o" )
 out_file=
-
-tmpdir="$(mktemp -d /tmp/mmixc.XXXXXXXXXX)"
+src_files=()
+obj_files=()
 
 verbose=false
 preprocess_only=false
@@ -55,7 +55,7 @@ print_help() {
   echo "  -I<directory>  : add directory to the list of include directories passed to cpp"
   echo "  -L<directory>  : add directory to the list of library directories passed to mmix-ld"
   echo "  -l<archive>    : an archive to link against (passed to mmix-ld)"
-  echo "  -o <filename>  : filename of linked proglram (passed to mmix-ld)"
+  echo "  -o <filename>  : filename of linked program (passed to mmix-ld)"
   echo "  -E             : only run preprocessor (cpp) on given source files (creates *.i files)"
   echo "  -c             : preprocessor (cpp) and assembler (mmix-as) on given source files (creates *.o files)"
   echo "  -keep-tmp      : keep temporary directories (implies -verbose)"
@@ -69,7 +69,7 @@ print_help() {
   echo "  mmix-ld: ${ld_args[@]}"
 }
 
-until [[ "$@" == "" ]]; do
+while (( $# )); do
   if  [[ "$1" == -Wa,* ]]; then
     as_args+=( "${1##-Wa,}" )
   elif  [[ "$1" == -Wl,* ]]; then
@@ -79,11 +79,15 @@ until [[ "$@" == "" ]]; do
   elif [[ "$1" == -L* || "$1" == -l* ]]; then
     ld_args+=( "$1" )
   elif [[ "$1" == "-o" ]]; then
+    if (( $# < 2 )); then
+      echo "mmixc: option -o requires an argument" >&2
+      exit 1
+    fi
     shift
     out_file="$1"
   elif [[ "$1" == "-h" || "$1" == "-help" ]]; then
     print_help
-    exit 1
+    exit 0
   elif [[ "$1" == "-v" || "$1" == "-verbose" ]]; then
     verbose=true
   elif [[ "$1" == "-E" ]]; then
@@ -93,6 +97,9 @@ until [[ "$@" == "" ]]; do
   elif [[ "$1" == "-keep-tmp" || "$1" == "-save-tmps" ]]; then
     keep_tmp=true
     verbose=true
+  elif [[ "$1" == "" ]]; then
+    echo "mmixc: empty file name" >&2
+    exit 1
   else
     if  [[ "$1" == *.o ]]; then
       ld_args_pre+=( "$1" )
@@ -107,29 +114,31 @@ if [[ "$out_file" == "" ]]; then
   out_file="a.mmo"
 fi
 
-$keep_tmp && echo "Temporary directory \"$tmpdir\" preserved."
+tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/mmixc.XXXXXXXXXX")"
 
-for i in "${src_files[@]}"; do
-  pre="$tmpdir/$(basename -s .mms $i)$RANDOM.i"
-  $preprocess_only && pre=$(basename -s .mms $i).i
-  obj="$tmpdir/$(basename -s .mms $i)$RANDOM.o"
-  $compile_only && obj=$(basename -s .mms $i).o
+cleanup() {
+  if $keep_tmp; then
+    echo "Temporary directory \"$tmpdir\" preserved."
+  else
+    rm -rf "$tmpdir"
+  fi
+}
+trap cleanup EXIT
+
+for i in "${src_files[@]:+${src_files[@]}}"; do
+  base="$(basename -s .mms "$i")"
+  pre="$tmpdir/$base$RANDOM.i"
+  $preprocess_only && pre="$base.i"
+  obj="$tmpdir/$base$RANDOM.o"
+  $compile_only && obj="$base.o"
 
   obj_files+=( "$obj" )
 
-  $verbose && echo "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"
-  if "$cpp" "${cpp_args[@]:+${cpp_args[@]}}" "$i" -o "$pre"; then
-    if ! $preprocess_only; then
-      $verbose && echo "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"
-      if ! "$as" "${as_args[@]:+${as_args[@]}}" "$pre" -o "$obj"; then
-        $keep_tmp || rm -rf "$tmpdir"
-        exit 1
-      fi
-    fi
-
-  else
-    $keep_tmp || rm -rf "$tmpdir"
-    exit 1
+  $verbose && echo "$cpp" "${cpp_args[@]}" "$i" -o "$pre"
+  "$cpp" "${cpp_args[@]}" "$i" -o "$pre" || exit 1
+  if ! $preprocess_only; then
+    $verbose && echo "$as" "${as_args[@]}" "$pre" -o "$obj"
+    "$as" "${as_args[@]}" "$pre" -o "$obj" || exit 1
   fi
 done
 
@@ -138,13 +147,6 @@ if ! $compile_only && ! $preprocess_only; then
   $verbose && echo "$ld" -o "$out_file" "${ld_args[@]}" "${ld_args_pre[@]}" \
     "${obj_files[@]:+${obj_files[@]}}" "${ld_args_post[@]}"
 
-  if "$ld" -o "$out_file" "${ld_args[@]}" "${ld_args_pre[@]}" "${obj_files[@]:+${obj_files[@]}}" \
-    "${ld_args_post[@]}" ; then
-    $keep_tmp || rm -rf "$tmpdir"
-  else
-    $keep_tmp || rm -rf "$tmpdir"
-    exit 1
-  fi
+  "$ld" -o "$out_file" "${ld_args[@]}" "${ld_args_pre[@]}" \
+    "${obj_files[@]:+${obj_files[@]}}" "${ld_args_post[@]}" || exit 1
 fi
-
-$keep_tmp || rm -rf "$tmpdir"
