@@ -1,0 +1,83 @@
+From 6e92100d3c17acccbe78f2fff3ddf7d8f1c858fa Mon Sep 17 00:00:00 2001
+From: Matthias Maier <tamiko@43-1.org>
+Date: Thu, 4 Jan 2018 12:58:22 -0600
+Subject: [PATCH] mmix-sim: trip when the interval counter rI runs out
+
+When the interval counter rI drops to 4 or below, raise a trip to
+location #00 and reset rI to -1, instead of stopping at an interactive
+breakpoint. rI now starts at -1, so the trip only fires after a program
+sets rI.
+
+Also remove the privileged-instruction check for PUT to special
+registers 12 to 18 (rI, rT, rTT, rK, rQ, rU, rV), so user programs can
+set rI. The MM library uses this for preemptive threading.
+---
+ mmix-sim.w | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/mmix-sim.w b/mmix-sim.w
+index 24372a8..0b77b02 100644
+--- a/mmix-sim.w
++++ b/mmix-sim.w
+@@ -1371,6 +1371,7 @@ the master switch that controls most of the action.
+   @t\4@>@<Cases for individual \MMIX\ instructions@>;
+   }
+   @<Check for trip interrupt@>;
++  @<Clock trip>@>;
+   @<Update the clocks@>;
+   @<Trace the current instruction, if requested@>;
+   if (resuming && op!=RESUME) resuming=false;
+@@ -1802,6 +1803,7 @@ fail in February of 2106.)
+ @d SUBSUBVERSION 3 /* further qualification to version number */
+ 
+ @<Initialize...@>=
++g[rI]=neg_one;
+ g[rK]=neg_one;
+ g[rN].h=(VERSION<<24)+(SUBVERSION<<16)+(SUBSUBVERSION<<8);
+ g[rN].l=ABSTIME; /* see comment and warning above */
+@@ -2114,7 +2116,6 @@ case PBNP: case PBNPB: case PBEV: case PBEVB:@/
+  if (good) good_guesses++;
+  else {
+    bad_guesses++, sclock.l+=2; /* penalty is $2\upsilon$ for bad guess */
+-   if (g[rI].l<=2 && g[rI].l && g[rI].h==0) tracing=breakpoint=true;
+    g[rI]=incr(g[rI],-2);
+  }
+  break;
+@@ -2203,7 +2204,6 @@ case PUT: case PUTI:@+ if (yy!=0 || xx>=32) goto illegal_inst;
+   strcpy(rhs,"%z = %#z");
+   if (xx>=8) {
+     if (xx<=11 && xx!=8) goto illegal_inst; /* can't change rN, rO, rS */
+-    if (xx<=18) goto privileged_inst;
+     if (xx==rA) @<Get ready to update rA@>@;
+     else if (xx==rL) @<Set $L=z=\min(z,L)$@>@;
+     else if (xx==rG) @<Get ready to update rG@>;
+@@ -2591,6 +2591,21 @@ if (exc) {
+   g[rA].l |= exc>>8;
+ }
+ 
++@ @<Clock trip>@>=
++if (g[rI].l<=4 && g[rI].h==0) {
++  tripping=true;
++  k=0;
++  exc&=~(H_BIT>>k);
++  g[rW]=inst_ptr;
++  inst_ptr.h=0, inst_ptr.l=0;
++  g[rX].h=sign_bit, g[rX].l=TRAP;
++  g[rY]=g[rI];
++  g[rZ]=sclock;
++  g[rB]=g[255];
++  g[255]=g[rJ];
++  g[rI]=neg_one;
++}
++
+ @ @<Initiate a trip interrupt@>=
+ {
+   tripping=true;
+@@ -2659,7 +2674,6 @@ if (sclock.l || sclock.h || !resuming) {
+       g[rU].l++;
+       if (g[rU].l==0)@+{@+g[rU].h++;@+if ((g[rU].h&0x7fff)==0) g[rU].h-=0x8000;@+}
+   } /* usage counter counts matched instructions simulated */
+-  if (g[rI].l<=info[op].oops && g[rI].l && g[rI].h==0) tracing=breakpoint=true;
+   g[rI]=incr(g[rI],-info[op].oops); /* interval $\upsilon$ timer counts down */
+ }
+ 

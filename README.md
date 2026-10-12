@@ -86,6 +86,44 @@ echo ":mmix:E::mmo::<path to binfmt-mmix>:" > /proc/sys/fs/binfmt_misc/register
 
 or permanently by putting the same line into `/etc/binfmt.d/mmix.conf`.
 
+### Patched simulator for preemptive threading
+
+Preemptive threading (`:MM:Thread:Enable`, used by
+`examples/threading.mms`) sets the interval counter `:rI` and expects a
+trip when it runs out. The stock `mmix` simulator treats `PUT :rI` as a
+privileged instruction and stops with "privileged instruction!".
+`patches/mmix-sim-interval-timer-trip.patch` changes the simulator so
+that:
+
+* `PUT` to special registers 12 to 18 (`rI`, `rT`, `rTT`, `rK`, `rQ`,
+  `rU`, `rV`) is allowed in user programs.
+* When `rI` drops to 4 or below, the simulator trips to `#00` and resets
+  `rI` to -1. The stock simulator stops at an interactive breakpoint
+  instead.
+* `rI` starts at -1, so programs that never set it behave as before.
+
+To build the patched simulator from the MMIXware sources at
+<https://gitlab.lrz.de/mmix/mmixware/> (this needs `ctangle` from CWEB):
+
+```
+git clone https://gitlab.lrz.de/mmix/mmixware.git
+cd mmixware
+git apply <path to this repository>/patches/mmix-sim-interval-timer-trip.patch
+make mmix
+```
+
+The patch was last checked against commit `90d53fb` of the `master`
+branch.
+
+With GCC 15 or newer, the MMIXware sources fail to compile because C23
+made `bool` and `false` keywords. Build with
+`make mmix CFLAGS="-O2 -std=gnu17 -Wno-error=implicit-int -Wno-error=implicit-function-declaration"`
+instead.
+
+Cooperative threading with `:MM:Thread:Yield` works on the stock
+simulator. To build `examples/threading.mms` in that mode, remove its
+`#define PREEMPTIVE` line.
+
 
 Dynamic memory allocation in `:PoolSegment`
 -------------------------------------------
